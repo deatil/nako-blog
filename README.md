@@ -1,2 +1,1 @@
-# rs-blog
-rs-blog
+nako-blog
