@@ -28,6 +28,8 @@ use crate::route::{
 
 /// app 运行
 pub async fn start() -> std::io::Result<()> {
+    dotenvy::dotenv().ok();
+
     // 日志
     let logger = nako_log::setup_logger();
     match logger {
@@ -35,16 +37,11 @@ pub async fn start() -> std::io::Result<()> {
         Err(err) => log::error!("set log err: {err}"),
     }
 
-    // env::set_var("RUST_LOG", "debug");
-    // tracing_subscriber::fmt::init();
-
-    dotenvy::dotenv().ok();
-    let db_url = env::var("DATABASE_URL").expect("DATABASE_URL is not set in .env file");
     let host = env::var("HOST").expect("HOST is not set in .env file");
     let port = env::var("PORT").expect("PORT is not set in .env file");
     let server_url = format!("{host}:{port}");
 
-    let conn = db::connect(db_url).await.unwrap();
+    let conn = db::connect().await.unwrap();
     let mut view = Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/assert/templates/**/*")).unwrap();
 
     // 设置模板函数

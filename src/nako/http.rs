@@ -1,12 +1,10 @@
 use actix_web::{
-    web, 
-    dev::ServiceRequest,
     http::header, 
-    http::StatusCode, 
+    http::{header::ContentType, StatusCode},
     HttpResponse,
 };
 use crate::nako::global::{
-    AppState, Serialize,
+    Serialize,
     Status, ResponseEntity
 };
 
@@ -35,16 +33,19 @@ pub fn success_response_json<T: Serialize>(message: String, data: T) -> HttpResp
 }
 
 // 返回失败页面
-pub fn error_response_html(req: &ServiceRequest, message: String) -> HttpResponse {
-    let state = req.app_data::<web::Data<AppState>>().unwrap();
-    let view = &state.view;
-
+pub fn error_response_html(view: &tera::Tera, message: String, url: String) -> HttpResponse {
     let mut ctx = tera::Context::new();
     ctx.insert("message", &message);
+    ctx.insert("url", &url);
 
-    let res_body = view.render("resp_error.html", &ctx).unwrap();    
+    let res_body: String = match view.render("resp_error.html", &ctx) {
+        Ok(data) => data.into(),
+        Err(_) => "error html is err.".into(),
+    };
 
-    HttpResponse::build(StatusCode::OK).body(res_body)
+    HttpResponse::build(StatusCode::OK)
+        .content_type(ContentType::html())
+        .body(res_body)
 }
 
 // 跳转
@@ -54,6 +55,24 @@ pub fn redirect(url: String) -> HttpResponse {
         .finish();
 
     res_body_data
+}
+
+// let mut ctx = view_ctx_new();
+// ctx.insert("name", "hello");
+pub fn view_ctx_new() -> tera::Context {
+    tera::Context::new()
+}
+
+// 视图
+pub fn view(view: &tera::Tera, name: &str, ctx: &tera::Context) -> HttpResponse {
+    let res_body: String = match view.render(name, ctx) {
+        Ok(data) => data.into(),
+        Err(_) => "error html is err.".into(),
+    };
+
+    HttpResponse::build(StatusCode::OK)
+        .content_type(ContentType::html())
+        .body(res_body)
 }
 
 // 返回页面

@@ -1,6 +1,5 @@
 use actix_web::{
     web, 
-    error, 
     Error,
     Responder,
     HttpResponse, 
@@ -30,7 +29,7 @@ pub async fn captcha(
         .apply_filter(Noise::new(0.4))
         .apply_filter(Wave::new(2.0, 20.0).horizontal())
         .apply_filter(Wave::new(2.0, 20.0).vertical())
-        .view(220, 100)
+        .view(130, 48)
         .apply_filter(Dots::new(15));
 
     if let Some((data, png_data)) = c.as_tuple() {
@@ -53,34 +52,32 @@ pub async fn login(
     session: Session, 
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
-    if let Some(_login_id) = session.get::<u32>("login_id")? {
-        let url = req.url_for("admin.index", &[""]).unwrap();
-
-        let home_url = nako_http::redirect(url.as_str().to_string());
+    if let Some(_) = session.get::<u32>("login_id")? {
+        let redirect_url: String = match req.url_for("admin.index", &[""]) {
+            Ok(data) => data.into(),
+            Err(_) => "/".into(),
+        };
         
-        return Ok(home_url);
-    }
+        return Ok(nako_http::redirect(redirect_url));
+    } 
 
     let view = &state.view;
 
-    let mut ctx = tera::Context::new();
+    let mut ctx = nako_http::view_ctx_new();
     ctx.insert("name", "hello");
 
-    let s = view.render("admin/auth/login.html", &ctx)
-        .map_err(|_| error::ErrorInternalServerError("Template error"))?;
-
-    Ok(nako_http::html(s))
+    Ok(nako_http::view(view, "admin/auth/login.html", &ctx))
 }
 
 // 提交登陆
 pub async fn login_check(
     session: Session, 
-) -> Result<impl Responder, Error> {
-    if let Some(auth_captcha) = session.get::<String>("auth_captcha")? {
-
+) -> Result<HttpResponse, Error> {
+    if let Some(_) = session.get::<String>("auth_captcha")? {
+        return Ok(nako_http::error_response_json("你已经登陆了".to_string()));
     }
 
-    Ok(format!("login_check!"))
+    Ok(nako_http::success_response_json("登陆成功".to_string(), "".to_string()))
 }
 
 // 退出

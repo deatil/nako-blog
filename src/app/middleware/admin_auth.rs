@@ -1,15 +1,19 @@
 use actix_web::{
-    body::{
-        BoxBody,
-    },
     dev,
+    web, 
     dev::ServiceRequest,
     Error,
     http::Method,
+    body::{
+        BoxBody,
+    },
 };
 use actix_web_lab::middleware::Next;
 
 use crate::nako::http;
+use crate::nako::global::{
+    AppState
+};
 
 // 过滤路由
 const IGNORE_ROUTES: [&str; 2] = [
@@ -38,16 +42,26 @@ pub async fn auth(
         }
     }
 
+    let state = req.app_data::<web::Data<AppState>>().unwrap();
+    let view = &state.view;
+
     let check = true;
     if !check {
         let method = req.method();
 
+        let message = "清先登陆".to_string();
+
+        let url: String = match req.request().url_for("admin.auth-login", &[""]) {
+            Ok(data) => data.into(),
+            Err(_) => "/".into(),
+        };
+
         if method == Method::POST {
-            let res_body_data = http::error_response_json(String::from("错误"));
+            let res_body_data = http::error_response_json(message);
             
             return Ok(req.into_response(res_body_data));
         } else {
-            let res_body_data = http::error_response_html(&req, String::from("错误"));
+            let res_body_data = http::error_response_html(view, message, url);
             
             return Ok(req.into_response(res_body_data));
         }
