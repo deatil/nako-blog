@@ -1,10 +1,15 @@
 use std::env;
 
 use actix_session::{
-    config::PersistentSession, storage::CookieSessionStore, SessionMiddleware,
+    SessionMiddleware,
+    config::PersistentSession, 
+    storage::CookieSessionStore, 
 };
 use actix_web::{
-    cookie::{time::Duration, Key},
+    cookie::{
+        Key,
+        time::Duration, 
+    },
     web, App, HttpServer
 };
 use actix_web::middleware::Logger;
@@ -14,13 +19,15 @@ use tera::Tera;
 use listenfd::ListenFd;
 
 use crate::nako::{
+    db, 
+    view as nako_view,
     log as nako_log,
     global::AppState,
-    db, 
-    view as nako_view
 };
 
-use crate::boot::{error};
+use crate::boot::{
+    error,
+};
 use crate::route::{
     admin,
     blog,
@@ -45,7 +52,7 @@ pub async fn start() -> std::io::Result<()> {
     let mut view = Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/assert/templates/**/*")).unwrap();
 
     // 设置模板函数
-    view.register_function("assert", nako_view::assert);
+    nako_view::set_fns(&mut view);
 
     let state = AppState { 
         view: view, 

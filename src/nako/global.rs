@@ -2,8 +2,10 @@ use tera::Tera;
 use sea_orm::DatabaseConnection;
 
 pub use actix_session::Session;
-pub use serde::Serialize;
-pub use serde::Deserialize;
+pub use serde::{
+    Serialize,
+    Deserialize,
+};
 
 #[derive(Debug, Clone)]
 pub struct AppState {

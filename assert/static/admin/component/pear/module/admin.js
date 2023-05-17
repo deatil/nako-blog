@@ -484,7 +484,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 		}
 
 		function compatible() {
-			if ($(window).width() <= 768) {
+			if ($(window).width() <= 700) {
 				collaspe()
 			}
 		}

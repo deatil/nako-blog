@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>用户管理</title>
+		<link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
+	</head>
+	<body class="pear-container">
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">用户名</label>
+							<div class="layui-input-inline">
+								<input type="text" name="name" placeholder="" class="layui-input">
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="user-query">
+								<i class="layui-icon layui-icon-search"></i>
+								查询
+							</button>
+							<button type="reset" class="pear-btn pear-btn-md">
+								<i class="layui-icon layui-icon-refresh"></i>
+								重置
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<table id="user-table" lay-filter="user-table"></table>
+			</div>
+		</div>
+
+		{% raw %}
+		<script type="text/html" id="user-toolbar">
+			<button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+		        <i class="layui-icon layui-icon-add-1"></i>
+		        新增
+		    </button>
+		</script>
+
+		<script type="text/html" id="user-bar">
+			<button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i></button>
+			<button class="pear-btn pear-btn-warn pear-btn-sm" lay-event="password"><i class="layui-icon layui-icon-file"></i></button>
+		    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i class="layui-icon layui-icon-delete"></i></button>
+		</script>
+
+		<script type="text/html" id="user-username">
+			<span lay-event="detail">
+				{{ d.username }}
+			</span>
+		</script>
+
+		<script type="text/html" id="user-enable">
+			<input type="checkbox" name="enable" value="{{d.id}}"
+				lay-skin="switch" 
+				lay-text="启用|禁用" 
+				lay-filter="user-enable" 
+				{{ d.status == 1 ? 'checked' : '' }}>
+		</script>
+
+		<script type="text/html" id="user-createTime">
+			{{# if (d.add_time > 0) { }}
+				{{layui.util.toDateString(d.add_time * 1000, 'yyyy-MM-dd HH:mm')}}
+		    {{# } else { }}
+		    	--
+		    {{# } }}
+		</script>
+		{% endraw %}
+
+		<script src="{{ assert(path='admin/component/layui/layui.js') | safe }}"></script>
+		<script src="{{ assert(path='admin/component/pear/pear.js') | safe }}"></script>
+		<script>
+			layui.use(['table', 'form', 'jquery','common'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				let common = layui.common;
+
+				let cols = [
+					[{
+							type: 'checkbox'
+						},
+						{
+							title: '账号',
+							field: 'username',
+							align: 'center',
+							width: 100,
+							templet: '#user-username'
+						},
+						{
+							title: '昵称',
+							field: 'nickname',
+							align: 'center'
+						},
+						{
+							title: '启用',
+							field: 'enable',
+							align: 'center',
+							templet: '#user-enable'
+						},
+						{
+							title: '注册时间',
+							field: 'createTime',
+							align: 'center',
+							templet: '#user-createTime'
+						},
+						{
+							title: '操作',
+							toolbar: '#user-bar',
+							align: 'center',
+							width: 150
+						}
+					]
+				]
+
+				table.render({
+					elem: '#user-table',
+					url: "{{ admin_url(url='user/list') | safe }}",
+					page: true,
+					cols: cols,
+					skin: 'line',
+					toolbar: '#user-toolbar',
+					parseData: function(res) {
+						return {
+							"code": res.code,
+							"count": res.data.count,
+							"data": res.data.list,
+						};
+					},
+					defaultToolbar: [{
+						title: '刷新',
+						layEvent: 'refresh',
+						icon: 'layui-icon-refresh',
+					}, 'filter', 'print', 'exports']
+				});
+
+				table.on('tool(user-table)', function(obj) {
+					if (obj.event === 'remove') {
+						window.remove(obj);
+					} else if (obj.event === 'edit') {
+						window.edit(obj);
+					} else if (obj.event === 'password') {
+						window.password(obj);
+					} else if (obj.event === 'detail') {
+						window.detail(obj);
+					}
+				});
+
+				table.on('toolbar(user-table)', function(obj) {
+					if (obj.event === 'add') {
+						window.add();
+					} else if (obj.event === 'refresh') {
+						window.refresh();
+					} else if (obj.event === 'batchRemove') {
+						window.batchRemove(obj);
+					}
+				});
+
+				form.on('submit(user-query)', function(data) {
+					table.reload('user-table', {
+						where: data.field
+					})
+					return false;
+				});
+
+				form.on('switch(user-enable)', function(obj) {
+					var status = 0;
+					if (obj.elem.checked == true) {
+						status = 1;
+					}
+
+					$.ajax({
+						url: "{{ admin_url(url='user/status') | safe }}?id=" + this.value,
+						data: {
+							status: status,
+						},
+						type: 'post',
+						dataType: 'json',
+						success: function(result) {
+							if (result.code == 0) {
+								layer.tips(result.message, obj.othis);
+							} else {
+								layer.msg(result.message, {
+									icon: 2,
+									time: 1000
+								});
+							}
+						}
+					});
+				});
+
+				window.add = function() {
+					layer.open({
+						type: 2,
+						title: '新增',
+						shade: 0.1,
+						area: [common.isModile()?'100%':'500px', common.isModile()?'100%':'400px'],
+						content: "{{ admin_url(url='user/create') | safe }}"
+					});
+				}
+
+				window.edit = function(obj) {
+					layer.open({
+						type: 2,
+						title: '修改',
+						shade: 0.1,
+						area: ['500px', '400px'],
+						content: "{{ admin_url(url='user/update') | safe }}?id=" + obj.data['id'],
+					});
+				}
+
+				window.password = function(obj) {
+					layer.open({
+						type: 2,
+						title: '修改密码',
+						shade: 0.1,
+						area: ['500px', '400px'],
+						content: "{{ admin_url(url='user/update-password') | safe }}?id=" + obj.data['id'],
+					});
+				}
+
+				window.detail = function(obj) {
+					layer.open({
+						type: 2,
+						title: '账号详情',
+						shade: 0.1,
+						area: ['500px', '400px'],
+						content: "{{ admin_url(url='user/detail') | safe }}?id=" + obj.data['id'],
+					});
+				}
+
+				window.remove = function(obj) {
+					layer.confirm('确定要删除该用户', {
+						icon: 3,
+						title: '提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+
+						$.ajax({
+							url: "{{ admin_url(url='user/delete') | safe }}?id=" + obj.data['id'],
+							data: {
+								id: obj.data['userId'],
+							},
+							type: 'post',
+							dataType: 'json',
+							success: function(result) {
+								layer.close(loading);
+
+								if (result.code == 0) {
+									layer.msg(result.message, {
+										icon: 1,
+										time: 1000
+									}, function() {
+										obj.del();
+									});
+								} else {
+									layer.msg(result.message, {
+										icon: 2,
+										time: 1000
+									});
+								}
+							}
+						})
+					});
+				}
+
+				window.refresh = function(param) {
+					table.reload('user-table');
+				}
+			})
+		</script>
+	</body>
+</html>

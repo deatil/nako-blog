@@ -9,6 +9,7 @@ use actix_web::{
     },
 };
 use actix_web_lab::middleware::Next;
+use actix_session::SessionExt;
 
 use crate::nako::http;
 use crate::nako::global::{
@@ -17,8 +18,8 @@ use crate::nako::global::{
 
 // 过滤路由
 const IGNORE_ROUTES: [&str; 2] = [
-    "/auth/captcha",
-    "/auth/login",
+    "/admin/auth/captcha",
+    "/admin/auth/login",
 ];
 
 async fn to_next(
@@ -45,11 +46,17 @@ pub async fn auth(
     let state = req.app_data::<web::Data<AppState>>().unwrap();
     let view = &state.view;
 
-    let check = true;
+    let session = req.get_session();
+
+    let mut check = false;
+    if let Some(_) = session.get::<u32>("login_id")? {
+        check = true;
+    }
+
     if !check {
         let method = req.method();
 
-        let message = "清先登陆".to_string();
+        let message = "清先登陆";
 
         let url: String = match req.request().url_for("admin.auth-login", &[""]) {
             Ok(data) => data.into(),
@@ -61,7 +68,7 @@ pub async fn auth(
             
             return Ok(req.into_response(res_body_data));
         } else {
-            let res_body_data = http::error_response_html(view, message, url);
+            let res_body_data = http::error_response_html(view, message, url.as_str());
             
             return Ok(req.into_response(res_body_data));
         }

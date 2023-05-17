@@ -13,7 +13,7 @@ pub struct Model {
     pub avatar: Option<String>,
     pub sign: Option<String>,
     pub status: Option<i32>,
-    pub add_time: Option<i32>,
+    pub add_time: Option<i64>,
     pub add_ip: Option<String>,
 }
 

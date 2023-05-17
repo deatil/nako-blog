@@ -20,6 +20,11 @@ pub fn is_debug() -> bool {
     get_env::<bool>("APP_DEBUG", "false")
 }
 
+// 管理员ID
+pub fn get_admin_id() -> u32 {
+    get_env::<u32>("ADMIN_ID", "0")
+}
+
 // 获取日志等级
 pub fn get_log_level(name: String) -> log::LevelFilter {
     match name.as_str() {

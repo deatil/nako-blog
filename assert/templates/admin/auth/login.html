@@ -2,35 +2,33 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Login Page</title>
+		<title>系统登陆</title>
 		<!-- 样 式 文 件 -->
-		<link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') }}" />
-		<link rel="stylesheet" href="{{ assert(path='admin/admin/css/other/login.css') }}" />
+		<link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
+		<link rel="stylesheet" href="{{ assert(path='admin/admin/css/other/login.css') | safe }}" />
 	</head>
 
   <!-- 代 码 结 构 -->
-	<body background="admin/images/background.svg" style="background-size: cover;">
+	<body background="{{ assert(path='admin/admin/images/background.svg') }}" style="background-size: cover;">
 		<form class="layui-form" action="javascript:void(0);">
 			<div class="layui-form-item">
-				<img class="logo" src="{{ assert(path='admin/admin/images/logo.png') }}" />
+				<img class="logo" src="{{ assert(path='admin/admin/images/logo.png') | safe }}" />
 				<div class="title">Nako Blog</div>
 				<div class="desc">
 					欢迎使用
 				</div>
 			</div>
 			<div class="layui-form-item">
-				<input placeholder="账 户 : admin " lay-verify="required" hover class="layui-input"  />
+				<input placeholder="账 户" type="text" lay-verify="required" hover class="layui-input login-name"  />
 			</div>
 			<div class="layui-form-item">
-				<input placeholder="密 码 : admin " lay-verify="required" hover class="layui-input"  />
+				<input placeholder="密 码" type="password" lay-verify="required" hover class="layui-input login-password"  />
 			</div>
 			<div class="layui-form-item">
-				<input placeholder="验证码 : "  hover  lay-verify="required" class="code layui-input layui-input-inline"  />
-				<img src="/admin/auth/captcha" class="codeImage" />
+				<input placeholder="验证码"  hover  lay-verify="required" class="code layui-input layui-input-inline login-captcha"  />
+				<img src="/admin/auth/captcha" data-src="/admin/auth/captcha" class="codeImage js-captcha-btn" />
 			</div>
-			<div class="layui-form-item">
-				<input type="checkbox" name="" title="记住密码" lay-skin="primary" checked>
-			</div>
+
 			<div class="layui-form-item">
 				<button type="button" class="pear-btn pear-btn-success login" lay-submit lay-filter="login">
 					登 入
@@ -39,31 +37,56 @@
 		</form>
 
 		<!-- 资 源 引 入 -->
-		<script src="{{ assert(path='admin/component/layui/layui.js') }} "></script>
-		<script src="{{ assert(path='admin/component/pear/pear.js') }}"></script>
+		<script src="{{ assert(path='admin/component/layui/layui.js') | safe }} "></script>
+		<script src="{{ assert(path='admin/component/pear/pear.js') | safe }}"></script>
+		<script src="{{ assert(path='admin/component/nako/md5.js') | safe }}"></script>
 		<script>
-			layui.use(['form', 'button', 'popup'], function() {
+			layui.use(['form', 'button', 'popup', 'jquery'], function() {
 				var form = layui.form;
 				var button = layui.button;
 				var popup = layui.popup;
+				var $ = layui.jquery;
+
+				$(".js-captcha-btn").click(function() {
+					var url = $(this).data("src") + "?" + Math.random();
+					$(this).attr("src", url);
+				});
 				
                 // 登 录 提 交
 				form.on('submit(login)', function(data) {
+					var name = $(data.form).find('.login-name').val();            
+					var password = $(data.form).find('.login-password').val();            
+					var captcha = $(data.form).find('.login-captcha').val();    
 					
-					/// 验证
-					
-					/// 登录
-					
+					var url = '{{ admin_url(url="auth/login") | safe }}';
+
 					/// 动画
 					button.load({
 						elem: '.login',
 						time: 1500,
 						done: function() {
-							popup.success("登录成功", function() {
-								location.href = "index.html"
-							});
+							$.post(url, {
+								'name': name,
+								'password': hex_md5(password),
+								'captcha': captcha,
+							}, function(data) {
+								if (data.code == 0) {
+									popup.success("登录成功", function() {
+										location.href = '{{ admin_url(url="index") | safe }}';
+									});
+								} else {
+									layer.msg(data.message, { 
+										offset: '15px',
+										icon: 5 
+									});
+
+									// 刷新验证码
+									$(".js-captcha-btn").click();
+								}
+							}, "json");
 						}
-					})
+					});
+
 					return false;
 				});
 			})

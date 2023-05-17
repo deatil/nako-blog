@@ -1,31 +1,44 @@
-use actix_web::{web, error, Result, Error, Responder};
-use actix_web_lab::respond::Html;
-
-use crate::nako::global::{
-    Session, AppState,
+use actix_web::{
+    web, 
+    Result, 
+    Error, 
+    HttpResponse, 
 };
 
+use crate::nako::http as nako_http;
+use crate::nako::global::{
+    AppState,
+};
+use crate::app::data as app_data;
+
+// 首页
 pub async fn index(
-    session: Session, 
     state: web::Data<AppState>,
-) -> Result<impl Responder, Error> {
+) -> Result<HttpResponse, Error> {
     let view = &state.view;
 
-    let mut counter = 1;
-    if let Some(count) = session.get::<i32>("counter")? {
-        counter = count + 1;
-        session.insert("counter", counter)?;
-    } else {
-        session.insert("counter", counter)?;
-    }
+    let ctx = tera::Context::new();
+
+    Ok(nako_http::view(view, "admin/index/index.html", &ctx))
+}
+
+// 菜单
+pub async fn menu() -> Result<HttpResponse, Error> {
+    let data = app_data::menu::menus();
+
+    Ok(nako_http::json(data))
+}
+
+// 控制台
+pub async fn console(
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, Error> {
+    let view = &state.view;
 
     let mut ctx = tera::Context::new();
-    ctx.insert("name", "hello");
-    ctx.insert("text", "Welcome!");
-    ctx.insert("counter", &counter);
 
-    let s = view.render("admin/index/index.html", &ctx)
-        .map_err(|_| error::ErrorInternalServerError("Template error"))?;
+    let art_count = 12;
+    ctx.insert("art_count", &art_count);
 
-    Ok(Html(s))
+    Ok(nako_http::view(view, "admin/index/console.html", &ctx))
 }
