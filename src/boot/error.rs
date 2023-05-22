@@ -1,54 +1,97 @@
 use actix_web::{
+    web, 
+    Error,
+    Result,
+    Responder,
+    HttpRequest,
+    HttpResponse, 
     body::BoxBody,
     dev::ServiceResponse,
-    http::{header::ContentType, StatusCode},
-    middleware::{ErrorHandlerResponse, ErrorHandlers},
-    web, HttpResponse, Result,
+    http::{
+        Method, 
+    },
+    middleware::{
+        ErrorHandlerResponse, 
+    },
+    error::{
+        InternalError, 
+        PathError, 
+        JsonPayloadError, 
+        QueryPayloadError,
+        UrlencodedError,
+    },
 };
-use tera::Tera;
 
-// Custom error handlers, to return HTML responses when an error occurs.
-pub fn error_handlers() -> ErrorHandlers<BoxBody> {
-    ErrorHandlers::new().handler(StatusCode::NOT_FOUND, not_found)
+use crate::nako::http as nako_http;
+use crate::nako::global::{
+    AppState
+};
+
+pub(crate) async fn app_default(req: HttpRequest) -> impl Responder {
+    get_error_response(&req, "no page")
 }
 
-// Error handler for a 404 Page not found error.
-fn not_found<B>(res: ServiceResponse<B>) -> Result<ErrorHandlerResponse<BoxBody>> {
-    let response = get_error_response(&res, "Page not found");
-    
+pub(crate) fn json_parser_error(
+    err: JsonPayloadError,
+    req: &HttpRequest,
+) -> Error {
+    let resp = get_error_response(&req, err.to_string().as_str());
+
+    InternalError::from_response(err, resp).into()
+}
+
+pub(crate) fn form_parser_error(
+    err: UrlencodedError,
+    req: &HttpRequest,
+) -> Error {
+    let resp = get_error_response(&req, err.to_string().as_str());
+
+    InternalError::from_response(err, resp).into()
+}
+
+pub(crate) fn query_parser_error(
+    err: QueryPayloadError,
+    req: &HttpRequest,
+) -> Error {
+    let resp = get_error_response(&req, err.to_string().as_str());
+
+    InternalError::from_response(err, resp).into()
+}
+
+pub(crate) fn path_parser_error(
+    err: PathError, 
+    req: &HttpRequest,
+) -> Error {
+    let resp = get_error_response(&req, err.to_string().as_str());
+
+    InternalError::from_response(err, resp).into()
+}
+
+// 404
+pub(crate) fn not_found<B>(res: ServiceResponse<B>) -> Result<ErrorHandlerResponse<BoxBody>> {
+    let req = res.request();
+
+    let response = get_error_response(&req, "Page not found");
+
     Ok(ErrorHandlerResponse::Response(ServiceResponse::new(
         res.into_parts().0,
         response.map_into_left_body(),
     )))
 }
 
-// Generic error handler.
-fn get_error_response<B>(res: &ServiceResponse<B>, error: &str) -> HttpResponse {
-    let request = res.request();
+// 获取响应
+fn get_error_response(req: &HttpRequest, error: &str) -> HttpResponse {
+    if let Some(state) = req.app_data::<web::Data<AppState>>() {
+        let view = &state.view;
 
-    // Provide a fallback to a simple plain text response in case an error occurs during the
-    // rendering of the error page.
-    let fallback = |e: &str| {
-        HttpResponse::build(res.status())
-            .content_type(ContentType::plaintext())
-            .body(e.to_string())
-    };
-
-    let tera = request.app_data::<web::Data<Tera>>().map(|t| t.get_ref());
-    match tera {
-        Some(tera) => {
-            let mut context = tera::Context::new();
-            context.insert("error", error);
-            context.insert("status_code", res.status().as_str());
-            let body = tera.render("error.html", &context);
-
-            match body {
-                Ok(body) => HttpResponse::build(res.status())
-                    .content_type(ContentType::html())
-                    .body(body),
-                Err(_) => fallback(error),
-            }
+        let method = req.method();
+        
+        if method == Method::POST {
+            return nako_http::error_response_json(error);
         }
-        None => fallback(error),
+        
+        return nako_http::error_response_html(view, error, "");
     }
+
+    nako_http::text(error.to_string())
 }

@@ -11,6 +11,13 @@ use crate::nako::global::{
     Status, ResponseEntity
 };
 
+// 返回文字
+pub fn text(body: String) -> HttpResponse {
+    HttpResponse::build(StatusCode::OK)
+        .content_type(ContentType::plaintext())    
+        .body(body)
+}
+
 // 返回页面
 pub fn html(body: String) -> HttpResponse {
     HttpResponse::build(StatusCode::OK)
@@ -67,10 +74,7 @@ pub fn error_response_html(view: &tera::Tera, message: &str, url: &str) -> HttpR
     ctx.insert("message", &message.to_string());
     ctx.insert("url", &new_url.to_string());
 
-    let res_body: String = match view.render("resp_error.html", &ctx) {
-        Ok(data) => data.into(),
-        Err(_) => "html [resp_error.html] is error.".into(),
-    };
+    let res_body: String = view.render("error_resp.html", &ctx).unwrap_or("html [error_resp.html] is error.".into());
 
     html(res_body)
 }
@@ -83,12 +87,9 @@ pub fn view_ctx_new() -> tera::Context {
 
 // 视图
 pub fn view(view: &tera::Tera, name: &str, ctx: &tera::Context) -> HttpResponse {
-    let err = "html [".to_owned() + name + "] is error.";
+    let err = format!("html [{}] is not exists.", name);
 
-    let res_body: String = match view.render(name, ctx) {
-        Ok(data) => data.into(),
-        Err(_) => err.into(),
-    };
+    let res_body: String = view.render(name, ctx).unwrap_or(err.into());
 
     html(res_body)
 }

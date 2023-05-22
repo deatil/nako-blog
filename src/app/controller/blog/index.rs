@@ -2,6 +2,7 @@ use actix_web::{web, error, Result, Error, Responder};
 use actix_web_lab::respond::Html;
 use actix_web::web::Json;
 
+use crate::nako::utils;
 use crate::nako::global::{
     Session, AppState,
     Status, ResponseEntity
@@ -44,11 +45,13 @@ pub async fn data(
 }
 
 pub async fn json() -> Result<Json<ResponseEntity<String>>> {
+    let s = utils::sha1("123112");
+
     let data: ResponseEntity<String> = ResponseEntity {
         status: Status::SUCCESS,
         code: 200,
         message: "获取成功".to_string(),
-        data: Some("登陆成功".to_string()),
+        data: Some(s),
     };
 
     Ok(Json(data))

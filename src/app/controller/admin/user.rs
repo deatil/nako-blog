@@ -33,8 +33,7 @@ pub async fn index(
 ) -> Result<HttpResponse, Error> {
     let view = &state.view;
 
-    let mut ctx = tera::Context::new();
-    ctx.insert("name", "hello");
+    let ctx = tera::Context::new();
 
     Ok(nako_http::view(view, "admin/user/index.html", &ctx))
 }
@@ -64,10 +63,7 @@ pub async fn list(
     let page: u64 = query.page;
     let per_page: u64 = query.limit;
 
-    let name: String = match query.name.clone() {
-        Some(res) => res,
-        None => "".to_string(),
-    };
+    let name: String = query.name.clone().unwrap_or("".to_string());
 
     let mut res: ListData = ListData{
         list: vec![],
@@ -77,45 +73,17 @@ pub async fn list(
     if name.as_str() != "" {
         let keyword = "%".to_owned() + name.as_str() + "%";
 
-        let data = user::UserModel::find_users_in_page_by_name(db, page, per_page, keyword.as_str()).await;
-        let (user_list, _num_pages) = match data { 
-            Ok((user_list, num_pages)) => (user_list, num_pages),
-            Err(_) => {
-                let list: Vec<user_entity::Model> = Vec::new();
-    
-                (list, 0)
-            },
-        };
-    
-        let count = match user::UserModel::find_users_count_by_name(db, keyword.as_str()).await {
-            Ok(res) => res,
-            Err(_) => 0,
-        };
+        let (user_list, _num_pages) = user::UserModel::find_users_in_page_by_name(db, page, per_page, keyword.as_str()).await.unwrap_or_default();
+        let count = user::UserModel::find_users_count_by_name(db, keyword.as_str()).await.unwrap_or(0);
 
-        res = ListData{
-            list: user_list,
-            count: count,
-        };
+        res.list = user_list;
+        res.count = count;
     } else {
-        let data = user::UserModel::find_users_in_page(db, page, per_page).await;
-        let (user_list, _num_pages) = match data { 
-            Ok((user_list, num_pages)) => (user_list, num_pages),
-            Err(_) => {
-                let list: Vec<user_entity::Model> = Vec::new();
-    
-                (list, 0)
-            },
-        };
-    
-        let count = match user::UserModel::find_users_count(db).await {
-            Ok(res) => res,
-            Err(_) => 0,
-        };
+        let (user_list, _num_pages) = user::UserModel::find_users_in_page(db, page, per_page).await.unwrap_or_default();
+        let count = user::UserModel::find_users_count(db).await.unwrap_or(0);
 
-        res = ListData{
-            list: user_list,
-            count: count,
-        };
+        res.list = user_list;
+        res.count = count;
     }
 
     Ok(nako_http::success_response_json("获取成功", res))
@@ -140,16 +108,15 @@ pub async fn detail(
         return Ok(nako_http::error_response_html(&view, "ID不能为空", ""));
     }
 
-    let user_data = user::UserModel::find_user_by_id(db, query.id).await;
-    if let Err(_) = user_data {
-        return Ok(nako_http::error_response_html(&view, "账号不存在", ""));
-    }
+    let user_data = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
 
     let mut ctx = tera::Context::new();
     
-    if let Ok(Some(user_info)) = user_data {
-        ctx.insert("data", &user_info);
+    if user_data.id == 0 {
+        return Ok(nako_http::error_response_html(&view, "账号不存在", ""));
     }
+
+    ctx.insert("data", &user_data);
 
     Ok(nako_http::view(view, "admin/user/detail.html", &ctx))
 }
@@ -194,17 +161,17 @@ pub async fn create_save(
 
     let db = &state.db;
 
-    let user_data = user::UserModel::find_user_by_name(db, params.username.as_str()).await;
-    if let Ok(Some(_user_info)) = user_data {
+    let user_data = user::UserModel::find_user_by_name(db, params.username.as_str()).await.unwrap_or_default().unwrap_or_default();
+    if user_data.id > 0 {
         return Ok(nako_http::error_response_json("账号已经存在"));
     }
+
+    let add_time = time::now().timestamp();
 
     let mut ip: String = "0.0.0.0".to_string();
     if let Some(val) = req.peer_addr() {
         ip = val.ip().to_string();
     }
-
-    let add_time = time::now().timestamp();
 
     let create_data = user::UserModel::create_user(db, user_entity::Model{
             username: params.username.clone(),
@@ -215,7 +182,7 @@ pub async fn create_save(
             add_ip:   Some(ip.clone()),
             ..entity::default()
         }).await;
-    if let Ok(_create_info) = create_data {
+    if let Ok(_) = create_data {
         return Ok(nako_http::success_response_json("添加成功", ""));
     }
 
@@ -241,16 +208,14 @@ pub async fn update(
         return Ok(nako_http::error_response_html(&view, "ID不能为空", ""));
     }
 
-    let user_data = user::UserModel::find_user_by_id(db, query.id).await;
-    if let Err(_) = user_data {
+    let user_info = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
+    if user_info.id == 0 {
         return Ok(nako_http::error_response_html(&view, "账号不存在", ""));
     }
 
     let mut ctx = tera::Context::new();
     
-    if let Ok(Some(user_info)) = user_data {
-        ctx.insert("data", &user_info);
-    }
+    ctx.insert("data", &user_info);
 
     Ok(nako_http::view(view, "admin/user/update.html", &ctx))
 }
@@ -298,17 +263,15 @@ pub async fn update_save(
 
     let db = &state.db;
 
-    let user_data = user::UserModel::find_user_by_id(db, query.id).await;
-    if let Err(_) = user_data {
+    let user_info = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
+    if user_info.id == 0 {
         return Ok(nako_http::error_response_json("要更改的账号不存在"));
     }
 
-    let user_data_by_name = user::UserModel::find_user_by_name(db, params.username.as_str()).await;
-    if let Ok(Some(user_info2)) = user_data_by_name {
-        if let Ok(Some(user_info1)) = user_data {
-            if user_info2.id != user_info1.id {
-                return Ok(nako_http::error_response_json("账号已经存在"));
-            }
+    let user_info_by_name = user::UserModel::find_user_by_name(db, params.username.as_str()).await.unwrap_or_default().unwrap_or_default();
+    if user_info_by_name.id > 0 {
+        if user_info.id != user_info_by_name.id {
+            return Ok(nako_http::error_response_json("账号已经存在"));
         }
     }
 
@@ -358,8 +321,8 @@ pub async fn delete(
 
     let db = &state.db;
 
-    let user_data = user::UserModel::find_user_by_id(db, query.id).await;
-    if let Err(_) = user_data {
+    let user_data = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
+    if user_data.id == 0 {
         return Ok(nako_http::error_response_json("要删除的账号不存在"));
     }
 
@@ -412,8 +375,8 @@ pub async fn update_status(
 
     let db = &state.db;
 
-    let user_data = user::UserModel::find_user_by_id(db, query.id).await;
-    if let Err(_) = user_data {
+    let user_data = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
+    if user_data.id == 0 {
         return Ok(nako_http::error_response_json("要更改的账号不存在"));
     }
 
@@ -449,18 +412,16 @@ pub async fn update_password(
         return Ok(nako_http::error_response_html(&view, "ID不能为空", ""));
     }
 
-    let user_data = user::UserModel::find_user_by_id(db, query.id).await;
-    if let Err(_) = user_data {
+    let user_info = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
+    if user_info.id == 0 {
         return Ok(nako_http::error_response_html(&view, "账号不存在", ""));
     }
 
     let mut ctx = tera::Context::new();
     
-    if let Ok(Some(user_info)) = user_data {
-        ctx.insert("data", &user_info);
-    }
+    ctx.insert("data", &user_info);
 
-    Ok(nako_http::view(view, "admin/user/update_passwqord.html", &ctx))
+    Ok(nako_http::view(view, "admin/user/update_password.html", &ctx))
 }
 
 // 表单数据
@@ -497,8 +458,8 @@ pub async fn update_password_save(
 
     let db = &state.db;
 
-    let user_data = user::UserModel::find_user_by_id(db, query.id).await;
-    if let Err(_) = user_data {
+    let user_info = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
+    if user_info.id == 0 {
         return Ok(nako_http::error_response_json("要更改的账号不存在"));
     }
 
@@ -508,12 +469,12 @@ pub async fn update_password_save(
     }
 
     // 更新
-    let user_data = user::UserModel::update_password_by_id(db, query.id, user_entity::Model{
+    let new_user_data = user::UserModel::update_password_by_id(db, query.id, user_entity::Model{
             password: Some(new_password.clone()),
             ..entity::default()
         })
         .await;
-    if let Err(_) = user_data {
+    if let Err(_) = new_user_data {
         return Ok(nako_http::error_response_json("更新失败"));
     }
 

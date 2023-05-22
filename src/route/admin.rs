@@ -6,6 +6,8 @@ use crate::app::controller::admin::{
     index,
     auth,
     user,
+    profile,
+    upload,
 };
 
 pub fn route(cfg: &mut web::ServiceConfig) {
@@ -16,7 +18,8 @@ pub fn route(cfg: &mut web::ServiceConfig) {
                 web::scope("/index")
                     .service(
                         web::resource("")
-                            .route(web::get().to(index::index)).name("admin.index"),
+                            .route(web::get().to(index::index))
+                            .name("admin.index"),
                     )
                     .service(
                         web::resource("/menu")
@@ -47,6 +50,42 @@ pub fn route(cfg: &mut web::ServiceConfig) {
                         web::resource("/logout")
                             .route(web::get().to(auth::logout))
                             .name("admin.auth-logout"),
+                    )
+            )
+            .service(
+                // 个人信息
+                web::scope("/profile")
+                    .service(
+                        web::resource("/info")
+                            .route(web::get().to(profile::update_info))
+                            .route(web::post().to(profile::update_info_save))
+                            .name("admin.profile-info"),
+                    )
+                    .service(
+                        web::resource("/password")
+                            .route(web::get().to(profile::update_password))
+                            .route(web::post().to(profile::update_password_save))
+                            .name("admin.profile-password"),
+                    )
+                    .service(
+                        web::resource("/avatar")
+                            .route(web::get().to(profile::update_avatar))
+                            .route(web::post().to(profile::update_avatar_save))
+                            .name("admin.profile-avatar"),
+                    )
+            )
+            .service(
+                // 上传
+                web::scope("/upload")
+                    .service(
+                        web::resource("/file")
+                            .route(web::post().to(upload::file))
+                            .name("admin.upload-file"),
+                    )
+                    .service(
+                        web::resource("/avatar")
+                            .route(web::post().to(upload::avatar))
+                            .name("admin.upload-avatar"),
                     )
             )
             .service(

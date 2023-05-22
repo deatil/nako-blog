@@ -27,4 +27,3 @@ pub struct ResponseEntity<T> {
     pub message: String,
     pub data: Option<T>,
 }
-

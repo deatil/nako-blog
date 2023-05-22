@@ -1,12 +1,12 @@
 use actix_web::{
     web, 
     Error,
+    Result,
     HttpRequest,
     HttpResponse, 
-    Result,
     http::{
-        header::ContentType,
         StatusCode,
+        header::ContentType,
     },
 };
 use serde::{
@@ -41,7 +41,11 @@ pub async fn captcha(
         .apply_filter(Dots::new(15));
 
     if let Some((data, png_data)) = c.as_tuple() {
-        session.insert("auth_captcha", data).unwrap();
+        if let Err(_) = session.insert("auth_captcha", data) {
+            return Ok(HttpResponse::build(StatusCode::OK)
+                .content_type(ContentType::plaintext())
+                .body("nodata".to_string()));
+        }
 
         // response
         Ok(HttpResponse::build(StatusCode::OK)
@@ -60,14 +64,15 @@ pub async fn login(
     session: Session, 
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
-    if let Some(_) = session.get::<u32>("login_id")? {
+    let login_id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
+    if login_id > 0 {
         let redirect_url: String = match req.url_for("admin.index", &[""]) {
             Ok(data) => data.into(),
             Err(_) => "/".into(),
         };
-        
+
         return Ok(nako_http::redirect(redirect_url));
-    } 
+    }
 
     let view = &state.view;
 
@@ -89,7 +94,8 @@ pub async fn login_check(
     params: web::Form<LoginParams>,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
-    if let Some(_) = session.get::<String>("login_id")? {
+    let login_id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
+    if login_id > 0 {
         return Ok(nako_http::error_response_json("你已经登陆了"));
     }
 
@@ -103,35 +109,31 @@ pub async fn login_check(
         return Ok(nako_http::error_response_json("验证码不能为空"));
     }
 
-    if let Some(auth_captcha) = session.get::<String>("auth_captcha")? {
-        if params.captcha.to_uppercase() != auth_captcha.to_uppercase() {
-            return Ok(nako_http::error_response_json("验证码错误"));
-        }
-    } else {
+    let auth_captcha = session.get::<String>("auth_captcha").unwrap_or_default().unwrap_or_default();
+    if params.captcha.to_uppercase() != auth_captcha.to_uppercase() {
         return Ok(nako_http::error_response_json("验证码错误"));
     }
 
     let db = &state.db;
-    let user_data = user::UserModel::find_user_by_name(db, params.name.as_str()).await;
-
-    if let Ok(Some(user_info)) = user_data {
-        let pass = match user_info.password {
-            Some(x) => x,
-            None => "".to_string()
-        };
-
-        if !nako_auth::password_verify(params.password.as_str(), pass.as_str()) {
-            return Ok(nako_http::error_response_json("账号或者密码错误"));
-        }
-
-        let user_id: u32 = user_info.id;
-        if user_id == 0 {
-            return Ok(nako_http::error_response_json("账号或者密码错误"));
-        }
-
-        session.insert("login_id", user_id)?;
-    } else {
+    let user_info = user::UserModel::find_user_by_name(db, params.name.as_str()).await.unwrap_or_default().unwrap_or_default();
+    
+    if user_info.id == 0 {
         return Ok(nako_http::error_response_json("账号或者密码错误"));
+    }
+
+    let pass = user_info.password.unwrap_or("".to_string());
+
+    if !nako_auth::password_verify(params.password.as_str(), pass.as_str()) {
+        return Ok(nako_http::error_response_json("账号或者密码错误"));
+    }
+
+    let status = user_info.status.unwrap_or(0);
+    if status == 0 {
+        return Ok(nako_http::error_response_json("账号不存在或者已被禁用"));
+    }
+
+    if session.insert("login_id", user_info.id).is_err() {
+        return Ok(nako_http::error_response_json("登陆失败"));
     }
 
     Ok(nako_http::success_response_json("登陆成功", ""))
@@ -142,9 +144,9 @@ pub async fn logout(
     req: HttpRequest,
     session: Session, 
 ) -> Result<HttpResponse, Error> {
-    let id: Option<u32> = session.get("login_id")?;
-    if let Some(_) = id {
-        session.remove("login_id");
+    let login_id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
+    if login_id > 0 {
+        return Ok(nako_http::error_response_json("你已经登陆了"));
     }
 
     let redirect_url: String = match req.url_for("admin.auth-login", &[""]) {

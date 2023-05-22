@@ -49,13 +49,13 @@ pub async fn auth(
     let session = req.get_session();
 
     let mut check = false;
-    if let Some(_) = session.get::<u32>("login_id")? {
+
+    let login_id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
+    if login_id > 0 {
         check = true;
     }
 
     if !check {
-        let method = req.method();
-
         let message = "清先登陆";
 
         let url: String = match req.request().url_for("admin.auth-login", &[""]) {
@@ -63,7 +63,7 @@ pub async fn auth(
             Err(_) => "/".into(),
         };
 
-        if method == Method::POST {
+        if req.method() == Method::POST {
             let res_body_data = http::error_response_json(message);
             
             return Ok(req.into_response(res_body_data));

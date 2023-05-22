@@ -25,17 +25,34 @@
 				<div id="control" class="layui-layout-control"></div>
 				<!-- 顶 部 右 侧 菜 单 -->
 				<ul class="layui-nav layui-layout-right">
-					<li class="layui-nav-item layui-hide-xs"><a href="#" class="fullScreen layui-icon layui-icon-screen-full"></a></li>
-					<li class="layui-nav-item layui-hide-xs"><a href="/admin/index" class="layui-icon layui-icon-website"></a></li>
+					<li class="layui-nav-item layui-hide-xs">
+						<a href="#" class="fullScreen layui-icon layui-icon-screen-full"></a>
+					</li>
+					<li class="layui-nav-item layui-hide-xs">
+						<a href="/" class="layui-icon layui-icon-website" target="_blank"></a>
+					</li>
 					<li class="layui-nav-item user">
 						<!-- 头 像 -->
 						<a href="javascript:;">
-							<img src="{{ assert(path='admin/admin/images/avatar.jpg') | safe }}" class="layui-nav-img">
+							<img src="{{ avatar(path=login_user.avatar) | safe }}" class="layui-nav-img">
 						</a>
 						<!-- 功 能 菜 单 -->
 						<dl class="layui-nav-child">
-							<dd><a user-menu-url="view/system/person.html" user-menu-id="5555" user-menu-title="基本资料">基本资料</a></dd>
-							<dd><a href="javascript:void(0);" class="logout">注销登录</a></dd>
+							<dd>
+								<a href="javascript:void(0);" 
+									user-menu-url="{{ admin_url(url='profile/info') | safe }}" 
+									user-menu-id="5555" 
+									user-menu-title="基本资料">基本资料</a>
+							</dd>
+							<dd>
+								<a href="javascript:void(0);" 
+									user-menu-url="{{ admin_url(url='profile/password') | safe }}" 
+									user-menu-id="5556" 
+									user-menu-title="更改密码">更改密码</a>
+							</dd>
+							<dd>
+								<a href="javascript:void(0);" class="logout">注销登录</a>
+							</dd>
 						</dl>
 					</li>
 					<!-- 主 题 配 置 -->
@@ -83,7 +100,7 @@
 				var convert = layui.convert;
 				var popup = layui.popup;
 		
-				admin.setAvatar("{{ assert(path='admin/admin/images/avatar.jpg') | safe }}", "nako-blog");
+				admin.setAvatar("{{ avatar(path=login_user.avatar) | safe }}", "{{ login_user.nickname }}");
 				
 				admin.render({
 					"logo": {
@@ -103,9 +120,9 @@
 						"keepState": true,
 						"tabMax": 30,
 						"index": {
-						"id": "0",
-						"href": "{{ admin_url(url='index/console') | safe }}",
-						"title": "首页"
+							"id": "0",
+							"href": "{{ admin_url(url='index/console') | safe }}",
+							"title": "首页"
 						}
 					},
 					"theme": {
@@ -154,9 +171,6 @@
 					// 注销逻辑 返回 true / false
 					return true;
 				});
-				
-				// 重写消息回调 [消息列表点击事件]
-				// admin.message(function(id, title, context, form) {});
 			})
 		</script>
 	</body>

@@ -1,6 +1,9 @@
 use sea_orm::*;
 
-use crate::app::entity::{user, user::Entity as User};
+use crate::app::entity::{
+    user, 
+    user::Entity as User,
+};
 
 pub struct UserModel;
 
@@ -97,11 +100,11 @@ impl UserModel {
             .map(Into::into)?;
 
         user::ActiveModel {
-                id: user.id,
+                id:       user.id,
                 username: Set(form_data.username.to_owned()),
                 nickname: Set(form_data.nickname.to_owned()),
-                sign: Set(form_data.sign.to_owned()),
-                status: Set(form_data.status.to_owned()),
+                sign:     Set(form_data.sign.to_owned()),
+                status:   Set(form_data.status.to_owned()),
                 ..Default::default()
             }
             .update(db)

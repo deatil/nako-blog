@@ -3,19 +3,18 @@ CREATE DATABASE IF NOT EXISTS `nako_blog` /*!40100 DEFAULT CHARACTER SET utf8mb4
 USE `nako_blog`;
 
 -- 导出  表 nako_blog.nako_art 结构
-DROP TABLE IF EXISTS `nako_art`;
 CREATE TABLE IF NOT EXISTS `nako_art` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'id',
   `cate_id` int unsigned NOT NULL DEFAULT '0' COMMENT '分类ID',
   `user_id` int unsigned NOT NULL DEFAULT '0' COMMENT '作者',
   `cover` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '封面',
-  `title` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '标题',
-  `keywords` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '' COMMENT '关键字',
+  `title` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '标题',
+  `keywords` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '关键字',
   `description` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '描述',
-  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '内容',
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '内容',
   `tags` varchar(250) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '标签',
-  `from` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '' COMMENT '来源',
+  `from` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '来源',
   `views` bigint unsigned DEFAULT '1' COMMENT '阅读量',
   `is_top` tinyint unsigned DEFAULT '0' COMMENT '1-置顶',
   `status` tinyint(1) DEFAULT '1' COMMENT '1-启用，0-禁用',
@@ -29,35 +28,36 @@ CREATE TABLE IF NOT EXISTS `nako_art` (
 /*!40000 ALTER TABLE `nako_art` ENABLE KEYS */;
 
 -- 导出  表 nako_blog.nako_attach 结构
-DROP TABLE IF EXISTS `nako_attach`;
 CREATE TABLE IF NOT EXISTS `nako_attach` (
-  `id` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
   `name` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '文件名',
-  `path` varchar(250) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '文件路径',
-  `ext` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '文件类型',
-  `size` int NOT NULL DEFAULT '0' COMMENT '文件大小',
+  `path` varchar(250) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '文件路径',
+  `ext` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '文件类型',
+  `size` int(10) unsigned zerofill NOT NULL DEFAULT '0000000000' COMMENT '文件大小',
   `md5` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '文件md5',
   `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态',
   `add_time` int NOT NULL DEFAULT '0' COMMENT '添加时间',
   `add_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '添加IP',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT COMMENT='附件表';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT COMMENT='附件表';
 
--- 正在导出表  nako_blog.nako_attach 的数据：~1 rows (大约)
+-- 正在导出表  nako_blog.nako_attach 的数据：~5 rows (大约)
 /*!40000 ALTER TABLE `nako_attach` DISABLE KEYS */;
+REPLACE INTO `nako_attach` (`id`, `name`, `path`, `ext`, `size`, `md5`, `status`, `add_time`, `add_ip`) VALUES
+	(1, '1684735695000.jpg', './assert/upload/4d00f34c-5911-45ff-9f53-de08a5cf2e34.jpg', 'jpg', 0000106083, 'f9ccf460dd24246a80110eca93f75d01', 1, 1684735695, '127.0.0.1'),
+	(2, '1684735868000.jpg', './assert/upload/a9ef57f1-698a-4af4-b1bf-613c800ab22a.jpg', 'jpg', 0000108104, '08621a62582b8f4cb02831fd4b8ad9c9', 1, 1684735868, '127.0.0.1');
 /*!40000 ALTER TABLE `nako_attach` ENABLE KEYS */;
 
 -- 导出  表 nako_blog.nako_cate 结构
-DROP TABLE IF EXISTS `nako_cate`;
 CREATE TABLE IF NOT EXISTS `nako_cate` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `pid` int NOT NULL DEFAULT '0' COMMENT '父级ID',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '名称',
   `slug` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '标志',
-  `desc` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '描述',
+  `desc` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '描述',
   `sort` int DEFAULT '100' COMMENT '排序',
-  `list_tpl` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '列表模板',
-  `view_tpl` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '详情模板',
+  `list_tpl` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '列表模板',
+  `view_tpl` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '详情模板',
   `status` tinyint(1) DEFAULT '1' COMMENT '1-启用，0-禁用',
   `add_time` int NOT NULL DEFAULT '0' COMMENT '添加时间',
   `add_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '添加IP',
@@ -73,7 +73,6 @@ REPLACE INTO `nako_cate` (`id`, `pid`, `name`, `slug`, `desc`, `sort`, `list_tpl
 /*!40000 ALTER TABLE `nako_cate` ENABLE KEYS */;
 
 -- 导出  表 nako_blog.nako_comment 结构
-DROP TABLE IF EXISTS `nako_comment`;
 CREATE TABLE IF NOT EXISTS `nako_comment` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `art_id` int NOT NULL DEFAULT '0' COMMENT '文件ID',
@@ -91,12 +90,11 @@ CREATE TABLE IF NOT EXISTS `nako_comment` (
 /*!40000 ALTER TABLE `nako_comment` ENABLE KEYS */;
 
 -- 导出  表 nako_blog.nako_page 结构
-DROP TABLE IF EXISTS `nako_page`;
 CREATE TABLE IF NOT EXISTS `nako_page` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int unsigned NOT NULL DEFAULT '0' COMMENT '作者',
-  `slug` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '标志',
-  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '标题',
+  `slug` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '标志',
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '标题',
   `keywords` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '关键字',
   `description` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '描述',
   `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '内容',
@@ -114,12 +112,11 @@ REPLACE INTO `nako_page` (`id`, `user_id`, `slug`, `title`, `keywords`, `descrip
 /*!40000 ALTER TABLE `nako_page` ENABLE KEYS */;
 
 -- 导出  表 nako_blog.nako_setting 结构
-DROP TABLE IF EXISTS `nako_setting`;
 CREATE TABLE IF NOT EXISTS `nako_setting` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '字段',
   `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '字段值',
-  `desc` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT '' COMMENT '字段说明',
+  `desc` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '字段说明',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='配置';
 
@@ -135,7 +132,6 @@ REPLACE INTO `nako_setting` (`id`, `key`, `value`, `desc`) VALUES
 /*!40000 ALTER TABLE `nako_setting` ENABLE KEYS */;
 
 -- 导出  表 nako_blog.nako_tag 结构
-DROP TABLE IF EXISTS `nako_tag`;
 CREATE TABLE IF NOT EXISTS `nako_tag` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '名称',
@@ -155,20 +151,26 @@ REPLACE INTO `nako_tag` (`id`, `name`, `desc`, `sort`, `status`, `add_time`, `ad
 /*!40000 ALTER TABLE `nako_tag` ENABLE KEYS */;
 
 -- 导出  表 nako_blog.nako_user 结构
-DROP TABLE IF EXISTS `nako_user`;
 CREATE TABLE IF NOT EXISTS `nako_user` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '账号，大小写字母数字',
-  `password` char(62) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '密码',
-  `nickname` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '昵称',
-  `avatar` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '头像',
+  `password` char(62) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '密码',
+  `nickname` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '昵称',
+  `avatar` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '头像',
   `sign` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '签名',
   `status` tinyint(1) DEFAULT '1' COMMENT '1-启用，0-禁用',
   `add_time` int NOT NULL DEFAULT '0' COMMENT '添加时间',
-  `add_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '添加IP',
+  `add_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '添加IP',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户';
+) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户';
 
--- 正在导出表  nako_blog.nako_user 的数据：1 rows
+-- 正在导出表  nako_blog.nako_user 的数据：2 rows
+/*!40000 ALTER TABLE `nako_user` DISABLE KEYS */;
 REPLACE INTO `nako_user` (`id`, `username`, `password`, `nickname`, `avatar`, `sign`, `status`, `add_time`, `add_ip`) VALUES
-	(1, 'username123', '', 'nickname123', NULL, 'signsign', NULL, 0, '');
+	(1, 'admin', '$2b$12$dWKe6QiMYCVtuAWguFPIs.cK4Nje/o6sJP4gAFD7PTtPK7eZ/NUEO', '管理员', '/upload/avatar/356a192b7913b04c54574d18c28d46e6395428ab.jpg', 'signsign123', 1, 1684299438, '127.0.0.1'),
+	(10, 'test', '$2b$12$do.4tIJg4Q3Yd.A6Jwio9O9bqZrOQKvblvRShhFOWpanvGW5is1hy', 'test', NULL, 'test123123', 1, 1684304910, '127.0.0.1');
+/*!40000 ALTER TABLE `nako_user` ENABLE KEYS */;
+
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

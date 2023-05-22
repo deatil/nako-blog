@@ -4,7 +4,7 @@ use serde_json::Value;
 // 菜单
 pub fn menus() -> Value {
     json!([{
-        "id": 1,
+        "id": 0,
         "title": "控制台",
         "icon": "layui-icon layui-icon-console",
         "type": 1,

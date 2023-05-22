@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <title>基本资料</title>
+        <link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
+        <link rel="stylesheet" href="{{ assert(path='admin/admin/css/other/person.css') | safe }}" />
+    </head>
+
+    <body class="pear-container">
+        <div class="layui-row">
+            <div class="layui-card">
+                <div class="layui-card-header">基本资料</div>
+                <div class="layui-card-body">
+                    <form class="layui-form" action="">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">头像</label>
+                            <div class="layui-input-block">
+                                <div class="user-info-head" id="userInfoHead">
+                                    <img src="" id="userAvatar" width="115px" height="115px" alt="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">账号</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="username" value="{{ data.username }}" lay-verify="title" autocomplete="off" placeholder="请输入账号" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">昵称</label>
+                            <div class="layui-input-block">
+                                <input type="text"  name="nickname" value="{{ data.nickname }}" lay-verify="title" autocomplete="off" placeholder="请输入昵称" class="layui-input">
+                            </div>
+                        </div>
+        
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">签名</label>
+                            <div class="layui-input-block">
+                                <textarea name="sign" placeholder="请输入签名" class="layui-textarea">{{ data.sign }}</textarea>
+                            </div>
+                        </div>
+        
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">&nbsp;</label>
+                            <div class="layui-input-block">
+                                <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="user-save">
+                                    <i class="layui-icon layui-icon-ok"></i>
+                                    提交
+                                </button>
+                                <button type="reset" class="pear-btn pear-btn-sm">
+                                    <i class="layui-icon layui-icon-refresh"></i>
+                                    重置
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script src="{{ assert(path='admin/component/layui/layui.js') | safe }}"></script>
+        <script src="{{ assert(path='admin/component/pear/pear.js') | safe }}"></script>
+        <script>
+        layui.use(['form','jquery'],function(){
+            let form = layui.form;
+            let $ = layui.jquery;
+
+			$("#userAvatar").attr("src", parent.layui.$(".layui-nav-img").attr("src"));
+
+			window.callback = function (data) {
+				layer.close(data.index);
+                $("#userAvatar").attr("src", data.newAvatar);
+                parent.layui.$(".layui-nav-img").attr("src", data.newAvatar);
+            }
+
+			$("#userAvatar").click(function () {
+				layer.open({
+					type: 2,
+					title: '更改头像',
+					shade: 0.1,
+					area: ["900px", "500px"],
+					content: '{{ admin_url(url="profile/avatar") | safe }}',
+					btn: ['确定', '取消'],
+					yes: function (index, layero) {
+						window['layui-layer-iframe' + index].submitForm();
+					}
+				});
+			});
+
+            form.on('submit(user-save)', function(data) {
+                $.ajax({
+                    url: "{{ admin_url(url='profile/info') | safe }}",
+                    data: data.field,
+                    dataType: 'json',
+                    type: 'post',
+                    success: function(result) {
+                        if (result.code == 0) {
+                            layer.msg(result.message, {icon:1,time:1000}, function() {
+                                location.reload();
+                            });
+                        } else {
+                            layer.msg(result.message, {icon:2,time:1000});
+                        }
+                    }
+                });
+
+                return false;
+            });
+        })
+        </script>
+    </body>
+</html>
