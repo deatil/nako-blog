@@ -7,6 +7,7 @@ use actix_web::{
     web, 
     App, 
     HttpServer,
+    dev::Service,
     http::{
         StatusCode,
     },
@@ -102,6 +103,13 @@ pub async fn start() -> std::io::Result<()> {
                     .error_handler(error::path_parser_error)
                     .clone(),
             )
+            .wrap_fn(move |req, srv| {
+                nako_view::ROUTES_KEY.with(|routes| {
+                    routes.borrow_mut().replace(req.resource_map().clone());
+                });
+                
+                srv.call(req)
+            })
             .service(Fs::new("/static", "./assert/static"))
             .service(Fs::new("/upload", "./assert/upload"))
             .configure(admin::route)

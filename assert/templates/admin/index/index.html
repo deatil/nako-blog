@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-		<title>Nako Blog</title>
+		<title>Nako Blog 后台</title>
 		<!-- 依 赖 样 式 -->
 		<link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
 		<!-- 加 载 样 式-->
@@ -108,7 +108,7 @@
 						"image": "{{ assert(path='admin/admin/images/logo.png') | safe }}"
 					},
 					"menu": {
-						"data": "{{ admin_url(url='index/menu') | safe }}",
+						"data": "{{ url_for(name='admin.index-menu') | safe }}",
 						"collaspe": true,
 						"accordion": true,
 						"method": "GET",
@@ -121,7 +121,7 @@
 						"tabMax": 30,
 						"index": {
 							"id": "0",
-							"href": "{{ admin_url(url='index/console') | safe }}",
+							"href": "{{ url_for(name='admin.index-console') | safe }}",
 							"title": "首页"
 						}
 					},
@@ -165,7 +165,7 @@
 				// 登出逻辑 
 				admin.logout(function(){
 					popup.success("注销成功", function() {
-						location.href = "{{ admin_url(url='auth/logout') | safe }}";
+						location.href = "{{ url_for(name='admin.auth-logout') | safe }}";
 					});
 
 					// 注销逻辑 返回 true / false

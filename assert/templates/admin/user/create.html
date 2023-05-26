@@ -64,7 +64,7 @@ layui.use(['form','jquery'],function(){
     form.on('submit(user-save)', function(data){
 
         $.ajax({
-            url: "{{ admin_url(url='user/create') | safe }}",
+            url: "{{ url_for(name='admin.user-create') | safe }}",
             data: data.field,
             dataType:'json',
             type:'post',

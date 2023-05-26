@@ -72,10 +72,10 @@ pub async fn file(
 
     let add_time = time::now().timestamp();
 
-    let mut add_ip: String = "0.0.0.0".to_string();
-    if let Some(val) = req.peer_addr() {
-        add_ip = val.ip().to_string();
-    }
+    let add_ip: String = match req.peer_addr() {
+        Some(val) => val.ip().to_string(),
+        None => "0.0.0.0".to_string(),
+    };
 
     let mut res = Vec::new();
 
@@ -89,13 +89,14 @@ pub async fn file(
             continue;
         }
 
-        let name = utils::uuid();
         let ext = utils::get_extension(file_name.clone().as_str());
-        let path = file_path(format!("{}.{}", name.clone(), ext));
-        let url = file_url(format!("{}.{}", name.clone(), ext));
+        let name = format!("{}.{}", utils::uuid(), ext);
+
+        let path = file_path(name.clone());
+        let url = file_url(name.clone());
 
         let mut buffer = Vec::new();
-        if let Err(_) = f.file.read_to_end(&mut buffer) {
+        if f.file.read_to_end(&mut buffer).is_err() {
             return Ok(nako_http::error_response_json("上传失败"));
         }
 
@@ -115,13 +116,13 @@ pub async fn file(
             continue;
         }
 
-        if let Err(_) = f.file.persist(path.clone()) {
+        if f.file.persist(path.clone()).is_err() {
             return Ok(nako_http::error_response_json("上传失败"));
         }
 
         let create_data = attach::AttachModel::create(db, attach_entity::Model{
                 name:     file_name.clone(),
-                path:     path.clone(),
+                path:     name.clone(),
                 ext:      ext.clone(),
                 size:     size,
                 md5:      md5.clone(),
@@ -192,7 +193,7 @@ pub async fn avatar(
     let path = file_path(format!("avatar/{}.{}", name.clone(), ext));
     let url = file_url(format!("avatar/{}.{}", name.clone(), ext));
 
-    if let Err(_) = form.file.file.persist(path.clone()) {
+    if form.file.file.persist(path.clone()).is_err() {
         return Ok(nako_http::error_response_json("上传失败"));
     }
 

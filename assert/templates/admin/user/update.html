@@ -68,7 +68,7 @@
 
         form.on('submit(user-save)', function(data) {
             $.ajax({
-                url: "{{ admin_url(url='user/update') | safe }}?id={{ data.id }}",
+                url: "{{ url_for(name='admin.user-update') | safe }}?id={{ data.id }}",
                 data: data.field,
                 dataType: 'json',
                 type: 'post',

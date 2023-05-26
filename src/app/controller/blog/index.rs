@@ -3,12 +3,12 @@ use actix_web_lab::respond::Html;
 use actix_web::web::Json;
 
 use crate::nako::utils;
+use crate::nako::http as nako_http;
 use crate::nako::global::{
     Session, AppState,
     Status, ResponseEntity
 };
 use crate::app::entity::{
-    self,
     user as user_entity
 };
 use crate::app::model::{
@@ -24,6 +24,8 @@ pub async fn data(
     state: web::Data<AppState>,
 ) -> Result<impl Responder, Error> {
     let view = &state.view;
+    
+    // let id: u32 = req.match_info().query("id").parse().unwrap_or_default();
 
     let mut counter = 1;
     if let Some(count) = session.get::<i32>("counter")? {
@@ -33,7 +35,7 @@ pub async fn data(
         session.insert("counter", counter)?;
     }
 
-    let mut ctx = tera::Context::new();
+    let mut ctx = nako_http::view_data();
     ctx.insert("name", "hello");
     ctx.insert("text", "Welcome!");
     ctx.insert("counter", &counter);
@@ -62,58 +64,12 @@ pub async fn usedb(
 ) -> Result<Json<ResponseEntity<Vec<user_entity::Model>>>> {
     let db = &state.db;
 
-    /*
-    // 创建
-    user::UserModel::create_user(db, user_entity::Model{
-            username: String::from("username"),
-            nickname: String::from("nickname"),
-            ..entity::default()
-        })
-        .await
-        .expect("could not insert user");
-    */
-
-    /*
-    // 查询
-    let id: u32 = 1;
-    let user_info: user_entity::Model = user::UserModel::find_user_by_id(db, id)
-        .await
-        .expect("could not find user")
-        .unwrap_or_else(|| panic!("could not find user with id {id}"));
-    */
-
     // 分页
     let page: u64 = 1;
     let per_page: u64 = 10;
     let (user_list, _num_pages) = user::UserModel::find_users_in_page(db, page, per_page)
         .await
         .expect("Cannot find users in page");
-
-    // 更新
-    let id: u32 = 1;
-    user::UserModel::update_user_by_id(db, id, user_entity::Model{
-            username: String::from("username123"),
-            nickname: String::from("nickname123"),
-            sign: Option::Some(String::from("signsign")),
-            ..entity::default()
-        })
-        .await
-        .expect("could not edit user");
-
-    /*
-    // 删除
-    let id2: u32 = 2;
-    user::UserModel::delete_user(db, id2)
-        .await
-        .expect("could not delete user");
-    */
-
-    /*
-    // 清空表
-    user::UserModel::delete_all_users(db)
-        .await
-        .expect("could not delete all user");
-    */
 
     let data: ResponseEntity<Vec<user_entity::Model>> = ResponseEntity {
         status: Status::SUCCESS,

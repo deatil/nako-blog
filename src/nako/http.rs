@@ -70,7 +70,7 @@ pub fn error_response_html(view: &tera::Tera, message: &str, url: &str) -> HttpR
         new_url = "javascript:history.back(-1);";
     }
 
-    let mut ctx = tera::Context::new();
+    let mut ctx = view_data();
     ctx.insert("message", &message.to_string());
     ctx.insert("url", &new_url.to_string());
 
@@ -79,9 +79,9 @@ pub fn error_response_html(view: &tera::Tera, message: &str, url: &str) -> HttpR
     html(res_body)
 }
 
-// let mut ctx = view_ctx_new();
+// let mut ctx = view_data();
 // ctx.insert("name", "hello");
-pub fn view_ctx_new() -> tera::Context {
+pub fn view_data() -> tera::Context {
     tera::Context::new()
 }
 

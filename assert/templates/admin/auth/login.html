@@ -62,7 +62,7 @@
 						password = hex_md5(password);
 					}              
     			
-					var url = '{{ admin_url(url="auth/login") | safe }}';
+					var url = "{{ url_for(name='admin.auth-login') | safe }}";
 
 					/// 动画
 					button.load({
@@ -76,7 +76,7 @@
 							}, function(data) {
 								if (data.code == 0) {
 									popup.success("登录成功", function() {
-										location.href = '{{ admin_url(url="index") | safe }}';
+										location.href = "{{ url_for(name='admin.index') | safe }}";
 									});
 								} else {
 									layer.msg(data.message, { 

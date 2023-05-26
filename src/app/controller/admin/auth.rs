@@ -21,6 +21,7 @@ use crate::nako::http as nako_http;
 use crate::nako::global::{
     Session, 
     AppState,
+    Validate,
 };
 
 use crate::app::model::{
@@ -41,21 +42,16 @@ pub async fn captcha(
         .apply_filter(Dots::new(15));
 
     if let Some((data, png_data)) = c.as_tuple() {
-        if let Err(_) = session.insert("auth_captcha", data) {
+        if !session.insert("auth_captcha", data).is_err() {
             return Ok(HttpResponse::build(StatusCode::OK)
-                .content_type(ContentType::plaintext())
-                .body("nodata".to_string()));
+                .content_type(ContentType::png())
+                .body(png_data));
         }
-
-        // response
-        Ok(HttpResponse::build(StatusCode::OK)
-            .content_type(ContentType::png())
-            .body(png_data))
-    } else { 
-        Ok(HttpResponse::build(StatusCode::OK)
-            .content_type(ContentType::plaintext())
-            .body("nodata".to_string()))
     }
+
+    Ok(HttpResponse::build(StatusCode::OK)
+        .content_type(ContentType::plaintext())
+        .body("nodata".to_string()))
 }
 
 // 登陆
@@ -76,16 +72,26 @@ pub async fn login(
 
     let view = &state.view;
 
-    let ctx = nako_http::view_ctx_new();
+    let ctx = nako_http::view_data();
 
     Ok(nako_http::view(view, "admin/auth/login.html", &ctx))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct LoginParams {
     name: String,
     password: String,
     captcha: String,
+}
+
+#[derive(Debug, Validate, Deserialize, Clone)]
+pub struct LoginValidate {
+    #[validate(required(message = "账号不能为空"))]
+    name: Option<String>,
+    #[validate(required(message = "密码不能为空"))]
+    password: Option<String>,
+    #[validate(required(message = "验证码不能为空"), length(min = 4, message = "验证码位数错误"))]
+    captcha: Option<String>,
 }
 
 // 提交登陆
@@ -99,14 +105,15 @@ pub async fn login_check(
         return Ok(nako_http::error_response_json("你已经登陆了"));
     }
 
-    if params.name.as_str() == "" {
-        return Ok(nako_http::error_response_json("账号不能为空"));
-    }
-    if params.password.as_str() == "" {
-        return Ok(nako_http::error_response_json("密码不能为空"));
-    }
-    if params.captcha.as_str() == "" {
-        return Ok(nako_http::error_response_json("验证码不能为空"));
+    let vali_data = LoginValidate{
+        name: Some(params.name.clone()),
+        password: Some(params.password.clone()),
+        captcha: Some(params.captcha.clone()),
+    };
+
+    let vali = vali_data.validate();
+    if vali.is_err() {
+        return Ok(nako_http::error_response_json(format!("{}", vali.unwrap_err()).as_str()));
     }
 
     let auth_captcha = session.get::<String>("auth_captcha").unwrap_or_default().unwrap_or_default();
@@ -146,7 +153,7 @@ pub async fn logout(
 ) -> Result<HttpResponse, Error> {
     let login_id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
     if login_id > 0 {
-        return Ok(nako_http::error_response_json("你已经登陆了"));
+        session.remove("login_id");
     }
 
     let redirect_url: String = match req.url_for("admin.auth-login", &[""]) {

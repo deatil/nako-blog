@@ -24,7 +24,7 @@ pub async fn index(
     let db = &state.db;
     let view = &state.view;
 
-    let mut ctx = tera::Context::new();
+    let mut ctx = nako_http::view_data();
 
     if let Some(login_id) = session.get::<u32>("login_id")? {
         let user_data = user::UserModel::find_user_by_id(db, login_id).await;
@@ -50,7 +50,7 @@ pub async fn console(
 ) -> Result<HttpResponse, Error> {
     let view = &state.view;
 
-    let mut ctx = tera::Context::new();
+    let mut ctx = nako_http::view_data();
 
     let art_count = 12;
     ctx.insert("art_count", &art_count);

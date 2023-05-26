@@ -41,7 +41,7 @@ pub async fn update_info(
         return Ok(nako_http::error_response_html(&view, "账号不存在", ""));
     }
 
-    let mut ctx = nako_http::view_ctx_new();
+    let mut ctx = nako_http::view_data();
     ctx.insert("data", &user_info);
 
     Ok(nako_http::view(view, "admin/profile/update_info.html", &ctx))
@@ -70,10 +70,7 @@ pub async fn update_info_save(
         return Ok(nako_http::error_response_json("昵称不能为空"));
     }
 
-    let mut id: u32 = 0;
-    if let Some(login_id) = session.get::<u32>("login_id")? {
-        id = login_id;
-    } 
+    let id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
 
     let user_info = user::UserModel::find_user_by_id(db, id).await.unwrap_or_default().unwrap_or_default();
     if user_info.id == 0 {
@@ -111,7 +108,7 @@ pub async fn update_password(
 ) -> Result<HttpResponse, Error> {
     let view = &state.view;
 
-    let ctx = nako_http::view_ctx_new();
+    let ctx = nako_http::view_data();
 
     Ok(nako_http::view(view, "admin/profile/update_password.html", &ctx))
 }
@@ -187,7 +184,7 @@ pub async fn update_avatar(
 ) -> Result<HttpResponse, Error> {
     let view = &state.view;
 
-    let ctx = nako_http::view_ctx_new();
+    let ctx = nako_http::view_data();
 
     Ok(nako_http::view(view, "admin/profile/update_avatar.html", &ctx))
 }

@@ -7,6 +7,7 @@ use crypto::hmac::Hmac;
 use crypto::mac::Mac;
 use crypto::digest::Digest;
 use uuid::Uuid;
+use humansize::{format_size, DECIMAL};
 
 // md5
 pub fn md5(data: &str) -> String {
@@ -54,5 +55,24 @@ pub fn get_extension(filename: &str) -> String {
     }
 
     "".to_string()
+}
+
+pub fn formatsize<T: humansize::ToF64 + humansize::Unsigned>(size: T) -> String {
+    let res: String = format_size(size, DECIMAL);
+
+    res
+}
+
+pub fn format_lensize(size: u64) -> String {
+    let sizes = ["", "k", "M", "G", "T", "P", "E", "Z"];
+    let mut size: f64 = size as f64;
+
+    let mut count = 0;
+    while count < sizes.len() - 1 && size > 1000.0 {
+        size /= 1000.0;
+        count += 1;
+    }
+
+    format!("{:.2}{}", size, sizes[count])
 }
 

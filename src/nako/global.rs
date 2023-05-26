@@ -7,6 +7,11 @@ pub use serde::{
     Deserialize,
 };
 
+pub use validator::{
+    Validate, 
+    ValidationError,
+};
+
 #[derive(Debug, Clone)]
 pub struct AppState {
     pub view: Tera,

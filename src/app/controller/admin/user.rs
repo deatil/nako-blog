@@ -33,7 +33,7 @@ pub async fn index(
 ) -> Result<HttpResponse, Error> {
     let view = &state.view;
 
-    let ctx = tera::Context::new();
+    let ctx = nako_http::view_data();
 
     Ok(nako_http::view(view, "admin/user/index.html", &ctx))
 }
@@ -110,7 +110,7 @@ pub async fn detail(
 
     let user_data = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
 
-    let mut ctx = tera::Context::new();
+    let mut ctx = nako_http::view_data();
     
     if user_data.id == 0 {
         return Ok(nako_http::error_response_html(&view, "账号不存在", ""));
@@ -129,7 +129,7 @@ pub async fn create(
 ) -> Result<HttpResponse, Error> {
     let view = &state.view;
 
-    let ctx = tera::Context::new();
+    let ctx = nako_http::view_data();
 
     Ok(nako_http::view(view, "admin/user/create.html", &ctx))
 }
@@ -213,7 +213,7 @@ pub async fn update(
         return Ok(nako_http::error_response_html(&view, "账号不存在", ""));
     }
 
-    let mut ctx = tera::Context::new();
+    let mut ctx = nako_http::view_data();
     
     ctx.insert("data", &user_info);
 
@@ -284,7 +284,7 @@ pub async fn update_save(
             ..entity::default()
         })
         .await;
-    if let Err(_) = user_data {
+    if user_data.is_err() {
         return Ok(nako_http::error_response_json("更新失败"));
     }
 
@@ -304,6 +304,8 @@ pub async fn delete(
     query: web::Query<DeleteQuery>,
     session: Session, 
 ) -> Result<HttpResponse, Error> {
+    let db = &state.db;
+
     if query.id == 0 {
         return Ok(nako_http::error_response_json("ID不能为空"));
     }
@@ -313,13 +315,10 @@ pub async fn delete(
         return Ok(nako_http::error_response_json("当前账号不能被删除"));
     }
 
-    if let Some(login_id) = session.get::<u32>("login_id")? {
-        if login_id == query.id {
-            return Ok(nako_http::error_response_json("你不能删除你自己"));
-        }
-    } 
-
-    let db = &state.db;
+    let login_id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
+    if login_id == query.id {
+        return Ok(nako_http::error_response_json("你不能删除你自己"));
+    }
 
     let user_data = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if user_data.id == 0 {
@@ -327,7 +326,7 @@ pub async fn delete(
     }
 
     let delete_data = user::UserModel::delete_user(db, query.id).await;
-    if let Err(_) = delete_data {
+    if delete_data.is_err() {
         return Ok(nako_http::error_response_json("删除失败"));
     }
 
@@ -386,7 +385,7 @@ pub async fn update_status(
             ..entity::default()
         })
         .await;
-    if let Err(_) = user_data {
+    if user_data.is_err() {
         return Ok(nako_http::error_response_json("更新失败"));
     }
 
@@ -417,7 +416,7 @@ pub async fn update_password(
         return Ok(nako_http::error_response_html(&view, "账号不存在", ""));
     }
 
-    let mut ctx = tera::Context::new();
+    let mut ctx = nako_http::view_data();
     
     ctx.insert("data", &user_info);
 
@@ -474,7 +473,7 @@ pub async fn update_password_save(
             ..entity::default()
         })
         .await;
-    if let Err(_) = new_user_data {
+    if new_user_data.is_err() {
         return Ok(nako_http::error_response_json("更新失败"));
     }
 

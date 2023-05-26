@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>附件管理</title>
+		<link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
+	</head>
+	<body class="pear-container">
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<table id="attach-table" lay-filter="attach-table"></table>
+			</div>
+		</div>
+
+		{% raw %}
+		<script type="text/html" id="action-bar">
+			<button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="detail">详情</button>
+		    <button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="download">下载</button>
+		    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove">删除</button>
+		</script>
+
+		<script type="text/html" id="enable">
+			{{# if (d.status == 1) { }}
+				<span class="layui-badge-dot layui-bg-green"></span>
+				<span class="text-green">启用</span>
+		    {{# } else { }}
+				<span class="layui-badge-dot layui-bg-orange"></span>
+				<span class="text-orange">禁用</span>
+		    {{# } }}
+		</script>
+
+		<script type="text/html" id="createTime">
+			{{# if (d.add_time > 0) { }}
+				{{layui.util.toDateString(d.add_time * 1000, 'yyyy-MM-dd HH:mm')}}
+		    {{# } else { }}
+		    	--
+		    {{# } }}
+		</script>
+		{% endraw %}
+
+		<script src="{{ assert(path='admin/component/layui/layui.js') | safe }}"></script>
+		<script src="{{ assert(path='admin/component/pear/pear.js') | safe }}"></script>
+		<script>
+			layui.use(['table', 'form', 'jquery','common'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				let common = layui.common;
+
+				let cols = [
+					[
+						{
+							title: '文件名',
+							field: 'name',
+							align: 'left',
+						},
+						{
+							title: '后缀',
+							field: 'ext',
+							align: 'left'
+						},
+						{
+							title: '上传时间',
+							field: 'createTime',
+							align: 'left',
+							templet: '#createTime'
+						},
+						{
+							title: '启用',
+							field: 'enable',
+							align: 'left',
+							templet: '#enable',
+							width: 100
+						},
+						{
+							title: '操作',
+							toolbar: '#action-bar',
+							align: 'left',
+							width: 190
+						}
+					]
+				]
+
+				table.render({
+					elem: '#attach-table',
+					url: "{{ url_for(name='admin.attach-list') | safe }}",
+					page: true,
+					cols: cols,
+					skin: 'line',
+					parseData: function(res) {
+						return {
+							"code": res.code,
+							"count": res.data.count,
+							"data": res.data.list,
+						};
+					},
+					defaultToolbar: [{
+						title: '刷新',
+						layEvent: 'refresh',
+						icon: 'layui-icon-refresh',
+					}, 'filter', 'print', 'exports']
+				});
+
+				table.on('tool(attach-table)', function(obj) {
+					if (obj.event === 'remove') {
+						window.remove(obj);
+					} else if (obj.event === 'detail') {
+						window.detail(obj);
+					} else if (obj.event === 'download') {
+						window.download(obj);
+					}
+				});
+
+				table.on('toolbar(attach-table)', function(obj) {
+					if (obj.event === 'refresh') {
+						window.refresh();
+					}
+				});
+
+				window.download = function(obj) {
+					var url = "{{ url_for(name='admin.attach-download') | safe }}?id=" + obj.data['id'];
+					window.open(url, '_blank');
+				}
+
+				window.detail = function(obj) {
+					layer.open({
+						type: 2,
+						title: '附件详情',
+						shade: 0.1,
+						area: ['500px', '400px'],
+						content: "{{ url_for(name='admin.attach-detail') | safe }}?id=" + obj.data['id'],
+					});
+				}
+
+				window.remove = function(obj) {
+					layer.confirm('确定要删除该用户', {
+						icon: 3,
+						title: '提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+
+						$.ajax({
+							url: "{{ url_for(name='admin.attach-delete') | safe }}?id=" + obj.data['id'],
+							data: {
+								id: obj.data['userId'],
+							},
+							type: 'post',
+							dataType: 'json',
+							success: function(result) {
+								layer.close(loading);
+
+								if (result.code == 0) {
+									layer.msg(result.message, {
+										icon: 1,
+										time: 1000
+									}, function() {
+										obj.del();
+									});
+								} else {
+									layer.msg(result.message, {
+										icon: 2,
+										time: 1000
+									});
+								}
+							}
+						})
+					});
+				}
+
+				window.refresh = function(param) {
+					table.reload('attach-table');
+				}
+			})
+		</script>
+	</body>
+</html>

@@ -60,7 +60,7 @@
                     
 					$.ajax({
                         method: "post",
-                        url: '{{ admin_url(url="upload/avatar") | safe }}',
+                        url: "{{ url_for(name='admin.upload-avatar') | safe }}",
                         data: formData,
                         processData: false,
                         contentType: false,
@@ -69,7 +69,7 @@
                         success: function (result) {
                             if (result.code == 0) {
                                 $.ajax({
-                                    url: "{{ admin_url(url='profile/avatar') | safe }}",
+                                    url: "{{ url_for(name='admin.profile-avatar') | safe }}",
                                     data: {
                                         avatar: result.data.url,
                                     },

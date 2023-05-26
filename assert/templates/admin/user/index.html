@@ -90,31 +90,32 @@
 						{
 							title: '账号',
 							field: 'username',
-							align: 'center',
+							align: 'left',
 							width: 100,
 							templet: '#user-username'
 						},
 						{
 							title: '昵称',
 							field: 'nickname',
-							align: 'center'
+							align: 'left'
+						},
+						{
+							title: '注册时间',
+							field: 'createTime',
+							align: 'left',
+							templet: '#user-createTime'
 						},
 						{
 							title: '启用',
 							field: 'enable',
 							align: 'center',
-							templet: '#user-enable'
-						},
-						{
-							title: '注册时间',
-							field: 'createTime',
-							align: 'center',
-							templet: '#user-createTime'
+							templet: '#user-enable',
+							width: 150
 						},
 						{
 							title: '操作',
 							toolbar: '#user-bar',
-							align: 'center',
+							align: 'left',
 							width: 150
 						}
 					]
@@ -202,7 +203,7 @@
 						title: '新增',
 						shade: 0.1,
 						area: [common.isModile()?'100%':'500px', common.isModile()?'100%':'400px'],
-						content: "{{ admin_url(url='user/create') | safe }}"
+						content: "{{ url_for(name='admin.user-create') | safe }}"
 					});
 				}
 
@@ -212,7 +213,7 @@
 						title: '修改',
 						shade: 0.1,
 						area: ['500px', '400px'],
-						content: "{{ admin_url(url='user/update') | safe }}?id=" + obj.data['id'],
+						content: "{{ url_for(name='admin.user-update') | safe }}?id=" + obj.data['id'],
 					});
 				}
 
@@ -221,8 +222,8 @@
 						type: 2,
 						title: '修改密码',
 						shade: 0.1,
-						area: ['500px', '400px'],
-						content: "{{ admin_url(url='user/update-password') | safe }}?id=" + obj.data['id'],
+						area: ['380px', '250px'],
+						content: "{{ url_for(name='admin.user-update-password') | safe }}?id=" + obj.data['id'],
 					});
 				}
 
@@ -232,7 +233,7 @@
 						title: '账号详情',
 						shade: 0.1,
 						area: ['500px', '400px'],
-						content: "{{ admin_url(url='user/detail') | safe }}?id=" + obj.data['id'],
+						content: "{{ url_for(name='admin.user-detail') | safe }}?id=" + obj.data['id'],
 					});
 				}
 
@@ -245,7 +246,7 @@
 						let loading = layer.load();
 
 						$.ajax({
-							url: "{{ admin_url(url='user/delete') | safe }}?id=" + obj.data['id'],
+							url: "{{ url_for(name='admin.user-delete') | safe }}?id=" + obj.data['id'],
 							data: {
 								id: obj.data['userId'],
 							},

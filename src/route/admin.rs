@@ -1,6 +1,10 @@
 use actix_web::web;
 use actix_web_lab::middleware::from_fn;
 
+use crate::nako::{
+    env,
+};
+
 use crate::app::middleware::{admin_auth};
 use crate::app::controller::admin::{
     index,
@@ -8,11 +12,14 @@ use crate::app::controller::admin::{
     user,
     profile,
     upload,
+    attach,
 };
 
 pub fn route(cfg: &mut web::ServiceConfig) {
+    let admin_prefix = env::get_env::<String>("ADMIN_PREFIX", "admin".to_string());
+
     cfg.service(
-        web::scope("admin")
+        web::scope(admin_prefix.as_str())
             .service(
                 // 后台首页
                 web::scope("/index")
@@ -135,6 +142,35 @@ pub fn route(cfg: &mut web::ServiceConfig) {
                             .name("admin.user-delete"),
                     )
             )
+            .service(
+                // 附件
+                web::scope("/attach")
+                    .service(
+                        web::resource("/index")
+                            .route(web::get().to(attach::index))
+                            .name("admin.attach-index"),
+                    )
+                    .service(
+                        web::resource("/list")
+                            .route(web::get().to(attach::list))
+                            .name("admin.attach-list"),
+                    )
+                    .service(
+                        web::resource("/detail")
+                            .route(web::get().to(attach::detail))
+                            .name("admin.attach-detail"),
+                    )
+                    .service(
+                        web::resource("/delete")
+                            .route(web::post().to(attach::delete))
+                            .name("admin.attach-delete"),
+                    )
+                    .service(
+                        web::resource("/download")
+                            .route(web::get().to(attach::download))
+                            .name("admin.attach-download"),
+                    )
+            )            
             .wrap(from_fn(admin_auth::auth)),
     );
 }

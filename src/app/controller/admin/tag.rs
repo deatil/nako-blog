@@ -16,7 +16,7 @@ pub async fn index(
 ) -> Result<HttpResponse, Error> {
     let view = &state.view;
 
-    let mut ctx = tera::Context::new();
+    let mut ctx = nako_http::view_data();
     ctx.insert("name", "hello");
 
     Ok(nako_http::view(view, "admin/user/index.html", &ctx))
@@ -28,7 +28,7 @@ pub async fn detail(
 ) -> Result<HttpResponse, Error> {
     let view = &state.view;
 
-    let mut ctx = tera::Context::new();
+    let mut ctx = nako_http::view_data();
     ctx.insert("name", "hello");
 
     Ok(nako_http::view(view, "admin/user/detail.html", &ctx))
@@ -40,7 +40,7 @@ pub async fn create(
 ) -> Result<HttpResponse, Error> {
     let view = &state.view;
 
-    let mut ctx = tera::Context::new();
+    let mut ctx = nako_http::view_data();
     ctx.insert("name", "hello");
 
     Ok(nako_http::view(view, "admin/user/create.html", &ctx))
@@ -57,7 +57,7 @@ pub async fn update(
 ) -> Result<HttpResponse, Error> {
     let view = &state.view;
 
-    let mut ctx = tera::Context::new();
+    let mut ctx = nako_http::view_data();
     ctx.insert("name", "hello");
 
     Ok(nako_http::view(view, "admin/user/update.html", &ctx))

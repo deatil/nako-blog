@@ -81,7 +81,7 @@
 					title: '更改头像',
 					shade: 0.1,
 					area: ["900px", "500px"],
-					content: '{{ admin_url(url="profile/avatar") | safe }}',
+					content: "{{ url_for(name='admin.profile-avatar') | safe }}",
 					btn: ['确定', '取消'],
 					yes: function (index, layero) {
 						window['layui-layer-iframe' + index].submitForm();
@@ -91,7 +91,7 @@
 
             form.on('submit(user-save)', function(data) {
                 $.ajax({
-                    url: "{{ admin_url(url='profile/info') | safe }}",
+                    url: "{{ url_for(name='admin.profile-info') | safe }}",
                     data: data.field,
                     dataType: 'json',
                     type: 'post',

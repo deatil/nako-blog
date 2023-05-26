@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>账号详情</title>
+        <title>附件详情</title>
         <link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
     </head>
     <body class="pear-container">
@@ -25,18 +25,25 @@
                         <td>{{ data.id }} </td>
                     </tr>
                     <tr>
-                        <td>账号</td>
-                        <td>{{ data.username }}</td>
+                        <td>文件名称</td>
+                        <td>{{ data.name }}</td>
                     </tr>
                     <tr>
-                        <td>昵称</td>
-                        <td>{{ data.nickname }}</td>
+                        <td>存储路径</td>
+                        <td>{{ data.path }}</td>
                     </tr>
                     <tr>
-                        <td>邮箱</td>
-                        <td>{{ data.sign }}</td>
+                        <td>后缀</td>
+                        <td>{{ data.ext }}</td>
                     </tr>
-
+                    <tr>
+                        <td>大小</td>
+                        <td>{{ format_size(size=data.size) }}</td>
+                    </tr>
+                    <tr>
+                        <td>HASH值</td>
+                        <td>{{ data.md5 }}</td>
+                    </tr>
                     <tr>
                         <td>状态</td>
                         <td>
@@ -51,13 +58,13 @@
                     </tr>
 
                     <tr>
-                        <td>注册时间</td>
+                        <td>上传时间</td>
                         <td>
                             {{ data.add_time | date(format="%Y-%m-%d %H:%M:%S", timezone="Asia/Shanghai") }}
                         </td>
                     </tr>
                     <tr>
-                        <td>注册IP</td>
+                        <td>上传IP</td>
                         <td>
                             {{ data.add_ip }}
                         </td>
@@ -65,7 +72,7 @@
 
                 </tbody>
             </table>
-        </div>     
+        </div>
         
     </body>
 </html>

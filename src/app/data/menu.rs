@@ -19,12 +19,20 @@ pub fn menus() -> Value {
         "href": "",
         "children": [
             {
-                "id": 2,
+                "id": 101,
                 "title": "用户管理",
                 "icon": "layui-icon layui-icon-face-smile",
                 "type": 1,
                 "openType": "_iframe",
                 "href": "/admin/user/index"
+            },
+            {
+                "id": 102,
+                "title": "附件管理",
+                "icon": "layui-icon layui-icon-file",
+                "type": 1,
+                "openType": "_iframe",
+                "href": "/admin/attach/index"
             }
         ]
     }])
