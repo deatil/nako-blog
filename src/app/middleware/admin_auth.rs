@@ -56,7 +56,7 @@ pub async fn auth(
     }
 
     if !check {
-        let message = "清先登陆";
+        let message = "请先登陆";
 
         let url: String = match req.request().url_for("admin.auth-login", &[""]) {
             Ok(data) => data.into(),

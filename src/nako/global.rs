@@ -6,16 +6,18 @@ pub use serde::{
     Serialize,
     Deserialize,
 };
+use redis::aio::ConnectionManager;
 
 pub use validator::{
     Validate, 
     ValidationError,
 };
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct AppState {
     pub view: Tera,
     pub db: DatabaseConnection,
+    pub redis: ConnectionManager,
 }
 
 // 状态枚举

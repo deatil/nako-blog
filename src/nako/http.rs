@@ -6,6 +6,8 @@ use actix_web::{
     },
     HttpResponse,
 };
+
+use crate::nako::app;
 use crate::nako::global::{
     Serialize,
     Status, ResponseEntity
@@ -39,18 +41,6 @@ pub fn redirect(url: String) -> HttpResponse {
     res_body_data
 }
 
-// 返回成功 json
-pub fn error_response_json(message: &str) -> HttpResponse {
-    let res_body: ResponseEntity<String> = ResponseEntity {
-        status: Status::FAIL,
-        code: 1,
-        message: message.to_string(),
-        data: Some("".to_string()),
-    };
-
-    json(res_body)
-}
-
 // 返回失败 json
 pub fn success_response_json<T: Serialize>(message: &str, data: T) -> HttpResponse {
     let res_body: ResponseEntity<T> = ResponseEntity {
@@ -58,6 +48,18 @@ pub fn success_response_json<T: Serialize>(message: &str, data: T) -> HttpRespon
         code: 0,
         message: message.to_string(),
         data: Some(data),
+    };
+
+    json(res_body)
+}
+
+// 返回成功 json
+pub fn error_response_json(message: &str) -> HttpResponse {
+    let res_body: ResponseEntity<String> = ResponseEntity {
+        status: Status::FAIL,
+        code: 1,
+        message: message.to_string(),
+        data: Some("".to_string()),
     };
 
     json(res_body)
@@ -74,7 +76,8 @@ pub fn error_response_html(view: &tera::Tera, message: &str, url: &str) -> HttpR
     ctx.insert("message", &message.to_string());
     ctx.insert("url", &new_url.to_string());
 
-    let res_body: String = view.render("error_resp.html", &ctx).unwrap_or("html [error_resp.html] is error.".into());
+    let res_body: String = view.render("error.html", &ctx)
+        .unwrap_or("html [error.html] is error.".into());
 
     html(res_body)
 }
@@ -87,9 +90,18 @@ pub fn view_data() -> tera::Context {
 
 // 视图
 pub fn view(view: &tera::Tera, name: &str, ctx: &tera::Context) -> HttpResponse {
-    let err = format!("html [{}] is not exists.", name);
+    let err = format!("html is error.");
 
-    let res_body: String = view.render(name, ctx).unwrap_or(err.into());
+    let res_body: String = match view.render(name, ctx) {
+        Ok(v) => v,
+        Err(e) => {
+            if app::is_debug() {
+                format!("html [{}] is error: {}", name, e)
+            } else {
+                err
+            }
+        },
+    };
 
     html(res_body)
 }

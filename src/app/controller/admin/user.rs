@@ -50,7 +50,10 @@ pub struct ListData {
 pub struct ListQuery {
     page: u64,
     limit: u64,
-    name: Option<String>,
+
+    username: Option<String>,
+    nickname: Option<String>,
+    status: Option<i32>,
 }
 
 // 数据列表
@@ -63,28 +66,27 @@ pub async fn list(
     let page: u64 = query.page;
     let per_page: u64 = query.limit;
 
-    let name: String = query.name.clone().unwrap_or("".to_string());
-
-    let mut res: ListData = ListData{
-        list: vec![],
-        count: 0,
+    let search_where = user::UserWhere{
+        username: query.username.clone(),
+        nickname: query.nickname.clone(),
+        status: query.status,
     };
+    let search_where = search_where.format();
 
-    if name.as_str() != "" {
-        let keyword = "%".to_owned() + name.as_str() + "%";
+    let (list, _num_pages) = user::UserModel::search_in_page(
+            db, 
+            page, 
+            per_page, 
+            search_where.clone(),
+        )
+        .await.unwrap_or_default();
+    let count = user::UserModel::search_count(db, search_where.clone())
+        .await.unwrap_or(0);
 
-        let (user_list, _num_pages) = user::UserModel::find_users_in_page_by_name(db, page, per_page, keyword.as_str()).await.unwrap_or_default();
-        let count = user::UserModel::find_users_count_by_name(db, keyword.as_str()).await.unwrap_or(0);
-
-        res.list = user_list;
-        res.count = count;
-    } else {
-        let (user_list, _num_pages) = user::UserModel::find_users_in_page(db, page, per_page).await.unwrap_or_default();
-        let count = user::UserModel::find_users_count(db).await.unwrap_or(0);
-
-        res.list = user_list;
-        res.count = count;
-    }
+    let res: ListData = ListData{
+        list: list,
+        count: count,
+    };
 
     Ok(nako_http::success_response_json("获取成功", res))
 }
@@ -109,13 +111,11 @@ pub async fn detail(
     }
 
     let user_data = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
-
-    let mut ctx = nako_http::view_data();
-    
     if user_data.id == 0 {
         return Ok(nako_http::error_response_html(&view, "账号不存在", ""));
     }
 
+    let mut ctx = nako_http::view_data();
     ctx.insert("data", &user_data);
 
     Ok(nako_http::view(view, "admin/user/detail.html", &ctx))

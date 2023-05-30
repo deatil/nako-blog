@@ -142,6 +142,8 @@ layui.define(['jquery'],function (exports) {
 
         option.images_upload_url = isset(option.images_upload_url) ? option.images_upload_url : settings.images_upload_url;
 
+        option.success = isset(option.success) ? option.success : settings.success;
+
         option.images_upload_handler = isset(option.images_upload_handler) ? option.images_upload_handler : function(blobInfo, succFun, failFun) {
             if(isEmpty(option.images_upload_url)){
                 failFun("上传接口未配置");
@@ -162,7 +164,7 @@ layui.define(['jquery'],function (exports) {
                 processData: false,
                 contentType: false,
                 success: function (res) {
-                    settings.success(res, succFun, failFun)
+                    option.success(res, succFun, failFun)
                 },
                 error: function (res) {
                     failFun("网络错误：" + res.status);

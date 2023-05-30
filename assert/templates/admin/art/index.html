@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>文章管理</title>
+		<link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
+	</head>
+	<body class="pear-container">
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">标题</label>
+							<div class="layui-input-inline">
+								<input type="text" name="title" placeholder="" class="layui-input">
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">文章UUID</label>
+							<div class="layui-input-inline">
+								<input type="text" name="uuid" placeholder="" class="layui-input">
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">置顶</label>
+							<div class="layui-input-inline">
+								<select name="is_top" lay-verify="">
+									<option value="-1">全部</option>
+									<option value="1">是</option>
+									<option value="0">否</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">状态</label>
+							<div class="layui-input-inline">
+								<select name="status" lay-verify="">
+									<option value="-1">全部</option>
+									<option value="1">启用</option>
+									<option value="0">禁用</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="art-query">
+								<i class="layui-icon layui-icon-search"></i>
+								查询
+							</button>
+							<button type="reset" class="pear-btn pear-btn-md">
+								<i class="layui-icon layui-icon-refresh"></i>
+								重置
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<table id="art-table" lay-filter="art-table"></table>
+			</div>
+		</div>
+
+		{% raw %}
+		<script type="text/html" id="art-toolbar">
+			<button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+		        <i class="layui-icon layui-icon-add-1"></i>
+		        新增
+		    </button>
+		</script>
+
+		<script type="text/html" id="art-bar">
+			<button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i></button>
+		    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i class="layui-icon layui-icon-delete"></i></button>
+		</script>
+
+		<script type="text/html" id="art-title">
+			<span lay-event="detail">
+				{{# if (d.is_top == 1) { }}
+					<span class="layui-badge layui-bg-green">顶</span>
+				{{# } }}
+				{{ d.title }}
+			</span>
+		</script>
+
+		<script type="text/html" id="art-enable">
+			<input type="checkbox" name="enable" value="{{d.id}}"
+				lay-skin="switch" 
+				lay-text="启用|禁用" 
+				lay-filter="art-enable" 
+				{{ d.status == 1 ? 'checked' : '' }}>
+		</script>
+
+		<script type="text/html" id="art-createTime">
+			{{# if (d.add_time > 0) { }}
+				{{layui.util.toDateString(d.add_time * 1000, 'yyyy-MM-dd HH:mm:ss')}}
+		    {{# } else { }}
+		    	--
+		    {{# } }}
+		</script>
+		{% endraw %}
+
+		<script src="{{ assert(path='admin/component/layui/layui.js') | safe }}"></script>
+		<script src="{{ assert(path='admin/component/pear/pear.js') | safe }}"></script>
+		<script>
+			layui.use(['table', 'form', 'jquery','common'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				let common = layui.common;
+
+				let cols = [
+					[
+						{
+							title: '标题',
+							field: 'title',
+							align: 'left',
+							templet: '#art-title'
+						},
+						{
+							title: '阅读数',
+							field: 'views',
+							align: 'left',
+							width: 100,
+						},
+						{
+							title: '添加时间',
+							field: 'createTime',
+							align: 'left',
+							templet: '#art-createTime',
+							width: 160,
+						},
+						{
+							title: '启用',
+							field: 'enable',
+							align: 'center',
+							templet: '#art-enable',
+							width: 130
+						},
+						{
+							title: '操作',
+							toolbar: '#art-bar',
+							align: 'left',
+							width: 150
+						}
+					]
+				]
+
+				table.render({
+					elem: '#art-table',
+					url: "{{ url_for(name='admin.art-list') | safe }}",
+					page: true,
+					cols: cols,
+					skin: 'line',
+					toolbar: '#art-toolbar',
+					parseData: function(res) {
+						return {
+							"code": res.code,
+							"count": res.data.count,
+							"data": res.data.list,
+						};
+					},
+					defaultToolbar: [{
+						title: '刷新',
+						layEvent: 'refresh',
+						icon: 'layui-icon-refresh',
+					}, 'filter', 'print', 'exports']
+				});
+
+				table.on('tool(art-table)', function(obj) {
+					if (obj.event === 'remove') {
+						window.remove(obj);
+					} else if (obj.event === 'edit') {
+						window.edit(obj);
+					} else if (obj.event === 'detail') {
+						window.detail(obj);
+					}
+				});
+
+				form.on('submit(art-query)', function(data) {
+					table.reload('art-table', {
+						where: data.field
+					})
+					return false;
+				});
+
+				table.on('toolbar(art-table)', function(obj) {
+					if (obj.event === 'add') {
+						window.add();
+					} else if (obj.event === 'refresh') {
+						window.refresh();
+					}
+				});
+
+				form.on('switch(art-enable)', function(obj) {
+					var status = 0;
+					if (obj.elem.checked == true) {
+						status = 1;
+					}
+
+					$.ajax({
+						url: "{{ url_for(name='admin.art-status') | safe }}?id=" + this.value,
+						data: {
+							status: status,
+						},
+						type: 'post',
+						dataType: 'json',
+						success: function(result) {
+							if (result.code == 0) {
+								layer.tips(result.message, obj.othis);
+							} else {
+								layer.msg(result.message, {
+									icon: 2,
+									time: 1000
+								});
+							}
+						}
+					});
+				});
+
+				window.add = function() {
+					layer.open({
+						type: 2,
+						title: '新增',
+						shade: 0.1,
+						area: [common.isModile()?'100%':'500px', common.isModile()?'100%':'310px'],
+						content: "{{ url_for(name='admin.art-create') | safe }}"
+					});
+				}
+
+				window.edit = function(obj) {
+					layer.open({
+						type: 2,
+						title: '修改',
+						shade: 0.1,
+						area: ['100%', '100%'],
+						mixmax: true,
+						content: "{{ url_for(name='admin.art-update') | safe }}?id=" + obj.data['id'],
+					});
+				}
+
+				window.detail = function(obj) {
+					layer.open({
+						type: 2,
+						title: '文章详情',
+						shade: 0.1,
+						area: ['500px', '400px'],
+						content: "{{ url_for(name='admin.art-detail') | safe }}?id=" + obj.data['id'],
+					});
+				}
+
+				window.remove = function(obj) {
+					layer.confirm('确定要删除该文章', {
+						icon: 3,
+						title: '提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+
+						$.ajax({
+							url: "{{ url_for(name='admin.art-delete') | safe }}?id=" + obj.data['id'],
+							data: {},
+							type: 'post',
+							dataType: 'json',
+							success: function(result) {
+								layer.close(loading);
+
+								if (result.code == 0) {
+									layer.msg(result.message, {
+										icon: 1,
+										time: 1000
+									}, function() {
+										obj.del();
+									});
+								} else {
+									layer.msg(result.message, {
+										icon: 2,
+										time: 1000
+									});
+								}
+							}
+						})
+					});
+				}
+
+				window.refresh = function(param) {
+					table.reload('art-table');
+				}
+			})
+		</script>
+	</body>
+</html>

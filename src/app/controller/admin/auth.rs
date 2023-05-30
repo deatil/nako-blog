@@ -16,12 +16,14 @@ use serde::{
 use captcha::Captcha;
 use captcha::filters::{Noise, Wave, Dots};
 
-use crate::nako::auth as nako_auth;
-use crate::nako::http as nako_http;
-use crate::nako::global::{
-    Session, 
-    AppState,
-    Validate,
+use crate::nako::{
+    auth as nako_auth,
+    http as nako_http,
+    global::{
+        Session, 
+        AppState,
+        Validate,
+    },
 };
 
 use crate::app::model::{

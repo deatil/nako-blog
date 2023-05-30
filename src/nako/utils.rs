@@ -76,3 +76,13 @@ pub fn format_lensize(size: u64) -> String {
     format!("{:.2}{}", size, sizes[count])
 }
 
+pub fn is_image(extension: String) -> bool {
+    extension.eq("png")
+        || extension.eq("jpg")
+        || extension.eq("jpeg")
+        || extension.eq("ico")
+        || extension.eq("gif")
+        || extension.eq("bmp")
+        || extension.eq("svg")
+}
+

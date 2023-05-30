@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>分类详情</title>
+        <link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
+    </head>
+    <body class="pear-container">
+        <div class="table-responsive">
+            <table class="layui-table">
+                <colgroup>
+                    <col width="200">
+                    <col>
+                </colgroup>
+          
+                <thead>
+                    <tr>
+                        <td>名称</td>
+                        <td>内容</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ID</td>
+                        <td>{{ data.id }} </td>
+                    </tr>
+                    <tr>
+                        <td>父级ID</td>
+                        <td>{{ data.pid }}</td>
+                    </tr>
+                    <tr>
+                        <td>分类名称</td>
+                        <td>{{ data.name }}</td>
+                    </tr>
+                    <tr>
+                        <td>分类标识</td>
+                        <td>{{ data.slug }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>分类描述</td>
+                        <td>{{ data.desc }}</td>
+                    </tr>
+                    <tr>
+                        <td>排序</td>
+                        <td>{{ data.sort }}</td>
+                    </tr>
+                    <tr>
+                        <td>列表模板</td>
+                        <td>{{ data.list_tpl }}</td>
+                    </tr>
+                    <tr>
+                        <td>详情模板</td>
+                        <td>{{ data.view_tpl }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>状态</td>
+                        <td>
+                            {% if data.status == 1 %}
+                                <span class="layui-badge-dot layui-bg-green"></span>
+                                <span class="text-green">启用</span>
+                            {% else %}
+                                <span class="layui-badge-dot layui-bg-orange"></span>
+                                <span class="text-orange">禁用</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>添加时间</td>
+                        <td>
+                            {{ data.add_time | date(format="%Y-%m-%d %H:%M:%S", timezone="Asia/Shanghai") }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>添加IP</td>
+                        <td>
+                            {{ data.add_ip }}
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>     
+        
+    </body>
+</html>

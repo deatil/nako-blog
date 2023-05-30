@@ -11,9 +11,27 @@
 				<form class="layui-form" action="">
 					<div class="layui-form-item">
 						<div class="layui-form-item layui-inline">
-							<label class="layui-form-label">用户名</label>
+							<label class="layui-form-label">账号</label>
 							<div class="layui-input-inline">
-								<input type="text" name="name" placeholder="" class="layui-input">
+								<input type="text" name="username" placeholder="" class="layui-input">
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">昵称</label>
+							<div class="layui-input-inline">
+								<input type="text" name="nickname" placeholder="" class="layui-input">
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">状态</label>
+							<div class="layui-input-inline">
+								<select name="status" lay-verify="">
+									<option value="-1">全部</option>
+									<option value="1">启用</option>
+									<option value="0">禁用</option>
+								</select>
 							</div>
 						</div>
 
@@ -31,6 +49,7 @@
 				</form>
 			</div>
 		</div>
+		
 		<div class="layui-card">
 			<div class="layui-card-body">
 				<table id="user-table" lay-filter="user-table"></table>
@@ -67,7 +86,7 @@
 
 		<script type="text/html" id="user-createTime">
 			{{# if (d.add_time > 0) { }}
-				{{layui.util.toDateString(d.add_time * 1000, 'yyyy-MM-dd HH:mm')}}
+				{{layui.util.toDateString(d.add_time * 1000, 'yyyy-MM-dd HH:mm:ss')}}
 		    {{# } else { }}
 		    	--
 		    {{# } }}
@@ -84,14 +103,11 @@
 				let common = layui.common;
 
 				let cols = [
-					[{
-							type: 'checkbox'
-						},
+					[
 						{
 							title: '账号',
 							field: 'username',
 							align: 'left',
-							width: 100,
 							templet: '#user-username'
 						},
 						{
@@ -103,7 +119,8 @@
 							title: '注册时间',
 							field: 'createTime',
 							align: 'left',
-							templet: '#user-createTime'
+							templet: '#user-createTime',
+							width: 160,
 						},
 						{
 							title: '启用',
@@ -123,7 +140,7 @@
 
 				table.render({
 					elem: '#user-table',
-					url: "{{ admin_url(url='user/list') | safe }}",
+					url: "{{ url_for(name='admin.user-list') | safe }}",
 					page: true,
 					cols: cols,
 					skin: 'line',
@@ -178,7 +195,7 @@
 					}
 
 					$.ajax({
-						url: "{{ admin_url(url='user/status') | safe }}?id=" + this.value,
+						url: "{{ url_for(name='admin.user-status') | safe }}?id=" + this.value,
 						data: {
 							status: status,
 						},

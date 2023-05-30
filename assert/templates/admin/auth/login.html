@@ -9,7 +9,7 @@
 	</head>
 
   <!-- 代 码 结 构 -->
-	<body background="{{ assert(path='admin/admin/images/background.svg') }}" style="background-size: cover;">
+	<body background="{{ assert(path='admin/admin/images/background.svg') | safe }}" style="background-size: cover;">
 		<form class="layui-form" action="javascript:void(0);">
 			<div class="layui-form-item">
 				<img class="logo" src="{{ assert(path='admin/admin/images/logo.png') | safe }}" />
@@ -60,8 +60,8 @@
 					
 					if (password != "") {
 						password = hex_md5(password);
-					}              
-    			
+					}
+					
 					var url = "{{ url_for(name='admin.auth-login') | safe }}";
 
 					/// 动画

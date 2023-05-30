@@ -1,0 +1,123 @@
+div.tagsinput {
+    background: #FFF;
+    padding: 5px;
+    width: 300px;
+    height: 26px;
+    overflow-y: auto;
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+}
+
+div.tagsinput span.tag a {
+    font-weight: 700;
+    color: #82ad2b;
+    text-decoration: none;
+    font-size: 11px
+}
+
+div.tagsinput input {
+    width: 120px;
+    margin: 0 5px 5px 0;
+    font-family: helvetica;
+    font-size: 13px;
+    border: 1px solid transparent;
+    background: 0 0;
+    color: #000;
+    outline: 0;
+    margin-bottom: 0;
+    margin-right: 0;
+    padding: 4px 5px;
+}
+
+div.tagsinput div {
+    display: block;
+    float: left
+}
+
+.tags_clear {
+    clear: both;
+    width: 100%;
+    height: 0
+}
+
+.not_valid {
+    background: #FBD8DB !important;
+    color: #90111A !important
+}
+
+div.tagsinput span.tag {
+    border: 1px solid #a5d24a;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    display: block;
+    float: left;
+    padding: 5px;
+    text-decoration: none;
+    background-color: #009688;
+    color: #fff;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    font-family: helvetica;
+    font-size: 13px height: 24px;
+    padding: 2px 5px;
+    margin-bottom: 0;
+    border-color: transparent
+}
+
+div.tagsinput span.tag a {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+}
+div.tagsinput span.tag a:hover {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+
+.autocomplete-suggestions {
+    text-align: left;
+    cursor: default;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: 2px;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    -moz-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    background-clip: padding-box;
+    position: absolute;
+    /* display: none; */
+    z-index: 1029;
+    max-height: 254px;
+    overflow: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.autocomplete-search .autocomplete-questions.selected,
+.autocomplete-search .autocomplete-questions:hover,
+.autocomplete-search .autocomplete-searchtags.selected,
+.autocomplete-search .autocomplete-searchtags:hover,
+.autocomplete-tags .autocomplete-suggestion.selected,
+.autocomplete-tags .autocomplete-suggestion:hover {
+    background: #f0f0f0
+}
+
+.autocomplete-tags {
+    min-width: 160px
+}
+
+.autocomplete-tags .autocomplete-suggestion {
+    position: relative;
+    line-height: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1em;
+    color: #333;
+    padding: 5px 10px;
+    cursor: pointer;
+    white-space: inherit
+}
+
+.autocomplete-tags .autocomplete-suggestion b {
+    font-weight: 400;
+    color: #f71752
+}

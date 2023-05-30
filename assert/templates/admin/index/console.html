@@ -87,20 +87,20 @@
 									</div>
 									<div class="layui-col-md6 layui-col-sm6 layui-col-xs6">
 										<div class="pear-card2">
-											<div class="title">待审帖子</div>
-											<div class="count pear-text">32</div>
+											<div class="title">分类数量</div>
+											<div class="count pear-text">{{ cate_count }}</div>
 										</div>
 									</div>
 									<div class="layui-col-md6 layui-col-sm6 layui-col-xs6">
 										<div class="pear-card2">
-											<div class="title">待审文章</div>
-											<div class="count pear-text">14</div>
+											<div class="title">评论数量</div>
+											<div class="count pear-text">{{ comment_count }}</div>
 										</div>
 									</div>
 									<div class="layui-col-md6 layui-col-sm6 layui-col-xs6">
 										<div class="pear-card2">
-											<div class="title">待审用户</div>
-											<div class="count pear-text">63</div>
+											<div class="title">标签数量</div>
+											<div class="count pear-text">{{ tag_count }}</div>
 										</div>
 									</div>
 								</div>
@@ -118,15 +118,16 @@
 					</div>
 				</div>
 			</div>
+
 			<div class="layui-col-md4">
 				<div class="layui-card">
-					<div class="layui-card-header">留言板</div>
+					<div class="layui-card-header">最新文章</div>
 					<div class="layui-card-body">
 						<ul class="pear-card-status">
 							<li>
 								<p>要不要作为我的家人，搬来我家。</p>
 								<span>12月25日 19:92</span>
-								<a href="javascript:;" data-id="1" class="pear-btn pear-btn-primary pear-btn-xs pear-reply">回复</a>
+								<a href="javascript:;" data-id="1" class="pear-btn pear-btn-primary pear-btn-xs pear-reply">编辑</a>
 							</li>
 							<li>
 								<p>快乐的时候不敢尽兴，频繁警戒自己保持清醒。</p>

@@ -1,7 +1,7 @@
 use actix_session::{
     SessionMiddleware,
-    config::PersistentSession, 
-    storage::CookieSessionStore, 
+    storage::RedisSessionStore, 
+    config::PersistentSession,
 };
 use actix_web::{
     web, 
@@ -13,13 +13,13 @@ use actix_web::{
     },
     cookie::{
         Key,
-        time::Duration, 
+        time,
     },
     middleware::{
+        Logger,
         ErrorHandlers,
     },
 };
-use actix_web::middleware::Logger;
 use actix_files::Files as Fs;
 
 use tera::Tera;
@@ -28,6 +28,7 @@ use listenfd::ListenFd;
 use crate::nako::{
     db, 
     env,
+    redis,
     view as nako_view,
     log as nako_log,
     global::AppState,
@@ -62,10 +63,17 @@ pub async fn start() -> std::io::Result<()> {
     // 设置模板函数
     nako_view::set_fns(&mut view);
 
+    let redis_url = env::get_env::<String>("REDIS_URL", "8080".to_string());
+    let redis = redis::create_redis_pool(redis_url).await.unwrap();
+
     let state = AppState { 
         view: view, 
         db: conn, 
+        redis: redis, 
     };
+
+    let session_redis_url = env::get_env::<String>("SESSION_REDIS_URL", "redis://127.0.0.1:6379".to_string());
+    let redis_store = RedisSessionStore::new(session_redis_url.clone()).await.unwrap();
 
     let mut listenfd = ListenFd::from_env();
     let mut server = HttpServer::new(move || {
@@ -75,14 +83,20 @@ pub async fn start() -> std::io::Result<()> {
             )
             .wrap(Logger::default())
             .wrap(
-                SessionMiddleware::builder(CookieSessionStore::default(), Key::from(&[0; 64]))
-                    .cookie_secure(false)
-                    .session_lifecycle(
-                        PersistentSession::default().session_ttl(Duration::hours(2)),
-                    )
-                    .build(),
+                SessionMiddleware::builder(
+                    redis_store.clone(),
+                    Key::from(&[0;64]),
+                )
+                .cookie_secure(false)
+                .session_lifecycle(
+                    PersistentSession::default()
+                        .session_ttl(time::Duration::days(5))
+                )
+                .build(),
             )
-            .app_data(web::Data::new(state.clone()))
+            .app_data(
+                web::Data::new(state.clone()),
+            )
             .app_data(
                 web::FormConfig::default()
                     .error_handler(error::form_parser_error)
@@ -111,7 +125,7 @@ pub async fn start() -> std::io::Result<()> {
                 srv.call(req)
             })
             .service(Fs::new("/static", "./assert/static"))
-            .service(Fs::new("/upload", "./assert/upload"))
+            .service(Fs::new("/upload", "./storage/upload"))
             .configure(admin::route)
             .configure(blog::route)
             .default_service(web::to(error::app_default))

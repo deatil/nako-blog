@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>分类编辑</title>
+    <link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
+</head>
+<body>
+<form class="layui-form" action="">
+    <div class="mainBox">
+        <div class="main-container">
+            <div class="main-container">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">分类名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="name" lay-verify="title" autocomplete="off" placeholder="请输入账号" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">分类标识</label>
+                    <div class="layui-input-block">
+                        <input type="text"  name="slug" lay-verify="title" autocomplete="off" placeholder="请输入昵称" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">状态</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="status" value="1" title="启用" checked>
+                        <input type="radio" name="status" value="0" title="禁用">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="cate-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="pear-btn pear-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+
+<script src="{{ assert(path='admin/component/layui/layui.js') | safe }}"></script>
+<script src="{{ assert(path='admin/component/pear/pear.js') | safe }}"></script>
+<script>
+layui.use(['form','jquery'],function(){
+    let form = layui.form;
+    let $ = layui.jquery;
+
+    form.on('submit(cate-save)', function(data){
+
+        $.ajax({
+            url: "{{ url_for(name='admin.cate-create') | safe }}",
+            data: data.field,
+            dataType:'json',
+            type:'post',
+            success:function(result) {
+                if (result.code == 0) {
+                    layer.msg(result.message, {icon:1,time:1000}, function() {
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+                        parent.layui.table.reload("cate-table");
+                    });
+                } else {
+                    layer.msg(result.message, {icon:2,time:1000});
+                }
+            }
+        })
+        return false;
+    });
+})
+</script>
+<script>
+</script>
+</body>
+</html>

@@ -31,10 +31,7 @@ pub async fn update_info(
     let db = &state.db;
     let view = &state.view;
 
-    let mut id: u32 = 0;
-    if let Some(login_id) = session.get::<u32>("login_id")? {
-        id = login_id;
-    } 
+    let id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
 
     let user_info = user::UserModel::find_user_by_id(db, id).await.unwrap_or_default().unwrap_or_default();
     if user_info.id == 0 {

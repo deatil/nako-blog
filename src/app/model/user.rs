@@ -5,6 +5,40 @@ use crate::app::entity::{
     user::Entity as User,
 };
 
+/// 条件
+#[derive(Clone)]
+pub struct UserWhere {
+    pub username: Option<String>,
+    pub nickname: Option<String>,
+    pub status: Option<i32>,
+}
+
+impl UserWhere {
+    /// 格式化
+    pub fn format(&self) -> Self {
+        let mut username = None;
+        if self.username != Some("".to_string()) {
+            username = self.username.clone();
+        }
+    
+        let mut nickname = None;
+        if self.nickname != Some("".to_string()) {
+            nickname = self.nickname.clone();
+        }
+    
+        let mut status = None;
+        if self.status == Some(1) || self.status == Some(0) {
+            status = self.status;
+        }
+    
+        Self {
+            username: username,
+            nickname: nickname,
+            status: status,
+        }
+    }
+}
+
 pub struct UserModel;
 
 impl UserModel {
@@ -23,51 +57,58 @@ impl UserModel {
         User::find().count(db).await
     }
 
-    pub async fn find_users_count_by_name(db: &DbConn, name: &str) -> Result<u64, DbErr> {
-        User::find()
-            .filter(
-                Condition::any()
-                    .add(user::Column::Username.like(name))
-                    .add(user::Column::Nickname.like(name))
-            )
-            .count(db)
-            .await
-    }
-
-    /// If ok, returns (user models, num pages).
     pub async fn find_users_in_page(
         db: &DbConn,
         page: u64,
         per_page: u64,
     ) -> Result<(Vec<user::Model>, u64), DbErr> {
-        // Setup paginator
         let paginator = User::find()
             .order_by_asc(user::Column::Id)
             .paginate(db, per_page);
         let num_pages = paginator.num_pages().await?;
 
-        // Fetch paginated users
         paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
     }
 
-    pub async fn find_users_in_page_by_name(
+    // 搜索
+    pub async fn search_count(
+        db: &DbConn,
+        wheres: UserWhere,
+    ) -> Result<u64, DbErr> {
+        User::find()
+            .apply_if(wheres.username, |query, v| {
+                query.filter(user::Column::Username.contains(format!("%{}%", v).as_str()))
+            })
+            .apply_if(wheres.nickname, |query, v| {
+                query.filter(user::Column::Nickname.contains(format!("%{}%", v).as_str()))
+            })
+            .apply_if(wheres.status, |query, v| {
+                query.filter(user::Column::Status.eq(v))
+            })
+            .count(db)
+            .await
+    }
+
+    pub async fn search_in_page(
         db: &DbConn,
         page: u64,
         per_page: u64,
-        name: &str,
+        wheres: UserWhere,
     ) -> Result<(Vec<user::Model>, u64), DbErr> {
-        // Setup paginator
         let paginator = User::find()
-            .filter(
-                Condition::any()
-                    .add(user::Column::Username.like(name))
-                    .add(user::Column::Nickname.like(name))
-            )
+            .apply_if(wheres.username, |query, v| {
+                query.filter(user::Column::Username.contains(format!("%{}%", v).as_str()))
+            })
+            .apply_if(wheres.nickname, |query, v| {
+                query.filter(user::Column::Nickname.contains(format!("%{}%", v).as_str()))
+            })
+            .apply_if(wheres.status, |query, v| {
+                query.filter(user::Column::Status.eq(v))
+            })
             .order_by_asc(user::Column::Id)
             .paginate(db, per_page);
         let num_pages = paginator.num_pages().await?;
 
-        // Fetch paginated users
         paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
     }
 

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>文章详情</title>
+        <link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
+    </head>
+    <body class="pear-container">
+        <div class="table-responsive">
+            <table class="layui-table">
+                <colgroup>
+                    <col width="200">
+                    <col>
+                </colgroup>
+          
+                <thead>
+                    <tr>
+                        <td>名称</td>
+                        <td>内容</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ID</td>
+                        <td>{{ data.id }} </td>
+                    </tr>
+                    <tr>
+                        <td>uuid</td>
+                        <td>{{ data.uuid }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>标题</td>
+                        <td>{{ data.title }}</td>
+                    </tr>
+                    <tr>
+                        <td>关键字</td>
+                        <td>{{ data.keywords }}</td>
+                    </tr>
+                    <tr>
+                        <td>描述</td>
+                        <td>{{ data.description }}</td>
+                    </tr>
+
+                    {% if data.cover %}
+                    <tr>
+                        <td>封面</td>
+                        <td>
+                            <a href="{{ data.cover }}" target="_blank">
+                                <img id="showImg" src="{{ data.cover }}" width="370px">
+                            </a>
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                    <tr>
+                        <td>分类</td>
+                        <td>{{ cate.name }} [{{ data.cate_id }}]</td>
+                    </tr>
+                    <tr>
+                        <td>所属账号</td>
+                        <td>{{ user.username }} [{{ data.user_id }}]</td>
+                    </tr>
+
+                    <tr>
+                        <td>标签</td>
+                        <td>{{ data.tags }}</td>
+                    </tr>
+                    <tr>
+                        <td>文章来源</td>
+                        <td>{{ data.from }}</td>
+                    </tr>
+                    <tr>
+                        <td>阅读量</td>
+                        <td>{{ data.views }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>置顶</td>
+                        <td>
+                            {% if data.is_top == 1 %}
+                                <span class="layui-badge-dot layui-bg-green"></span>
+                                <span class="text-green">是</span>
+                            {% else %}
+                                <span class="layui-badge-dot layui-bg-orange"></span>
+                                <span class="text-orange">否</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>状态</td>
+                        <td>
+                            {% if data.status == 1 %}
+                                <span class="layui-badge-dot layui-bg-green"></span>
+                                <span class="text-green">启用</span>
+                            {% else %}
+                                <span class="layui-badge-dot layui-bg-orange"></span>
+                                <span class="text-orange">禁用</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>添加时间</td>
+                        <td>
+                            {{ data.add_time | date(format="%Y-%m-%d %H:%M:%S", timezone="Asia/Shanghai") }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>添加IP</td>
+                        <td>
+                            {{ data.add_ip }}
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>     
+        
+    </body>
+</html>

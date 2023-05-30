@@ -12,6 +12,7 @@ pub struct Model {
     pub ext: String,
     pub size: u64,
     pub md5: String,
+    pub r#type: i32,
     pub status: i32,
     pub add_time: i64,
     pub add_ip: String,

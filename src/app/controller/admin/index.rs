@@ -14,6 +14,10 @@ use crate::nako::global::{
 use crate::app::data as app_data;
 use crate::app::model::{
     user,
+    art,
+    cate,
+    comment,
+    tag,
 };
 
 // 首页
@@ -24,15 +28,11 @@ pub async fn index(
     let db = &state.db;
     let view = &state.view;
 
+    let id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
+    let user_info = user::UserModel::find_user_by_id(db, id).await.unwrap_or_default().unwrap_or_default();
+    
     let mut ctx = nako_http::view_data();
-
-    if let Some(login_id) = session.get::<u32>("login_id")? {
-        let user_data = user::UserModel::find_user_by_id(db, login_id).await;
-
-        if let Ok(Some(user_info)) = user_data {
-            ctx.insert("login_user", &user_info);
-        }
-    } 
+    ctx.insert("login_user", &user_info);
 
     Ok(nako_http::view(view, "admin/index/index.html", &ctx))
 }
@@ -48,12 +48,19 @@ pub async fn menu() -> Result<HttpResponse, Error> {
 pub async fn console(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
+    let db = &state.db;
     let view = &state.view;
 
-    let mut ctx = nako_http::view_data();
+    let art_count = art::ArtModel::find_count(db).await.unwrap_or(0);
+    let cate_count = cate::CateModel::find_count(db).await.unwrap_or(0);
+    let comment_count = comment::CommentModel::find_count(db).await.unwrap_or(0);
+    let tag_count = tag::TagModel::find_count(db).await.unwrap_or(0);
 
-    let art_count = 12;
+    let mut ctx = nako_http::view_data();
     ctx.insert("art_count", &art_count);
+    ctx.insert("cate_count", &cate_count);
+    ctx.insert("comment_count", &comment_count);
+    ctx.insert("tag_count", &tag_count);
 
     Ok(nako_http::view(view, "admin/index/console.html", &ctx))
 }

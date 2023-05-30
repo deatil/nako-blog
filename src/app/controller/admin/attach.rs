@@ -29,7 +29,7 @@ use crate::app::model::{
     attach,
 };
 use crate::nako::app::{
-    file_path, 
+    upload_path, 
 };
 
 // 首页
@@ -55,6 +55,9 @@ pub struct ListData {
 pub struct ListQuery {
     page: u64,
     limit: u64,
+
+    name: Option<String>,
+    status: Option<i32>,
 }
 
 // 数据列表
@@ -67,8 +70,21 @@ pub async fn list(
     let page: u64 = query.page;
     let per_page: u64 = query.limit;
 
-    let (list, _num_pages) = attach::AttachModel::find_in_page(db, page, per_page).await.unwrap_or_default();
-    let count = attach::AttachModel::find_count(db).await.unwrap_or(0);
+    let search_where = attach::AttachWhere{
+        name: query.name.clone(),
+        status: query.status,
+    };
+    let search_where = search_where.format();
+
+    let (list, _num_pages) = attach::AttachModel::search_in_page(
+            db, 
+            page, 
+            per_page, 
+            search_where.clone(),
+        )
+        .await.unwrap_or_default();
+    let count = attach::AttachModel::search_count(db, search_where.clone())
+        .await.unwrap_or(0);
 
     let res = ListData{
         list: list,
@@ -136,8 +152,8 @@ pub async fn delete(
         return Ok(nako_http::error_response_json("删除失败"));
     }
 
-    let file_path = file_path(data.path);
-    fs::remove_file(file_path).unwrap_or_default();
+    let upload_path = upload_path(data.path);
+    fs::remove_file(upload_path).unwrap_or_default();
 
     Ok(nako_http::success_response_json("删除成功", ""))
 }
@@ -148,7 +164,6 @@ pub async fn delete(
 pub struct DownloadQuery {
     id: u32,
 }
-
 
 // 下载
 pub async fn download(
@@ -167,7 +182,7 @@ pub async fn download(
         return Ok(nako_http::text("附件不存在".to_string()));
     }
 
-    let filename = file_path(data.path);
+    let filename = upload_path(data.path);
 
     if let Ok(named_file) = NamedFile::open(&filename) {
         let content_disposition = ContentDisposition {
@@ -181,11 +196,18 @@ pub async fn download(
     return Ok(nako_http::text("文件不存在".to_string()));
 }
 
+// ==========================
+
+#[derive(Deserialize)]
+pub struct PreviewQuery {
+    id: u32,
+}
+
 // 预览
 pub async fn preview(
     req: HttpRequest,
     state: web::Data<AppState>,
-    query: web::Query<DownloadQuery>,
+    query: web::Query<PreviewQuery>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
 
@@ -198,9 +220,9 @@ pub async fn preview(
         return Ok(nako_http::text("附件不存在".to_string()));
     }
 
-    let file_path = file_path(data.path);
+    let upload_path = upload_path(data.path);
 
-    if let Ok(named_file) = NamedFile::open(&file_path) {
+    if let Ok(named_file) = NamedFile::open(&upload_path) {
         return Ok(named_file.into_response(&req));
     }
 

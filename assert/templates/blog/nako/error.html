@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>系统提示</title>
+        <link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
+		<link href="{{ assert(path='admin/admin/css/other/error.css') | safe }}" rel="stylesheet" />
+	</head>
+	<body>
+		<div class="content">
+			<img src="{{ assert(path='admin/admin/images/500.svg') | safe }}" alt="500">
+			<div class="content-r">
+				<h1>404</h1>
+				<p>{{ message }}</p>
+				<a href="/" class="pear-btn pear-btn-primary">返回首页</a>
+			</div>
+		</div>
+	</body>
+</html>

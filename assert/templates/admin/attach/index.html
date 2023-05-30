@@ -8,6 +8,43 @@
 	<body class="pear-container">
 		<div class="layui-card">
 			<div class="layui-card-body">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">文件名</label>
+							<div class="layui-input-inline">
+								<input type="text" name="name" placeholder="" class="layui-input">
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">状态</label>
+							<div class="layui-input-inline">
+								<select name="status" lay-verify="">
+									<option value="-1">全部</option>
+									<option value="1">启用</option>
+									<option value="0">禁用</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="attach-query">
+								<i class="layui-icon layui-icon-search"></i>
+								查询
+							</button>
+							<button type="reset" class="pear-btn pear-btn-md">
+								<i class="layui-icon layui-icon-refresh"></i>
+								重置
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<div class="layui-card">
+			<div class="layui-card-body">
 				<table id="attach-table" lay-filter="attach-table"></table>
 			</div>
 		</div>
@@ -31,7 +68,7 @@
 
 		<script type="text/html" id="createTime">
 			{{# if (d.add_time > 0) { }}
-				{{layui.util.toDateString(d.add_time * 1000, 'yyyy-MM-dd HH:mm')}}
+				{{layui.util.toDateString(d.add_time * 1000, 'yyyy-MM-dd HH:mm:ss')}}
 		    {{# } else { }}
 		    	--
 		    {{# } }}
@@ -63,7 +100,8 @@
 							title: '上传时间',
 							field: 'createTime',
 							align: 'left',
-							templet: '#createTime'
+							templet: '#createTime',
+							width: 160,
 						},
 						{
 							title: '启用',
@@ -109,6 +147,13 @@
 					} else if (obj.event === 'download') {
 						window.download(obj);
 					}
+				});
+
+				form.on('submit(attach-query)', function(data) {
+					table.reload('attach-table', {
+						where: data.field
+					})
+					return false;
 				});
 
 				table.on('toolbar(attach-table)', function(obj) {

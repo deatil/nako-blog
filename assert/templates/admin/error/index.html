@@ -10,9 +10,9 @@
 		<div class="content">
 			<img src="{{ assert(path='admin/admin/images/500.svg') | safe }}" alt="500">
 			<div class="content-r">
-				<h1>错误</h1>
+				<h1>404</h1>
 				<p>{{ message }}</p>
-				<a href="{{ url }}" class="pear-btn pear-btn-primary">马上跳转</a>
+				<a href="javascript:location.reload();" class="pear-btn pear-btn-primary">刷新重试</a>
 			</div>
 		</div>
 	</body>

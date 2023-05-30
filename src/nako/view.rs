@@ -8,7 +8,6 @@ use tera::{
 };
 use serde_json::value::{
     from_value, 
-    /*to_value, */ 
     Value,
 };
 
@@ -47,29 +46,6 @@ fn assert(args: &HashMap<String, Value>) -> Result<Value> {
         },
     }
 
-}
-
-// 后台路由
-fn admin_url(args: &HashMap<String, Value>) -> Result<Value> {
-    let admin_prefix = env::get_env::<String>("ADMIN_PREFIX", "admin".to_string());
-
-    let none_route = format!("/{}/index", admin_prefix);
-
-    match args.get("url") {
-        Some(val) => match from_value::<String>(val.clone()) {
-            Ok(v) =>  {
-                let v2 = format!("/{}/{}", admin_prefix, v);
-
-                Ok(serde_json::Value::String(v2))
-            },
-            Err(_) => {
-                Ok(serde_json::Value::String(none_route))
-            }
-        },
-        None => {
-            Ok(serde_json::Value::String(none_route))
-        },
-    }
 }
 
 // 头像
@@ -143,7 +119,6 @@ fn format_size(args: &HashMap<String, Value>) -> Result<Value> {
 // 设置模板方法
 pub fn set_fns(view: &mut Tera) {
     view.register_function("assert", assert);
-    view.register_function("admin_url", admin_url);
     view.register_function("avatar", avatar);
     view.register_function("url_for", url_for);
     view.register_function("format_size", format_size);

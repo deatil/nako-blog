@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>编辑页面</title>
+        <link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
+        <style>
+        #fileName {
+            display: inline-block;
+            width: 235px;
+            margin-bottom: 10px;
+        }
+        </style>
+    </head>
+    <body>
+    <form class="layui-form" action="">
+        <div class="mainBox">
+            <div class="main-container">
+                <div class="main-container">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">页面标题</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="title" value="{{ data.title }}" lay-verify="title" autocomplete="off" placeholder="请输入页面标题" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">页面内容</label>
+                        <div class="layui-input-block">
+                            <textarea name="content" placeholder="请输入页面内容" id="content" class="layui-textarea js-content">{{ data.content }}</textarea>
+                        </div>
+                    </div>   
+    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">页面标识</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="slug" value="{{ data.slug }}" lay-verify="title" autocomplete="off" placeholder="请输入页面标识" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">关键字</label>
+                        <div class="layui-input-block">
+                            <input type="text"  name="keywords" value="{{ data.keywords }}" lay-verify="title" autocomplete="off" placeholder="请输入关键字" class="layui-input">
+                        </div>
+                    </div>
+    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">描述</label>
+                        <div class="layui-input-block">
+                            <textarea name="description" placeholder="请输入描述" class="layui-textarea">{{ data.description }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">页面模板</label>
+                        <div class="layui-input-block">
+							<select name="tpl" lay-verify="">
+                                {% for page_tpl in page_tpls %}
+                                    {% if data.tpl == page_tpl %}
+								        <option value="{{ page_tpl }}" selected>{{ page_tpl }}</option>
+                                    {% else %}
+                                        <option value="{{ page_tpl }}">{{ page_tpl }}</option>
+                                    {% endif %}
+                                {% endfor %}
+							</select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            {% if data.status == 1 %}
+                                <input type="radio" name="status" value="1" title="启用" checked>
+                                <input type="radio" name="status" value="0" title="禁用">
+                            {% else %}
+                                <input type="radio" name="status" value="1" title="启用">
+                                <input type="radio" name="status" value="0" title="禁用" checked>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bottom">
+            <div class="button-container">
+                <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="page-save">
+                    <i class="layui-icon layui-icon-ok"></i>
+                    提交
+                </button>
+                <button type="reset" class="pear-btn pear-btn-sm">
+                    <i class="layui-icon layui-icon-refresh"></i>
+                    重置
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <script src="{{ assert(path='admin/component/layui/layui.js') | safe }}"></script>
+    <script src="{{ assert(path='admin/component/pear/pear.js') | safe }}"></script>
+    <script>
+    layui.use(['form', 'jquery', 'tinymce', 'laydate'],function(){
+        let form = layui.form;
+        let $ = layui.jquery;
+        var tinymce = layui.tinymce;
+
+        var edit = tinymce.render({
+            elem: "#content",
+            toolbar: true,
+            menubar: true,
+            height: 400,
+            form: {
+                name: 'file',
+            },
+            images_upload_url: "{{ url_for(name='admin.upload-image') | safe }}",
+            success: function(res, succFun, failFun) {
+                if (res['code'] == 0) {
+                    succFun(res['data'][0]['url']);
+                } else {
+                    failFun(res['message']);
+                }
+            },
+        });
+        edit.on("change", function() {
+            edit.save();
+        });
+        
+        form.on('submit(page-save)', function(data) {
+            $.ajax({
+                url: "{{ url_for(name='admin.page-update') | safe }}?id={{ data.id }}",
+                data: data.field,
+                dataType: 'json',
+                type: 'post',
+                success: function(result) {
+                    if (result.code == 0) {
+                        layer.msg(result.message, {icon:1,time:1000}, function() {
+                            parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+                            parent.layui.table.reload("page-table");
+                        });
+                    } else {
+                        layer.msg(result.message, {icon:2,time:1000});
+                    }
+                }
+            });
+
+            return false;
+        });
+    })
+    </script>
+    </body>
+</html>

@@ -5,14 +5,23 @@ use crate::nako::{
     env,
 };
 
-use crate::app::middleware::{admin_auth};
+use crate::app::middleware::{
+    admin_auth,
+};
 use crate::app::controller::admin::{
     index,
     auth,
     user,
+    cate,
     profile,
     upload,
     attach,
+    comment,
+    tag,
+    art,
+    page,
+    setting,
+    error,
 };
 
 pub fn route(cfg: &mut web::ServiceConfig) {
@@ -85,6 +94,11 @@ pub fn route(cfg: &mut web::ServiceConfig) {
                 // 上传
                 web::scope("/upload")
                     .service(
+                        web::resource("/image")
+                            .route(web::post().to(upload::image))
+                            .name("admin.upload-image"),
+                    )
+                    .service(
                         web::resource("/file")
                             .route(web::post().to(upload::file))
                             .name("admin.upload-file"),
@@ -93,6 +107,199 @@ pub fn route(cfg: &mut web::ServiceConfig) {
                         web::resource("/avatar")
                             .route(web::post().to(upload::avatar))
                             .name("admin.upload-avatar"),
+                    )
+            )
+            .service(
+                // 文章
+                web::scope("/art")
+                    .service(
+                        web::resource("/index")
+                            .route(web::get().to(art::index))
+                            .name("admin.art-index"),
+                    )
+                    .service(
+                        web::resource("/list")
+                            .route(web::get().to(art::list))
+                            .name("admin.art-list"),
+                    )
+                    .service(
+                        web::resource("/detail")
+                            .route(web::get().to(art::detail))
+                            .name("admin.art-detail"),
+                    )
+                    .service(
+                        web::resource("/create")
+                            .route(web::get().to(art::create))
+                            .route(web::post().to(art::create_save))
+                            .name("admin.art-create"),
+                    )
+                    .service(
+                        web::resource("/update")
+                            .route(web::get().to(art::update))
+                            .route(web::post().to(art::update_save))
+                            .name("admin.art-update"),
+                    )
+                    .service(
+                        web::resource("/status")
+                            .route(web::post().to(art::update_status))
+                            .name("admin.art-status"),
+                    )
+                    .service(
+                        web::resource("/delete")
+                            .route(web::post().to(art::delete))
+                            .name("admin.art-delete"),
+                    )
+            )
+            .service(
+                // 分类
+                web::scope("/cate")
+                    .service(
+                        web::resource("/index")
+                            .route(web::get().to(cate::index))
+                            .name("admin.cate-index"),
+                    )
+                    .service(
+                        web::resource("/list")
+                            .route(web::get().to(cate::list))
+                            .name("admin.cate-list"),
+                    )
+                    .service(
+                        web::resource("/detail")
+                            .route(web::get().to(cate::detail))
+                            .name("admin.cate-detail"),
+                    )
+                    .service(
+                        web::resource("/create")
+                            .route(web::get().to(cate::create))
+                            .route(web::post().to(cate::create_save))
+                            .name("admin.cate-create"),
+                    )
+                    .service(
+                        web::resource("/update")
+                            .route(web::get().to(cate::update))
+                            .route(web::post().to(cate::update_save))
+                            .name("admin.cate-update"),
+                    )
+                    .service(
+                        web::resource("/status")
+                            .route(web::post().to(cate::update_status))
+                            .name("admin.cate-status"),
+                    )
+                    .service(
+                        web::resource("/delete")
+                            .route(web::post().to(cate::delete))
+                            .name("admin.cate-delete"),
+                    )
+            )
+            .service(
+                // 评论
+                web::scope("/comment")
+                    .service(
+                        web::resource("/index")
+                            .route(web::get().to(comment::index))
+                            .name("admin.comment-index"),
+                    )
+                    .service(
+                        web::resource("/list")
+                            .route(web::get().to(comment::list))
+                            .name("admin.comment-list"),
+                    )
+                    .service(
+                        web::resource("/detail")
+                            .route(web::get().to(comment::detail))
+                            .name("admin.comment-detail"),
+                    )
+                    .service(
+                        web::resource("/status")
+                            .route(web::post().to(comment::update_status))
+                            .name("admin.comment-status"),
+                    )
+                    .service(
+                        web::resource("/delete")
+                            .route(web::post().to(comment::delete))
+                            .name("admin.comment-delete"),
+                    )
+            )
+            .service(
+                // 标签
+                web::scope("/tag")
+                    .service(
+                        web::resource("/index")
+                            .route(web::get().to(tag::index))
+                            .name("admin.tag-index"),
+                    )
+                    .service(
+                        web::resource("/list")
+                            .route(web::get().to(tag::list))
+                            .name("admin.tag-list"),
+                    )
+                    .service(
+                        web::resource("/detail")
+                            .route(web::get().to(tag::detail))
+                            .name("admin.tag-detail"),
+                    )
+                    .service(
+                        web::resource("/create")
+                            .route(web::get().to(tag::create))
+                            .route(web::post().to(tag::create_save))
+                            .name("admin.tag-create"),
+                    )
+                    .service(
+                        web::resource("/update")
+                            .route(web::get().to(tag::update))
+                            .route(web::post().to(tag::update_save))
+                            .name("admin.tag-update"),
+                    )
+                    .service(
+                        web::resource("/status")
+                            .route(web::post().to(tag::update_status))
+                            .name("admin.tag-status"),
+                    )
+                    .service(
+                        web::resource("/delete")
+                            .route(web::post().to(tag::delete))
+                            .name("admin.tag-delete"),
+                    )
+            )
+            .service(
+                // 页面
+                web::scope("/page")
+                    .service(
+                        web::resource("/index")
+                            .route(web::get().to(page::index))
+                            .name("admin.page-index"),
+                    )
+                    .service(
+                        web::resource("/list")
+                            .route(web::get().to(page::list))
+                            .name("admin.page-list"),
+                    )
+                    .service(
+                        web::resource("/detail")
+                            .route(web::get().to(page::detail))
+                            .name("admin.page-detail"),
+                    )
+                    .service(
+                        web::resource("/create")
+                            .route(web::get().to(page::create))
+                            .route(web::post().to(page::create_save))
+                            .name("admin.page-create"),
+                    )
+                    .service(
+                        web::resource("/update")
+                            .route(web::get().to(page::update))
+                            .route(web::post().to(page::update_save))
+                            .name("admin.page-update"),
+                    )
+                    .service(
+                        web::resource("/status")
+                            .route(web::post().to(page::update_status))
+                            .name("admin.page-status"),
+                    )
+                    .service(
+                        web::resource("/delete")
+                            .route(web::post().to(page::delete))
+                            .name("admin.page-delete"),
                     )
             )
             .service(
@@ -170,7 +377,23 @@ pub fn route(cfg: &mut web::ServiceConfig) {
                             .route(web::get().to(attach::download))
                             .name("admin.attach-download"),
                     )
-            )            
+                    .service(
+                        web::resource("/preview")
+                            .route(web::get().to(attach::preview))
+                            .name("admin.attach-preview"),
+                    )
+            )
+            .service(
+                // 设置
+                web::scope("/setting")
+                    .service(
+                        web::resource("/index")
+                            .route(web::get().to(setting::index))
+                            .route(web::post().to(setting::setting_save))
+                            .name("admin.setting-index"),
+                    )
+            )
+            .default_service(web::to(error::index))
             .wrap(from_fn(admin_auth::auth)),
     );
 }
