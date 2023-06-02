@@ -5,3 +5,4 @@ pub mod index;
 pub mod page;
 pub mod tag;
 pub mod view;
+pub mod guestbook;

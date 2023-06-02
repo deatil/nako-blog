@@ -11,24 +11,24 @@ pub use sea_orm;
 
 use crate::nako::{
     app,
-    env::get_env,
+    config,
 };
 
 // 数据库连接
 pub async fn connect() -> Result<DatabaseConnection, DbErr> {
-    let db_url = get_env::<String>("DB_URL", "".to_string());
+    let db_url = config::section::<String>("db", "url", "".to_string());
 
-    let max_connections = get_env::<u32>("DB_MAX_CONNECTIONS", 100);
-    let min_connections = get_env::<u32>("DB_MIN_CONNECTIONS", 5);
+    let max_connections = config::section::<u32>("db", "max_connections", 100);
+    let min_connections = config::section::<u32>("db", "min_connections", 5);
 
-    let connect_timeout = get_env::<u64>("DB_CONNECT_TIMEOUT", 8);
-    let acquire_timeout = get_env::<u64>("DB_ACQUIRE_TIMEOUT", 8);
-    let idle_timeout = get_env::<u64>("DB_IDLE_TIMEOUT", 8);
-    let max_lifetime = get_env::<u64>("DB_MAX_LIFETIME", 8);
+    let connect_timeout = config::section::<u64>("db", "connect_timeout", 8);
+    let acquire_timeout = config::section::<u64>("db", "acquire_timeout", 8);
+    let idle_timeout = config::section::<u64>("db", "idle_timeout", 8);
+    let max_lifetime = config::section::<u64>("db", "max_lifetime", 8);
 
-    let logging = get_env::<bool>("DB_LOGGING", false);
+    let logging = config::section::<bool>("db", "logging", false);
 
-    let db_logging_level = get_env::<String>("DB_LOGGING_LEVEL", "info".into());
+    let db_logging_level = config::section::<String>("db", "logging_level", "info".into());
     let logging_level = app::get_log_level(db_logging_level);
 
     let mut opt = ConnectOptions::new(db_url);

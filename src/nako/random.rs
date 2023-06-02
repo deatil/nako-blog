@@ -5,7 +5,8 @@ pub fn random_b64(len: usize) -> String {
     let mut rng = rand::thread_rng();
     let mut s = String::with_capacity(len);
     for _ in 0..len {
-        s.push(chars.chars().nth(rng.gen_range(0..64)).unwrap());
+        s.push(chars.chars().nth(rng.gen_range(0..64)).unwrap_or_default());
     }
+
     return s;
 }

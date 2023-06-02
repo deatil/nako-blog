@@ -1,0 +1,30 @@
+<div class="widewrapper masthead">
+    <div class="container">
+        <a href="{{ url_for(name='blog.index') | safe }}"logo">
+            <img src="{{ assert(path='blog/nako/img/logo.png') | safe }}" alt="clean Blog">
+        </a>
+
+        <div id="mobile-nav-toggle" class="pull-right">
+            <a href="#" data-toggle="collapse" data-target=".clean-nav .navbar-collapse">
+                <i class="fa fa-bars"></i>
+            </a>
+        </div>
+
+        <nav class="pull-right clean-nav">
+            <div class="collapse navbar-collapse">
+                <ul class="nav nav-pills navbar-nav">
+                        <li>
+                        <a href="{{ url_for(name='blog.index') | safe }}">首页</a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for(name='blog.page-index', elements=['aboutme' | as_str ]) | safe }}">关于我</a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for(name='blog.page-index', elements=['contact' | as_str ]) | safe }}">联系我</a>
+                    </li>                 
+                </ul>
+            </div>
+        </nav>        
+
+    </div>
+</div>

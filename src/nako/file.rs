@@ -26,10 +26,10 @@ impl File {
     }
 
     /// 删除文件
-    pub fn remove(f: &str) -> Result<String, Error> {
+    pub fn remove(f: &str) -> Result<(), Error> {
         fs::remove_file(f)?;
 
-        Ok(String::new())
+        Ok(())
     }
 
     /// 创建文件
@@ -55,27 +55,27 @@ impl File {
     }
 
     /// 写入信息
-    pub fn write(f: &str, content: String) -> Result<String, Error> {
+    pub fn write(f: &str, content: String) -> Result<(), Error> {
         let path = path::Path::new(f);
 
         let mut file = fs::File::create(path)?;
         file.write_all(content.as_bytes())?;
 
-        Ok(String::new())
+        Ok(())
     }
 
     /// 创建文件夹
-    pub fn mkdir(d: &str) -> Result<String, Error> {
+    pub fn mkdir(d: &str) -> Result<(), Error> {
         fs::create_dir_all(d)?;
 
-        Ok(String::new())
+        Ok(())
     }
 
     /// 删除文件夹
-    pub fn rmdir(d: &str) -> Result<String, Error> {
+    pub fn rmdir(d: &str) -> Result<(), Error> {
         fs::remove_dir(d)?;
 
-        Ok(String::new())
+        Ok(())
     }
 
 }

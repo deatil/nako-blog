@@ -1,0 +1,18 @@
+{% extends "blog/nako/base.html" %}
+
+{% block title %}关于我{% endblock title %}
+
+{% block breadcrumb %}
+<a href="#">关于我</a>
+{% endblock breadcrumb %}
+
+{% block container %}
+<div class="widewrapper main">
+  <div class="container about">
+      <div class="page-content">
+        {{ data.content | safe }}
+      </div>
+  </div>
+
+</div>
+{% endblock container %}

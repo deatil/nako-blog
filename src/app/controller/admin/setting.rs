@@ -18,6 +18,7 @@ use crate::app::entity::{
 use crate::app::model::{
     setting,
 };
+use crate::app::service;
 
 // 首页
 pub async fn index(
@@ -61,6 +62,8 @@ pub async fn setting_save(
             }
         }
     }
+
+    service::setting::clear(&mut state.get_ref().clone()).await;
 
     Ok(nako_http::success_response_json("更新成功", ""))
 }

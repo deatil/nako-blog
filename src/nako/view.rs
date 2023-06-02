@@ -18,12 +18,14 @@ use actix_web::{
 };
 
 use crate::nako::{
-    env,
+    app,
+    config,
     utils,
 };
 
 thread_local! {
     pub static ROUTES_KEY: RefCell<Option<ResourceMap>> = RefCell::new(None);
+    pub static SETTINGS: RefCell<Option<HashMap<String, String>>> = RefCell::new(None);
 }
 
 // 引入资源
@@ -48,9 +50,31 @@ fn assert(args: &HashMap<String, Value>) -> Result<Value> {
 
 }
 
+// 图片预览
+fn upload_url(args: &HashMap<String, Value>) -> Result<Value> {
+    let none = String::from("/upload/none");
+
+    match args.get("path") {
+        Some(val) => match from_value::<String>(val.clone()) {
+            Ok(v) =>  {
+                let path = app::upload_url(v);
+
+                Ok(serde_json::Value::String(path))
+            },
+            Err(_) => {
+                Ok(serde_json::Value::String(none))
+            }
+        },
+        None => {
+            Ok(serde_json::Value::String(none))
+        },
+    }
+
+}
+
 // 头像
 fn avatar(args: &HashMap<String, Value>) -> Result<Value> {
-    let mut default_avatar = env::get_env::<String>("DEFAULT_AVATAR", "".to_string());
+    let mut default_avatar = config::section::<String>("app", "default_avatar", "".to_string());
     default_avatar = format!("/static/{}", default_avatar);
 
     match args.get("path") {
@@ -116,10 +140,31 @@ fn format_size(args: &HashMap<String, Value>) -> Result<Value> {
     }
 }
 
+// 设置
+pub fn settings(args: &HashMap<String, Value>) -> WebResult<Value, Error> {
+    let name = args["name"].as_str().ok_or(Error::msg("`name` should be a string"))?;
+    
+    SETTINGS.with(|data| {
+        let mut data_option = data.borrow_mut();
+        let datas = data_option.as_mut().ok_or(
+            Error::msg("`settings` should only be called in request context")
+        )?;
+
+        let mut res: String = "".to_string();
+        if let Some(k) = datas.get(name) {
+            res = k.parse::<String>().unwrap_or("".into());
+        }
+
+        Ok(Value::String(res))
+    })
+}
+
 // 设置模板方法
 pub fn set_fns(view: &mut Tera) {
     view.register_function("assert", assert);
+    view.register_function("upload_url", upload_url);
     view.register_function("avatar", avatar);
     view.register_function("url_for", url_for);
     view.register_function("format_size", format_size);
+    view.register_function("settings", settings);
 }

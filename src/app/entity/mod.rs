@@ -6,6 +6,7 @@ pub mod page;
 pub mod setting;
 pub mod tag;
 pub mod user;
+pub mod guestbook;
 
 #[inline]
 pub fn default<T: Default>() -> T {

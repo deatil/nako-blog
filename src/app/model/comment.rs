@@ -82,7 +82,8 @@ impl CommentModel {
         artid: u32,
     ) -> Result<u64, DbErr> {
         Comment::find()
-            .filter(comment::Column::ArtId.contains(artid.to_string().as_str()))
+            .filter(comment::Column::ArtId.eq(artid))
+            .filter(comment::Column::Status.eq(1))
             .count(db)
             .await
     }
@@ -94,8 +95,9 @@ impl CommentModel {
         per_page: u64,
     ) -> Result<(Vec<comment::Model>, u64), DbErr> {
         let paginator = Comment::find()
-            .filter(comment::Column::ArtId.contains(artid.to_string().as_str()))
-            .order_by_asc(comment::Column::Id)
+            .filter(comment::Column::ArtId.eq(artid))
+            .filter(comment::Column::Status.eq(1))
+            .order_by_desc(comment::Column::AddTime)
             .paginate(db, per_page);
         let num_pages = paginator.num_pages().await?;
 

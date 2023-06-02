@@ -1,0 +1,47 @@
+<aside class="col-md-4 blog-aside">
+      
+    <div class="aside-widget">
+        <header>
+            <h3>热门文章</h3>
+        </header>
+        <div class="body">
+            <ul class="clean-list">
+              {% if hot_arts %}
+                  {% for hot_art in hot_arts %}
+                      <li><a href="{{ url_for(name='blog.view-index', elements=[hot_art.uuid | as_str]) | safe }}">{{ hot_art.title }}</a></li>
+                  {% endfor %}
+              {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="aside-widget">
+        <header>
+            <h3>文章分类</h3>
+        </header>
+        <div class="body">
+            <ul class="clean-list">
+              {% if cates %}
+                  {% for cate_item in cates %}
+                      <li><a href="{{ url_for(name='blog.cate-name', elements=[cate_item.slug | as_str]) | safe }}">{{ cate_item.name }}</a></li>
+                  {% endfor %}
+              {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="aside-widget">
+        <header>
+            <h3>推荐标签</h3>
+        </header>
+        <div class="body clearfix">
+            <ul class="tags">
+              {% if tags %}
+                  {% for tag in tags %}
+                      <li><a href="{{ url_for(name='blog.tag-index', elements=[tag.name | as_str]) | safe }}">{{ tag.name }}</a></li>
+                  {% endfor %}
+              {% endif %}                        
+            </ul>
+        </div>
+    </div>
+</aside>

@@ -18,6 +18,13 @@
             <div class="main-container">
                 <div class="main-container">
                     <div class="layui-form-item">
+                        <label class="layui-form-label">页面标识</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="slug" value="{{ data.slug }}" lay-verify="title" autocomplete="off" placeholder="请输入页面标识" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
                         <label class="layui-form-label">页面标题</label>
                         <div class="layui-input-block">
                             <input type="text" name="title" value="{{ data.title }}" lay-verify="title" autocomplete="off" placeholder="请输入页面标题" class="layui-input">
@@ -31,13 +38,6 @@
                         </div>
                     </div>   
     
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">页面标识</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="slug" value="{{ data.slug }}" lay-verify="title" autocomplete="off" placeholder="请输入页面标识" class="layui-input">
-                        </div>
-                    </div>
-                    
                     <div class="layui-form-item">
                         <label class="layui-form-label">关键字</label>
                         <div class="layui-input-block">

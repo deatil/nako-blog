@@ -27,7 +27,7 @@ use listenfd::ListenFd;
 
 use crate::nako::{
     db, 
-    env,
+    config,
     redis,
     view as nako_view,
     log as nako_log,
@@ -44,6 +44,10 @@ use crate::route::{
 
 /// app 运行
 pub async fn start() -> std::io::Result<()> {
+    let rust_log = config::section::<String>("app", "rust_log", "error".to_string());
+    std::env::set_var("RUST_LOG", rust_log.as_str());
+
+    // 导入环境变量
     dotenvy::dotenv().ok();
 
     // 日志
@@ -53,8 +57,8 @@ pub async fn start() -> std::io::Result<()> {
         Err(err) => log::error!("set log err: {err}"),
     }
 
-    let host = env::get_env::<String>("HOST", "127.0.0.1".to_string());
-    let port = env::get_env::<String>("PORT", "8080".to_string());
+    let host = config::section::<String>("server", "host", "127.0.0.1".to_string());
+    let port = config::section::<String>("server", "port", "8080".to_string());
     let server_url = format!("{host}:{port}");
 
     let conn = db::connect().await.unwrap_or_default();
@@ -63,7 +67,7 @@ pub async fn start() -> std::io::Result<()> {
     // 设置模板函数
     nako_view::set_fns(&mut view);
 
-    let redis_url = env::get_env::<String>("REDIS_URL", "8080".to_string());
+    let redis_url = config::section::<String>("redis", "url", "8080".to_string());
     let redis = redis::create_redis_pool(redis_url).await.unwrap();
 
     let state = AppState { 
@@ -72,7 +76,7 @@ pub async fn start() -> std::io::Result<()> {
         redis: redis, 
     };
 
-    let session_redis_url = env::get_env::<String>("SESSION_REDIS_URL", "redis://127.0.0.1:6379".to_string());
+    let session_redis_url = config::section::<String>("session", "redis_url", "redis://127.0.0.1:6379".to_string());
     let redis_store = RedisSessionStore::new(session_redis_url.clone()).await.unwrap();
 
     let mut listenfd = ListenFd::from_env();

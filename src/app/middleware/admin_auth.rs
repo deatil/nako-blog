@@ -16,6 +16,8 @@ use crate::nako::global::{
     AppState
 };
 
+use crate::app::service;
+
 // 过滤路由
 const IGNORE_ROUTES: [&str; 2] = [
     "/admin/auth/captcha",
@@ -58,7 +60,7 @@ pub async fn auth(
     if !check {
         let message = "请先登陆";
 
-        let url: String = match req.request().url_for("admin.auth-login", &[""]) {
+        let url: String = match req.request().url_for_static("admin.auth-login") {
             Ok(data) => data.into(),
             Err(_) => "/".into(),
         };
@@ -68,7 +70,7 @@ pub async fn auth(
             
             return Ok(req.into_response(res_body_data));
         } else {
-            let res_body_data = http::error_response_html(view, message, url.as_str());
+            let res_body_data = service::http::error_admin_html(view, message, url.as_str());
             
             return Ok(req.into_response(res_body_data));
         }

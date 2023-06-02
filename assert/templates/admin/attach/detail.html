@@ -44,6 +44,16 @@
                         <td>HASH值</td>
                         <td>{{ data.md5 }}</td>
                     </tr>
+
+                    {% if data.type == 2 %}
+                    <tr>
+                        <td>预览</td>
+                        <td>
+                            <img src="{{ upload_url(path=data.path) | safe }}" width="115px" alt="{{ data.name }}">
+                        </td>
+                    </tr>
+                    {% endif %}
+
                     <tr>
                         <td>状态</td>
                         <td>

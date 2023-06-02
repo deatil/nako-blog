@@ -21,7 +21,8 @@ use crate::nako::global::{
 
 use crate::app::entity::{
     self,
-    art as art_entity
+    art as art_entity,
+    // cate as cate_entity,
 };
 use crate::app::model::{
     art,
@@ -72,6 +73,7 @@ pub async fn list(
     let search_where = art::ArtWhere{
         title: query.title.clone(),
         uuid: query.uuid.clone(),
+        tag: None,
         cate_id: None,
         user_id: None,
         is_top: query.is_top,
@@ -249,6 +251,7 @@ pub struct UpdateForm {
     keywords: String,
     description: String,
     content: String,
+    brief: String,
     tags: String,
     from: String,
     is_top: i32,
@@ -264,6 +267,8 @@ pub struct UpdateValidate {
     title: Option<String>,
     #[validate(required(message = "内容不能为空"))]
     content: Option<String>,
+    #[validate(required(message = "简介不能为空"))]
+    brief: Option<String>,
     #[validate(required(message = "状态不能为空"))]
     status: Option<i32>,
     #[validate(required(message = "发布时间不能为空"))]
@@ -284,6 +289,7 @@ pub async fn update_save(
         cate_id: Some(params.cate_id.clone()),
         title: Some(params.title.clone()),
         content: Some(params.content.clone()),
+        brief: Some(params.brief.clone()),
         status: Some(params.status.clone()),
         add_time: Some(params.add_time.clone()),
     };
@@ -310,6 +316,7 @@ pub async fn update_save(
             description: Some(params.description.clone()),
             cover:       Some(params.cover.clone()),
             content:     params.content.clone(),
+            brief:       Some(params.brief.clone()),
             tags:        Some(params.tags.clone()),
             from:        Some(params.from.clone()),
             is_top:      Some(params.is_top),

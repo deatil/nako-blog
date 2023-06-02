@@ -1,0 +1,37 @@
+<footer>
+    <div class="widewrapper footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 footer-widget">
+                    <h3> <i class="fa fa-user"></i>关于我</h3>
+
+                    <p>nako-blog 是使用 rust 开发的博客系统。</p>
+                </div>
+
+                <div class="col-md-4 footer-widget">
+                    <h3> <i class="fa fa-pencil"></i> 推荐链接</h3>
+                    <ul class="clean-list">
+                        <li><a href="{{ url_for(name='blog.cate-index') | safe }}">浏览文章</a></li>
+                        <li><a href="{{ url_for(name='blog.page-index', elements=['contact' | as_str ]) | safe }}">给我留言</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-4 footer-widget">
+                    <h3> <i class="fa fa-envelope"></i>联系我</h3>
+
+                    <p>本博客模板来源于网络，如果你有需求可联系我。</p>
+                    <div class="footer-widget-icon">
+                        <i class="fa fa-facebook"></i>
+                        <i class="fa fa-twitter"></i>
+                        <i class="fa fa-google"></i>
+                    </div>
+                </div>
+               
+            </div>
+        </div>
+    </div>
+    <div class="widewrapper copyright">
+            Copyright @ {{ now() | date(format="%Y", timezone="Asia/Shanghai") }}
+            {{ settings(name="website_copyright") }} {{ settings(name="website_beian") }}
+    </div>
+</footer>

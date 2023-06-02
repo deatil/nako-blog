@@ -16,6 +16,7 @@ pub struct Model {
     pub cover: Option<String>,
     #[sea_orm(column_type = "Text")]
     pub content: String,
+    pub brief: Option<String>,
     pub tags: Option<String>,
     pub from: Option<String>,
     pub views: Option<u64>,
@@ -26,6 +27,31 @@ pub struct Model {
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+    #[sea_orm(
+        belongs_to = "super::cate::Entity",
+        from = "Column::CateId",
+        to = "super::cate::Column::Id"
+    )]
+    Cate,
+    #[sea_orm(
+        belongs_to = "super::user::Entity",
+        from = "Column::UserId",
+        to = "super::user::Column::Id"
+    )]
+    User,
+}
+
+impl Related<super::cate::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Cate.def()
+    }
+}
+
+impl Related<super::user::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::User.def()
+    }
+}
 
 impl ActiveModelBehavior for ActiveModel {}

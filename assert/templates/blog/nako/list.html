@@ -1,0 +1,56 @@
+{% extends "blog/nako/base.html" %}
+
+{% block title %}{{ cate_data.name | default(value="全部文章") }}{% endblock title %}
+{% block description %}{{ cate_data.desc | default(value="文章列表")  | safe }}{% endblock description %}
+
+{% block breadcrumb %}
+<a href="{{ url_for(name='blog.cate-index') | safe }}">{{ cate_data.name | default(value="全部文章") }}</a>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 blog-main">
+      <div class="row">
+        {% if arts %}
+            {% for art in arts %}
+            <div class="col-md-6 col-sm-6">
+                <article class=" blog-teaser">
+                    <header>
+                        <img src="{{ art.cover }}" alt="{{ art.title }}">
+                        <h3><a href="{{ url_for(name='blog.view-index', elements=[art.uuid | as_str]) | safe }}">{{ art.title }}</a></h3>
+                        <span class="meta">{{ art.add_time | date(format="%Y-%m-%d", timezone="Asia/Shanghai") }}, {{ art.from | default(value='网络') }}</span>
+                        <hr>
+                    </header>
+                    <div class="body">{{ art.brief }}</div>
+                    <div class="clearfix">
+                        <a href="{{ url_for(name='blog.view-index', elements=[art.uuid | as_str]) | safe }}" class="btn btn-clean-one">阅读更多</a>
+                    </div>
+                </article>
+            </div>
+            {% endfor %}
+        {% endif %}
+      </div>
+
+      {% if num_pages > 1 %} 
+      <div class="paging">
+        {% if page == 1 %} 
+            <span class="older">上一页</span>
+        {% else %}
+            <a href="?page={{ page - 1 }}" class="older">上一页</a>
+        {% endif %} 
+
+        <span class="now-page">{{ page | default(value="1") }}</span>
+        
+        {% if page == num_pages %} 
+            <span class="newer">下一页</span>
+        {% else %}
+            <a href="?page={{ page + 1 }}" class="newer">下一页</a>
+        {% endif %}
+      </div>
+      {% endif %} 
+  </div>
+
+  {% include "blog/nako/_right.html" %}
+
+</div>
+{% endblock content %}

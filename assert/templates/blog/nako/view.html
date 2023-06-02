@@ -1,0 +1,144 @@
+{% extends "blog/nako/base.html" %}
+
+{% block title %}{{ art.title | safe }}{% endblock title %}
+{% block keywords %}{{ art.keywords | safe }}{% endblock keywords %}
+{% block description %}{{ art.description | safe }}{% endblock description %}
+
+{% block breadcrumb %}
+    {% if cate_data %}
+        <a href="{{ url_for(name='blog.cate-name', elements=[cate_data.slug | as_str]) | safe }}">{{ cate_data.name | default(value="文章未分类") }}</a>
+    {% else %}
+        <a href="{{ url_for(name='blog.cate-index') | safe }}">{{ cate_data.name | default(value="文章未分类") }}</a>
+    {% endif %}
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 blog-main">
+        <article class="blog-post">
+            {% if art.cover %}
+            <header>
+                <div class="lead-image">
+                    <img src="{{ art.cover }}" alt="{{ art.title }}" class="img-responsive">
+                </div>
+            </header>
+            {% endif %}
+
+            <div class="body">
+                <h1>{{ art.title }}</h1>
+                <div class="meta">
+                    <i class="fa fa-user"></i> {{ art.from | default(value='网络') }} 
+                    <i class="fa fa-calendar"></i> {{ art.add_time | date(format="%Y-%m-%d %H:%M", timezone="Asia/Shanghai") }}
+                    <i class="fa fa-comments"></i> <span class="data"><a href="#comments">{{ comments_count | default(value="0") }} 条回复</a></span>
+                    {% if art_tags %}
+                        <i class="fa fa-tags"></i> 
+                        {% for art_tag in art_tags %}
+                            <a href="{{ url_for(name='blog.tag-index', elements=[art_tag | as_str]) | safe }}">{{ art_tag | safe }}</a>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="view-content">{{ art.content | safe }}</div>
+            </div>
+        </article>
+
+        <aside class="social-icons clearfix">
+            <h3>分享到 </h3> 
+            <a href="#"><i class="fa fa-facebook"></i></a> 
+            <a href="#"><i class="fa fa-twitter"></i></a> 
+            <a href="#"><i class="fa fa-google"></i></a>
+        </aside>
+
+        {% if comments %}
+        <aside class="comments" id="comments">
+            <hr>
+
+            <h2><i class="fa fa-comments"></i> {{ comments_count | default(value="0") }} 条回复</h2>
+
+            {% for comment in comments %}
+            <article class="comment">
+                <header class="clearfix">
+                    <img src="{{ assert(path='blog/nako/img/avatar.png') | safe }}" alt="{{ comment.username | default(value='留言用户') }}" class="avatar">
+                    <div class="meta">
+                        <h3><a href="#">{{ comment.username | default(value="留言用户") }}</a></h3>
+                        <span class="date">
+                            {{ comment.add_time | date(format="%Y-%m-%d %H:%M", timezone="Asia/Shanghai") }}
+                        </span>  
+                    </div>
+                </header>
+                <div class="body">{{ comment.content | safe }}</div>
+            </article>
+            {% endfor %}
+   
+        </aside>
+
+        {% if comments_num_pages > 1 %} 
+        <div class="paging">
+          {% if page == 1 %} 
+              <span class="older">上一页</span>
+          {% else %}
+              <a href="?page={{ page - 1 }}" class="older">上一页</a>
+          {% endif %} 
+  
+          <span class="now-page">{{ page | default(value="1") }}</span>
+          
+          {% if page == comments_num_pages %} 
+              <span class="newer">下一页</span>
+          {% else %}
+              <a href="?page={{ page + 1 }}" class="newer">下一页</a>
+          {% endif %}
+        </div>
+        {% endif %} 
+        
+        {% endif %}
+
+        <aside class="create-comment" id="create-comment">
+            <hr>    
+
+            <h2><i class="fa fa-pencil"></i> 添加回复 </h2>
+
+            <form action="" method="get" accept-charset="utf-8" class="comment-form">
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="text" name="username" id="comment-name" placeholder="你的称呼" class="form-control input-lg">    
+                    </div>
+                    <div class="col-md-6">
+                        <input type="email" name="email" id="comment-email" placeholder="你的联系邮箱" class="form-control input-lg">    
+                    </div>
+                </div>
+
+                <input type="hidden" name="uuid" value="{{ art.uuid }}" />
+
+                <textarea rows="10" name="message" id="comment-body" placeholder="你的留言内容" class="form-control input-lg"></textarea>
+
+                <div class="buttons clearfix">
+                    <button type="button" class="btn btn-xlarge btn-clean-one js-save-btn">提交</button>
+                </div>
+            </form>
+        </aside>
+    </div>
+
+    {% include "blog/nako/_right.html" %}
+</div>
+{% endblock content %}
+
+{% block script_append %}
+<script>
+$(function() {
+    $(".js-save-btn").click(function() {
+        var form = $(".comment-form");
+
+        $.ajax({
+            url: "{{ url_for(name='blog.comment-create') | safe }}",
+            data: form.serialize(),
+            dataType:'json',
+            type:'post',
+            success:function(result) {
+                alert(result.message);
+            }
+        });
+
+        return false;
+    });
+});
+</script>
+{% endblock script_append %}

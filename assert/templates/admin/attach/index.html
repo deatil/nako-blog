@@ -56,6 +56,14 @@
 		    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove">删除</button>
 		</script>
 
+		<script type="text/html" id="type">
+			{{# if (d.type == 2) { }}
+				<span class="layui-badge layui-bg-green">图片</span>
+		    {{# } else { }}
+				<span class="layui-badge layui-bg-orange">附件</span>
+		    {{# } }}
+		</script>
+
 		<script type="text/html" id="enable">
 			{{# if (d.status == 1) { }}
 				<span class="layui-badge-dot layui-bg-green"></span>
@@ -97,6 +105,13 @@
 							align: 'left'
 						},
 						{
+							title: '附件类型',
+							field: 'type',
+							align: 'center',
+							templet: '#type',
+							width: 100
+						},
+						{
 							title: '上传时间',
 							field: 'createTime',
 							align: 'left',
@@ -106,7 +121,7 @@
 						{
 							title: '启用',
 							field: 'enable',
-							align: 'left',
+							align: 'center',
 							templet: '#enable',
 							width: 100
 						},

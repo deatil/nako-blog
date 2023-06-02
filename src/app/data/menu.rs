@@ -62,6 +62,14 @@ pub fn menus() -> Value {
             "href": "/admin/page/index"
         },
         {
+            "id": "guestbook",
+            "title": "留言管理",
+            "icon": "icon pear-icon pear-icon-complete",
+            "type": 1,
+            "openType": "_iframe",
+            "href": "/admin/guestbook/index"
+        },
+        {
             "id": "system",
             "title": "系统管理",
             "icon": "layui-icon layui-icon-set-fill",

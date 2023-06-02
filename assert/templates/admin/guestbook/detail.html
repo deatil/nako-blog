@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>留言详情</title>
+        <link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
+    </head>
+    <body class="pear-container">
+        <div class="table-responsive">
+            <table class="layui-table">
+                <colgroup>
+                    <col width="200">
+                    <col>
+                </colgroup>
+          
+                <thead>
+                    <tr>
+                        <td>名称</td>
+                        <td>内容</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>留言ID</td>
+                        <td>{{ data.id }} </td>
+                    </tr>
+                    <tr>
+                        <td>用户</td>
+                        <td>{{ data.name }}</td>
+                    </tr>
+                    <tr>
+                        <td>留言内容</td>
+                        <td>{{ data.message }}</td>
+                    </tr>
+                    <tr>
+                        <td>联系电话</td>
+                        <td>{{ data.phone }}</td>
+                    </tr>
+                    <tr>
+                        <td>联系邮箱</td>
+                        <td>{{ data.email }}</td>
+                    </tr>
+                    <tr>
+                        <td>联系QQ</td>
+                        <td>{{ data.qq }}</td>
+                    </tr>
+                    <tr>
+                        <td>联系微信</td>
+                        <td>{{ data.weixin }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>状态</td>
+                        <td>
+                            {% if data.status == 1 %}
+                                <span class="layui-badge-dot layui-bg-green"></span>
+                                <span class="text-green">启用</span>
+                            {% else %}
+                                <span class="layui-badge-dot layui-bg-orange"></span>
+                                <span class="text-orange">禁用</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>留言时间</td>
+                        <td>
+                            {{ data.add_time | date(format="%Y-%m-%d %H:%M:%S", timezone="Asia/Shanghai") }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>留言IP</td>
+                        <td>
+                            {{ data.add_ip }}
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>     
+        
+    </body>
+</html>

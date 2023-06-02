@@ -2,7 +2,7 @@ use actix_web::web;
 use actix_web_lab::middleware::from_fn;
 
 use crate::nako::{
-    env,
+    config,
 };
 
 use crate::app::middleware::{
@@ -22,10 +22,11 @@ use crate::app::controller::admin::{
     page,
     setting,
     error,
+    guestbook,
 };
 
 pub fn route(cfg: &mut web::ServiceConfig) {
-    let admin_prefix = env::get_env::<String>("ADMIN_PREFIX", "admin".to_string());
+    let admin_prefix = config::section::<String>("app", "admin_prefix", "admin".to_string());
 
     cfg.service(
         web::scope(admin_prefix.as_str())
@@ -300,6 +301,35 @@ pub fn route(cfg: &mut web::ServiceConfig) {
                         web::resource("/delete")
                             .route(web::post().to(page::delete))
                             .name("admin.page-delete"),
+                    )
+            )
+            .service(
+                // 留言
+                web::scope("/guestbook")
+                    .service(
+                        web::resource("/index")
+                            .route(web::get().to(guestbook::index))
+                            .name("admin.guestbook-index"),
+                    )
+                    .service(
+                        web::resource("/list")
+                            .route(web::get().to(guestbook::list))
+                            .name("admin.guestbook-list"),
+                    )
+                    .service(
+                        web::resource("/detail")
+                            .route(web::get().to(guestbook::detail))
+                            .name("admin.guestbook-detail"),
+                    )
+                    .service(
+                        web::resource("/status")
+                            .route(web::post().to(guestbook::update_status))
+                            .name("admin.guestbook-status"),
+                    )
+                    .service(
+                        web::resource("/delete")
+                            .route(web::post().to(guestbook::delete))
+                            .name("admin.guestbook-delete"),
                     )
             )
             .service(

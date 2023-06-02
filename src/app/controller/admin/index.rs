@@ -51,12 +51,25 @@ pub async fn console(
     let db = &state.db;
     let view = &state.view;
 
+    let search_where = art::ArtWhere{
+        title: None,
+        uuid: None,
+        tag: None,
+        cate_id: None,
+        user_id: None,
+        is_top: None,
+        status: Some(1),
+    };
+    let (new_arts, _) = art::ArtModel::search_in_page(db, 1, 6, search_where.clone()).await.unwrap_or_default();
+
     let art_count = art::ArtModel::find_count(db).await.unwrap_or(0);
     let cate_count = cate::CateModel::find_count(db).await.unwrap_or(0);
     let comment_count = comment::CommentModel::find_count(db).await.unwrap_or(0);
     let tag_count = tag::TagModel::find_count(db).await.unwrap_or(0);
 
     let mut ctx = nako_http::view_data();
+    ctx.insert("new_arts", &new_arts);
+
     ctx.insert("art_count", &art_count);
     ctx.insert("cate_count", &cate_count);
     ctx.insert("comment_count", &comment_count);

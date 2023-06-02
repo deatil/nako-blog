@@ -34,11 +34,33 @@ pub fn json<T: Serialize>(res_body: T) -> HttpResponse {
 
 // 跳转
 pub fn redirect(url: String) -> HttpResponse {
-    let res_body_data = HttpResponse::Found()
+    HttpResponse::Found()
         .append_header((header::LOCATION, url))
-        .finish();
+        .finish()
+}
 
-    res_body_data
+// let mut ctx = view_data();
+// ctx.insert("name", "hello");
+pub fn view_data() -> tera::Context {
+    tera::Context::new()
+}
+
+// 视图
+pub fn view(view: &tera::Tera, name: &str, ctx: &tera::Context) -> HttpResponse {
+    let err = format!("html is error.");
+
+    let res_body: String = match view.render(name, ctx) {
+        Ok(v) => v,
+        Err(e) => {
+            if app::is_debug() {
+                format!("html [{}] is error: {}", name, e)
+            } else {
+                err
+            }
+        },
+    };
+
+    html(res_body)
 }
 
 // 返回失败 json
@@ -66,7 +88,7 @@ pub fn error_response_json(message: &str) -> HttpResponse {
 }
 
 // 返回失败页面
-pub fn error_response_html(view: &tera::Tera, message: &str, url: &str) -> HttpResponse {
+pub fn error_response_html(t: &tera::Tera, message: &str, url: &str) -> HttpResponse {
     let mut new_url = url;
     if new_url == "back" {
         new_url = "javascript:history.back(-1);";
@@ -76,32 +98,5 @@ pub fn error_response_html(view: &tera::Tera, message: &str, url: &str) -> HttpR
     ctx.insert("message", &message.to_string());
     ctx.insert("url", &new_url.to_string());
 
-    let res_body: String = view.render("error.html", &ctx)
-        .unwrap_or("html [error.html] is error.".into());
-
-    html(res_body)
-}
-
-// let mut ctx = view_data();
-// ctx.insert("name", "hello");
-pub fn view_data() -> tera::Context {
-    tera::Context::new()
-}
-
-// 视图
-pub fn view(view: &tera::Tera, name: &str, ctx: &tera::Context) -> HttpResponse {
-    let err = format!("html is error.");
-
-    let res_body: String = match view.render(name, ctx) {
-        Ok(v) => v,
-        Err(e) => {
-            if app::is_debug() {
-                format!("html [{}] is error: {}", name, e)
-            } else {
-                err
-            }
-        },
-    };
-
-    html(res_body)
+    view(t, "error.html", &ctx)
 }

@@ -48,7 +48,7 @@ impl CateModel {
 
     pub async fn find_by_slug(db: &DbConn, slug: &str) -> Result<Option<cate::Model>, DbErr> {
         Cate::find()
-            .filter(cate::Column::Slug.contains(slug))
+            .filter(cate::Column::Slug.eq(slug))
             .one(db)
             .await
     }
@@ -105,6 +105,7 @@ impl CateModel {
             .apply_if(wheres.status, |query, v| {
                 query.filter(cate::Column::Status.eq(v))
             })
+            .order_by_desc(cate::Column::Sort)
             .order_by_asc(cate::Column::Id)
             .paginate(db, per_page);
         let num_pages = paginator.num_pages().await?;
@@ -116,7 +117,20 @@ impl CateModel {
         db: &DbConn,
     ) -> Result<Vec<cate::Model>, DbErr> {
         Cate::find()
+            .order_by_desc(cate::Column::Sort)
             .order_by_asc(cate::Column::Id)
+            .all(db)
+            .await
+    }
+
+    /// 查询启用的分类
+    pub async fn find_open_cate(
+        db: &DbConn,
+    ) -> Result<Vec<cate::Model>, DbErr> {
+        Cate::find()
+            .order_by_desc(cate::Column::Sort)
+            .order_by_asc(cate::Column::Id)
+            .filter(cate::Column::Status.eq(1))
             .all(db)
             .await
     }

@@ -1,18 +1,23 @@
 use std::fs;
 use std::path::Path;
 
-use crate::nako::env::{
-    get_env,
+use actix_web::{
+    HttpResponse,
+};
+
+use crate::nako::http;
+use crate::nako::{
+    config,
 };
 
 // 是否是调试模式
 pub fn is_debug() -> bool {
-    get_env::<bool>("APP_DEBUG", false)
+    config::section::<bool>("app", "debug", false)
 }
 
 // 管理员ID
 pub fn get_admin_id() -> u32 {
-    get_env::<u32>("ADMIN_ID", 0)
+    config::section::<u32>("app", "admin_id", 0)
 }
 
 // 获取日志等级
@@ -28,28 +33,28 @@ pub fn get_log_level(name: String) -> log::LevelFilter {
 }
 
 pub fn upload_path(name: String) -> String {
-    let path = get_env::<String>("UPLOAD_PATH", "./storage/upload".to_string());
+    let path = config::section::<String>("attach", "upload_path", "./storage/upload".to_string());
 
     format!("{}{}", path, name)
 }
 
 pub fn upload_url(name: String) -> String {
-    let path = get_env::<String>("UPLOAD_URL", "/upload".to_string());
+    let path = config::section::<String>("attach", "upload_url", "/upload".to_string());
 
     format!("{}{}", path, name)
 }
 
 // 附件路径
 pub fn attach_path(name: String) -> String {
-    let path = get_env::<String>("ATTACH_PATH", "./storage/attach".to_string());
+    let path = config::section::<String>("attach", "attach_path", "./storage/attach".to_string());
 
     format!("{}{}", path, name)
 }
 
 // 列出模板
 pub fn list_tpls_by_prefix(file_prefix: String) -> Vec<String> {
-    let tpl = get_env::<String>("BLOG_TPL_PATH", "./assert/templates/blog".to_string());
-    let theme = get_env::<String>("BLOG_THEME", "nako".to_string());
+    let tpl = config::section::<String>("view", "blog_tpl_path", "./assert/templates/blog".to_string());
+    let theme = config::section::<String>("view", "blog_theme", "nako".to_string());
 
     let path = format!("{}/{}/", tpl, theme);
 
@@ -96,9 +101,17 @@ pub fn page_tpls() -> Vec<String> {
 
 // 模板路径
 pub fn view_path(name: &str) -> String {
-    let theme = get_env::<String>("BLOG_THEME", "nako".to_string());
+    let theme = config::section::<String>("view", "blog_theme", "nako".to_string());
 
     let path = format!("blog/{}/{}", theme, name);
 
     path
+}
+
+// 返回失败页面
+pub fn error_html(t: &tera::Tera, message: &str) -> HttpResponse {
+    let mut ctx = http::view_data();
+    ctx.insert("message", &message.to_string());
+
+    http::view(t, view_path("error.html").as_str(), &ctx)
 }

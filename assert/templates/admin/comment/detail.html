@@ -42,7 +42,7 @@
                     </tr>
                     <tr>
                         <td>回复内容</td>
-                        <td>{{ data.email }}</td>
+                        <td>{{ data.content }}</td>
                     </tr>
 
                     <tr>
@@ -59,13 +59,13 @@
                     </tr>
 
                     <tr>
-                        <td>注册时间</td>
+                        <td>回复时间</td>
                         <td>
                             {{ data.add_time | date(format="%Y-%m-%d %H:%M:%S", timezone="Asia/Shanghai") }}
                         </td>
                     </tr>
                     <tr>
-                        <td>注册IP</td>
+                        <td>回复IP</td>
                         <td>
                             {{ data.add_ip }}
                         </td>

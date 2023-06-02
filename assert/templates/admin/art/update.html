@@ -50,6 +50,13 @@
                     </div>   
     
                     <div class="layui-form-item">
+                        <label class="layui-form-label">简介</label>
+                        <div class="layui-input-block">
+                            <textarea name="brief" placeholder="请输入简介" class="layui-textarea">{{ data.brief }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
                         <label class="layui-form-label">关键字</label>
                         <div class="layui-input-block">
                             <input type="text"  name="keywords" value="{{ data.keywords }}" lay-verify="title" autocomplete="off" placeholder="请输入关键字" class="layui-input">
@@ -66,19 +73,19 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">封面</label>
                         <div class="layui-input-block">
-                            <input id="fileName" type="text" lay-verify="fileName" autocomplete="off" class="layui-input" disabled>
+                            <input id="fileName" value="{{ data.cover }}" type="text" lay-verify="fileName" autocomplete="off" class="layui-input" disabled>
                     
                             <input id="credential_hide" name="cover" value="{{ data.cover }}" type="hidden" autocomplete="off" class="layui-input">
                             
                             <button id="upload_img" type="button" hidden></button>
                             <button class="layui-btn" id="preview_img" type="button">
-                                上传图片
+                                选择图片
                             </button>
                             <button class="layui-btn layui-btn-normal" 
                                 disabled="disabled"
                                 type="button" 
                                 id="upload_img_save">
-                                确定
+                                上传
                             </button>
 
                             <div class="layui-collapse" lay-accordion="" style="width: 399.5px">
@@ -86,7 +93,7 @@
                                     <h2 class="layui-colla-title">展开图片</h2>
                                     <div class="layui-colla-content" id="colla_img">
                                         {% if data.cover %}
-                                            <a href="#">
+                                            <a href="{{ data.cover }}" target="_blank">
                                                 <img id="showImg" src="{{ data.cover }}" width="370px">
                                             </a>
                                         {% endif %}
@@ -197,7 +204,7 @@
         var tags = $(elem);
         tags.tagsInput({
             width: 'auto',
-            defaultText: '输入后空格确认',
+            defaultText: '输入后回车确认',
             minInputWidth: 110,
             height: 'auto',
             placeholderColor: '#999',

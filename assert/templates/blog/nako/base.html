@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{{ settings(name="website_name") }}{% endblock title %}</title>
+    <meta name="keywords" content="{% block keywords %}{{ settings(name='website_keywords') }}{% endblock keywords %}">
+    <meta name="description" content="{% block description %}{{ settings(name='website_description') }}{% endblock description %}">
+    <meta name="viewport" content="width=device-width">
+
+    {% block head %}
+    <!-- Bootstrap styles -->
+    <link rel="stylesheet" href="{{ assert(path='blog/nako/css/bootstrap.min.css') | safe }}">
+
+    <!-- Font-Awesome -->
+    <link rel="stylesheet" href="{{ assert(path='blog/nako/css/font-awesome/css/font-awesome.min.css') | safe }}">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ assert(path='blog/nako/css/style.css') | safe }}" id="theme-styles">
+
+    <!--[if lt IE 9]>      
+        <script src="{{ assert(path='blog/nako/js/vendor/google/html5-3.6-respond-1.1.0.min.js') | safe }}"></script>
+    <![endif]-->
+    {% endblock head %}
+
+    {% block head_append %}{% endblock head_append %}
+    
+</head>
+<body>
+    <header>
+        {% block header %}
+            {% include "blog/nako/_header.html" %}
+        {% endblock header %}
+
+        <div class="widewrapper subheader">
+            <div class="container">
+                <div class="clean-breadcrumb">
+                    {% block breadcrumb %}
+                        <a href="{{ url_for(name='blog.index') | safe }}">首页</a>
+                    {% endblock breadcrumb %}
+                </div>
+
+                <div class="clean-searchbox">
+                    <form action="{{ url_for(name='blog.cate-index') | safe }}" method="get" accept-charset="utf-8">
+                        <input class="searchfield" id="searchbox" type="text" name="keywords" value="{{ keywords | default(value='') }}" placeholder="搜索">
+                        <button class="searchbutton" type="submit">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    {% block container %}
+    <div class="widewrapper main">
+        <div class="container">
+            {% block content %}{% endblock content %}
+        </div>
+    </div>
+    {% endblock container %} 
+
+    {% block footer %}
+        {% include "blog/nako/_footer.html" %}
+    {% endblock footer %}
+
+    {% block script %}
+        <script src="{{ assert(path='blog/nako/js/jquery.min.js') | safe }}"></script>
+        <script src="{{ assert(path='blog/nako/js/bootstrap.min.js') | safe }}"></script>
+        <script src="{{ assert(path='blog/nako/js/modernizr.js') | safe }}"></script>
+    {% endblock script %}
+    {% block script_append %}{% endblock script_append %}
+
+</body>
+</html>

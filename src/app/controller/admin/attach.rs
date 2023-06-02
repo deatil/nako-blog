@@ -29,6 +29,7 @@ use crate::app::model::{
     attach,
 };
 use crate::nako::app::{
+    attach_path,
     upload_path, 
 };
 
@@ -152,7 +153,11 @@ pub async fn delete(
         return Ok(nako_http::error_response_json("删除失败"));
     }
 
-    let upload_path = upload_path(data.path);
+    let mut upload_path = upload_path(data.path.clone());
+    if data.r#type == 1 {
+        upload_path = attach_path(data.path.clone());
+    }
+
     fs::remove_file(upload_path).unwrap_or_default();
 
     Ok(nako_http::success_response_json("删除成功", ""))
@@ -182,7 +187,10 @@ pub async fn download(
         return Ok(nako_http::text("附件不存在".to_string()));
     }
 
-    let filename = upload_path(data.path);
+    let mut filename = upload_path(data.path.clone());
+    if data.r#type == 1 {
+        filename = attach_path(data.path.clone());
+    }
 
     if let Ok(named_file) = NamedFile::open(&filename) {
         let content_disposition = ContentDisposition {
@@ -218,6 +226,10 @@ pub async fn preview(
     let data = attach::AttachModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if data.id == 0 {
         return Ok(nako_http::text("附件不存在".to_string()));
+    }
+
+    if data.r#type != 2 {
+        return Ok(nako_http::text("附件不能预览".to_string()));
     }
 
     let upload_path = upload_path(data.path);

@@ -1,4 +1,5 @@
 use actix_web::web;
+use actix_web_lab::middleware::from_fn;
 
 use crate::app::controller::blog::{
     error,
@@ -8,13 +9,20 @@ use crate::app::controller::blog::{
     page,
     tag,
     view,
+    guestbook,
+};
+
+use crate::app::middleware::{
+    blog_settings,
+    blog_open,
 };
 
 pub fn route(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("")
             .service(
-                web::scope("/index")
+                // 首页
+                web::scope("/")
                     .service(
                         web::resource("")
                             .route(web::get().to(index::index))
@@ -23,40 +31,35 @@ pub fn route(cfg: &mut web::ServiceConfig) {
             )
             .service(
                 // 分类
-                web::scope("/cate")
+                web::scope("/c")
                     .service(
                         web::resource("")
                             .route(web::get().to(cate::index))
                             .name("blog.cate-index"),
                     )
                     .service(
-                        web::resource("/{name}")
+                        web::resource("/{slug}")
                             .route(web::get().to(cate::name))
                             .name("blog.cate-name"),
                     ),
             )
             .service(
+                // 详情
+                web::scope("/a")
+                    .service(
+                        web::resource("/{uuid}")
+                            .route(web::get().to(view::index))
+                            .name("blog.view-index"),
+                    )
+            )
+            .service(
                 // 评论
                 web::scope("/comment")
-                    .service(
-                        web::resource("/{art_id}")
-                            .route(web::get().to(comment::index))
-                            .name("blog.comment-index"),
-                    )
                     .service(
                         web::resource("/create")
                             .route(web::post().to(comment::create))
                             .name("blog.comment-create"),
                     ),
-            )
-            .service(
-                // 页面
-                web::scope("/page")
-                    .service(
-                        web::resource("/{slug}")
-                            .route(web::get().to(page::index))
-                            .name("blog.page-index"),
-                    )
             )
             .service(
                 // 标签
@@ -68,14 +71,25 @@ pub fn route(cfg: &mut web::ServiceConfig) {
                     )
             )
             .service(
-                // 详情
-                web::scope("/view")
+                // 页面
+                web::scope("/p")
                     .service(
-                        web::resource("/{id}")
-                            .route(web::get().to(view::index))
-                            .name("blog.view-index"),
+                        web::resource("/{slug}")
+                            .route(web::get().to(page::index))
+                            .name("blog.page-index"),
                     )
             )
-            .default_service(web::to(error::index)),
+            .service(
+                // 评论
+                web::scope("/guestbook")
+                    .service(
+                        web::resource("/create")
+                            .route(web::post().to(guestbook::create))
+                            .name("blog.guestbook-create"),
+                    ),
+            )
+            .default_service(web::to(error::index))
+            .wrap(from_fn(blog_settings::settings))
+            .wrap(from_fn(blog_open::check)),
     );
 }

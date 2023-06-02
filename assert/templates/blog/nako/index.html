@@ -1,0 +1,38 @@
+{% extends "blog/nako/base.html" %}
+
+{% block breadcrumb %}
+<a href="{{ url_for(name='blog.index') | safe }}">首页</a>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 blog-main">
+      <div class="row">
+        {% if arts %}
+            {% for art in arts %}
+            <div class="col-md-6 col-sm-6">
+                <article class=" blog-teaser">
+                    <header>
+                        <img src="{{ art.cover }}" alt="{{ art.title }}">
+                        <h3><a href="{{ url_for(name='blog.view-index', elements=[art.uuid | as_str]) | safe }}">{{ art.title }}</a></h3>
+                        <span class="meta">{{ art.add_time | date(format="%Y-%m-%d", timezone="Asia/Shanghai") }}, {{ art.from | default(value='网络') }}</span>
+                        <hr>
+                    </header>
+                    <div class="body">{{ art.brief }}</div>
+                    <div class="clearfix">
+                        <a href="{{ url_for(name='blog.view-index', elements=[art.uuid | as_str]) | safe }}" class="btn btn-clean-one">阅读更多</a>
+                    </div>
+                </article>
+            </div>
+            {% endfor %}
+        {% endif %}
+      </div>
+
+      <div class="paging">
+          <a href="{{ url_for(name='blog.cate-index') | safe }}" class="older">查看更多文章</i></a>
+      </div>
+  </div>
+
+  {% include "blog/nako/_right.html" %}
+</div>
+{% endblock content %}

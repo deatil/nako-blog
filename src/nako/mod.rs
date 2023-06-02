@@ -13,3 +13,4 @@ pub mod redis;
 pub mod rsa;
 pub mod file;
 pub mod page;
+pub mod config;

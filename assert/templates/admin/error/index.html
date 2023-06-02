@@ -12,7 +12,11 @@
 			<div class="content-r">
 				<h1>404</h1>
 				<p>{{ message }}</p>
-				<a href="javascript:location.reload();" class="pear-btn pear-btn-primary">刷新重试</a>
+				{% if url %}
+					<a href="{{ url | safe }}" class="pear-btn pear-btn-primary">马上跳转</a>
+				{% else %}
+					<a href="javascript:location.reload();" class="pear-btn pear-btn-primary">刷新重试</a>
+				{% endif %}
 			</div>
 		</div>
 	</body>

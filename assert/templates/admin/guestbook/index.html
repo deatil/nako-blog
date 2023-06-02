@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>留言管理</title>
+		<link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
+	</head>
+	<body class="pear-container">
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">用户</label>
+							<div class="layui-input-inline">
+								<input type="text" name="name" placeholder="" class="layui-input">
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">邮箱</label>
+							<div class="layui-input-inline">
+								<input type="text" name="email" placeholder="" class="layui-input">
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">电话</label>
+							<div class="layui-input-inline">
+								<input type="text" name="phone" placeholder="" class="layui-input">
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">内容</label>
+							<div class="layui-input-inline">
+								<input type="text" name="message" placeholder="" class="layui-input">
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">状态</label>
+							<div class="layui-input-inline">
+								<select name="status" lay-verify="">
+									<option value="-1">全部</option>
+									<option value="1">启用</option>
+									<option value="0">禁用</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="guestbook-query">
+								<i class="layui-icon layui-icon-search"></i>
+								查询
+							</button>
+							<button type="reset" class="pear-btn pear-btn-md">
+								<i class="layui-icon layui-icon-refresh"></i>
+								重置
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<table id="guestbook-table" lay-filter="guestbook-table"></table>
+			</div>
+		</div>
+
+		{% raw %}
+		<script type="text/html" id="guestbook-bar">
+			<button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="detail">详情</button>
+		    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove">删除</button>
+		</script>
+
+		<script type="text/html" id="guestbook-connect">
+			<input type="checkbox" name="connect" value="{{d.id}}"
+				lay-skin="switch" 
+				lay-text="已联系|未联系" 
+				lay-filter="guestbook-connect" 
+				{{ d.status == 1 ? 'checked' : '' }}>
+		</script>
+
+		<script type="text/html" id="guestbook-createTime">
+			{{# if (d.add_time > 0) { }}
+				{{layui.util.toDateString(d.add_time * 1000, 'yyyy-MM-dd HH:mm:ss')}}
+		    {{# } else { }}
+		    	--
+		    {{# } }}
+		</script>
+		{% endraw %}
+
+		<script src="{{ assert(path='admin/component/layui/layui.js') | safe }}"></script>
+		<script src="{{ assert(path='admin/component/pear/pear.js') | safe }}"></script>
+		<script>
+			layui.use(['table', 'form', 'jquery','common'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				let common = layui.common;
+
+				let cols = [
+					[
+					{
+							title: '用户',
+							field: 'name',
+							align: 'left',
+						},
+						{
+							title: '邮箱',
+							field: 'email',
+							align: 'left',
+						},
+						{
+							title: '电话',
+							field: 'phone',
+							align: 'left',
+						},
+						{
+							title: '留言时间',
+							field: 'createTime',
+							align: 'left',
+							templet: '#guestbook-createTime',
+							width: 160,
+						},
+						{
+							title: '联系',
+							field: 'connect',
+							align: 'center',
+							templet: '#guestbook-connect',
+							width: 150
+						},
+						{
+							title: '操作',
+							toolbar: '#guestbook-bar',
+							align: 'left',
+							width: 150
+						}
+					]
+				]
+
+				table.render({
+					elem: '#guestbook-table',
+					url: "{{ url_for(name='admin.guestbook-list') | safe }}",
+					page: true,
+					cols: cols,
+					skin: 'line',
+					parseData: function(res) {
+						return {
+							"code": res.code,
+							"count": res.data.count,
+							"data": res.data.list,
+						};
+					},
+					defaultToolbar: [{
+						title: '刷新',
+						layEvent: 'refresh',
+						icon: 'layui-icon-refresh',
+					}, 'filter', 'print', 'exports']
+				});
+
+				table.on('tool(guestbook-table)', function(obj) {
+					if (obj.event === 'remove') {
+						window.remove(obj);
+					} else if (obj.event === 'detail') {
+						window.detail(obj);
+					}
+				});
+
+				form.on('submit(guestbook-query)', function(data) {
+					table.reload('guestbook-table', {
+						where: data.field
+					})
+					return false;
+				});
+
+				table.on('toolbar(guestbook-table)', function(obj) {
+					if (obj.event === 'refresh') {
+						window.refresh();
+					}
+				});
+
+				form.on('switch(guestbook-connect)', function(obj) {
+					var status = 0;
+					if (obj.elem.checked == true) {
+						status = 1;
+					}
+
+					$.ajax({
+						url: "{{ url_for(name='admin.guestbook-status') | safe }}?id=" + this.value,
+						data: {
+							status: status,
+						},
+						type: 'post',
+						dataType: 'json',
+						success: function(result) {
+							if (result.code == 0) {
+								layer.tips(result.message, obj.othis);
+							} else {
+								layer.msg(result.message, {
+									icon: 2,
+									time: 1000
+								});
+							}
+						}
+					});
+				});
+
+				window.detail = function(obj) {
+					layer.open({
+						type: 2,
+						title: '留言详情',
+						shade: 0.1,
+						area: ['500px', '400px'],
+						content: "{{ url_for(name='admin.guestbook-detail') | safe }}?id=" + obj.data['id'],
+					});
+				}
+
+				window.remove = function(obj) {
+					layer.confirm('确定要删除该留言', {
+						icon: 3,
+						title: '提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+
+						$.ajax({
+							url: "{{ url_for(name='admin.guestbook-delete') | safe }}?id=" + obj.data['id'],
+							data: {
+								id: obj.data['userId'],
+							},
+							type: 'post',
+							dataType: 'json',
+							success: function(result) {
+								layer.close(loading);
+
+								if (result.code == 0) {
+									layer.msg(result.message, {
+										icon: 1,
+										time: 1000
+									}, function() {
+										obj.del();
+									});
+								} else {
+									layer.msg(result.message, {
+										icon: 2,
+										time: 1000
+									});
+								}
+							}
+						})
+					});
+				}
+
+				window.refresh = function(param) {
+					table.reload('guestbook-table');
+				}
+			})
+		</script>
+	</body>
+</html>

@@ -48,7 +48,7 @@ impl PageModel {
 
     pub async fn find_by_slug(db: &DbConn, slug: &str) -> Result<Option<page::Model>, DbErr> {
         Page::find()
-            .filter(page::Column::Slug.contains(slug))
+            .filter(page::Column::Slug.eq(slug))
             .one(db)
             .await
     }

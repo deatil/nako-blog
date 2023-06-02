@@ -82,7 +82,7 @@ pub async fn list(
     let count = cate::CateModel::search_count(db, search_where.clone())
         .await.unwrap_or(0);
 
-    let mut res: ListData = ListData{
+    let res = ListData{
         list: list,
         count: count,
     };

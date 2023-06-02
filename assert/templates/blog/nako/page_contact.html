@@ -1,0 +1,46 @@
+{% extends "blog/nako/base.html" %}
+
+{% block title %}联系我{% endblock title %}
+
+{% block breadcrumb %}
+<a href="#">联系我</a>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 col-md-offset-3 clean-superblock" id="contact">
+        <h2>联系我</h2>
+        
+        <form action="" method="get" accept-charset="utf-8" class="contact-form">
+            <input type="text" name="name" id="contact-name" placeholder="你的称呼" class="form-control input-lg">
+            <input type="email" name="email" id="contact-email" placeholder="你的联系邮箱" class="form-control input-lg">
+            <textarea rows="10" name="message" id="contact-body" placeholder="你的信息" class="form-control input-lg"></textarea>
+            <div class="buttons clearfix">
+                <button type="button" class="btn btn-xlarge btn-clean-one js-save-btn">提交</button>
+            </div>                    
+        </form>
+    </div>
+</div>        
+{% endblock content %}
+
+{% block script_append %}
+<script>
+$(function() {
+    $(".js-save-btn").click(function() {
+        var form = $(".contact-form");
+
+        $.ajax({
+            url: "{{ url_for(name='blog.guestbook-create') | safe }}",
+            data: form.serialize(),
+            dataType:'json',
+            type:'post',
+            success:function(result) {
+                alert(result.message);
+            }
+        });
+
+        return false;
+    });
+});
+</script>
+{% endblock script_append %}

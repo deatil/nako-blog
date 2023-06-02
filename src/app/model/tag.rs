@@ -41,7 +41,7 @@ impl TagModel {
 
     pub async fn find_by_name(db: &DbConn, name: &str) -> Result<Option<tag::Model>, DbErr> {
         Tag::find()
-            .filter(tag::Column::Name.contains(name))
+            .filter(tag::Column::Name.eq(name))
             .one(db)
             .await
     }
@@ -97,6 +97,20 @@ impl TagModel {
         let num_pages = paginator.num_pages().await?;
 
         paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
+    }
+
+    /// 正常标签列表
+    pub async fn find_open_tags(
+        db: &DbConn,
+        per_page: u64,
+    ) -> Result<Vec<tag::Model>, DbErr> {
+        Tag::find()
+            .filter(tag::Column::Status.eq(1))
+            .limit(per_page)
+            .order_by_desc(tag::Column::Sort)
+            .order_by_asc(tag::Column::Id)
+            .all(db)
+            .await
     }
 
     pub async fn create(

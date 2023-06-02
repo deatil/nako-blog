@@ -9,13 +9,13 @@ pub use chrono::{
 use chrono_tz::Tz;
 use chrono_tz::UTC;
 
-use crate::nako::env::{
-    get_env,
+use crate::nako::{
+    config,
 };
 
 // 时区
 pub fn timezone() -> Tz {
-    let tz: Tz = get_env::<Tz>("TIMEZONE", UTC);
+    let tz: Tz = config::section::<Tz>("time", "timezone", UTC);
 
     tz
 }
