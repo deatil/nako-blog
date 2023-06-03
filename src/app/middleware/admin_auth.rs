@@ -46,7 +46,7 @@ pub async fn auth(
     }
 
     let state = req.app_data::<web::Data<AppState>>().unwrap();
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let session = req.get_session();
 
@@ -70,7 +70,7 @@ pub async fn auth(
             
             return Ok(req.into_response(res_body_data));
         } else {
-            let res_body_data = service::http::error_admin_html(view, message, url.as_str());
+            let res_body_data = service::http::error_admin_html(&mut view, message, url.as_str());
             
             return Ok(req.into_response(res_body_data));
         }

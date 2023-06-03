@@ -29,7 +29,7 @@
         </td>
         <td width="50%">
             <center>
-                <img alt="控制台" src="https://github.com/deatil/nako-blog/assets/24578855/5619400f-d223-490e-8fce-50d48289885f" />
+                <img alt="控制台" src="https://github.com/deatil/nako-blog/assets/24578855/784c7bde-9d2f-48f1-8d44-059ddd631020" />
             </center>
         </td>
     </tr>

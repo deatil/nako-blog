@@ -27,7 +27,7 @@ pub async fn index(
     web::Query(params): web::Query<HashMap<String, String>>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let mut page: u64 = 1;
     if let Some(p) = params.get("page") {
@@ -66,7 +66,7 @@ pub async fn index(
     ctx.insert("cates", &cates);
     ctx.insert("tags", &tags);
 
-    Ok(nako_http::view(view, app::view_path("tag.html").as_str(), &ctx))
+    Ok(nako_http::view(&mut view, app::view_path("tag.html").as_str(), &ctx))
 }
 
 

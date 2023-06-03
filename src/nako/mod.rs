@@ -14,3 +14,4 @@ pub mod rsa;
 pub mod file;
 pub mod page;
 pub mod config;
+pub mod embed;

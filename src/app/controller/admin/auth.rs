@@ -72,11 +72,11 @@ pub async fn login(
         return Ok(nako_http::redirect(redirect_url));
     }
 
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let ctx = nako_http::view_data();
 
-    Ok(nako_http::view(view, "admin/auth/login.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/auth/login.html", &ctx))
 }
 
 #[derive(Deserialize, Clone)]

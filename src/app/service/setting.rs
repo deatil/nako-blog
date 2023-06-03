@@ -13,7 +13,7 @@ pub async fn settings(state: &mut AppState) -> HashMap<String, String> {
     let db = &state.db;
     let r = &mut state.redis;
 
-    let setting_key = "setting_key";
+    let setting_key = "nako:setting_key";
 
     let res = redis::get::<HashMap<String, String>>(r, setting_key).await;
     if res.is_ok() {
@@ -40,7 +40,7 @@ pub async fn settings(state: &mut AppState) -> HashMap<String, String> {
 pub async fn clear(state: &mut AppState) {
     let r = &mut state.redis;
 
-    let setting_key = "setting_key".to_string();
+    let setting_key = "nako:setting_key".to_string();
 
     let _ = redis::delete(r, vec![setting_key]).await;
 }

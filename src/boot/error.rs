@@ -107,7 +107,7 @@ pub(crate) fn not_found<B>(
 // 获取响应
 fn get_error_response(req: &HttpRequest, error: &str) -> HttpResponse {
     if let Some(state) = req.app_data::<web::Data<AppState>>() {
-        let view = &state.view;
+        let mut view = state.view.clone();
 
         let method = req.method();
         
@@ -115,7 +115,7 @@ fn get_error_response(req: &HttpRequest, error: &str) -> HttpResponse {
             return nako_http::error_response_json(error);
         }
         
-        return nako_http::error_response_html(view, error, "");
+        return nako_http::error_response_html(&mut view, error, "");
     }
 
     nako_http::text(error.to_string())

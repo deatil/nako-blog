@@ -1,6 +1,6 @@
 {% extends "blog/nako/base.html" %}
 
-{% block title %}{{ art.title | safe }}{% endblock title %}
+{% block title %}{{ art.title | safe }} - {{ super() }}{% endblock title %}
 {% block keywords %}{{ art.keywords | safe }}{% endblock keywords %}
 {% block description %}{{ art.description | safe }}{% endblock description %}
 

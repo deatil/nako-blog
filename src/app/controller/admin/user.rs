@@ -31,11 +31,11 @@ use crate::app::model::{
 pub async fn index(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let ctx = nako_http::view_data();
 
-    Ok(nako_http::view(view, "admin/user/index.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/user/index.html", &ctx))
 }
 
 // ==========================
@@ -104,21 +104,21 @@ pub async fn detail(
     query: web::Query<DetailQuery>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "ID不能为空", ""));
+        return Ok(nako_http::error_response_html(&mut view, "ID不能为空", ""));
     }
 
     let user_data = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if user_data.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "账号不存在", ""));
+        return Ok(nako_http::error_response_html(&mut view, "账号不存在", ""));
     }
 
     let mut ctx = nako_http::view_data();
     ctx.insert("data", &user_data);
 
-    Ok(nako_http::view(view, "admin/user/detail.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/user/detail.html", &ctx))
 }
 
 // ==========================
@@ -127,11 +127,11 @@ pub async fn detail(
 pub async fn create(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let ctx = nako_http::view_data();
 
-    Ok(nako_http::view(view, "admin/user/create.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/user/create.html", &ctx))
 }
 
 // 表单数据
@@ -202,22 +202,22 @@ pub async fn update(
     query: web::Query<UpdateQuery>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "ID不能为空", ""));
+        return Ok(nako_http::error_response_html(&mut view, "ID不能为空", ""));
     }
 
     let user_info = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if user_info.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "账号不存在", ""));
+        return Ok(nako_http::error_response_html(&mut view, "账号不存在", ""));
     }
 
     let mut ctx = nako_http::view_data();
     
     ctx.insert("data", &user_info);
 
-    Ok(nako_http::view(view, "admin/user/update.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/user/update.html", &ctx))
 }
 
 // 表单数据
@@ -405,22 +405,22 @@ pub async fn update_password(
     query: web::Query<UpdatePasswordQuery>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "ID不能为空", ""));
+        return Ok(nako_http::error_response_html(&mut view, "ID不能为空", ""));
     }
 
     let user_info = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if user_info.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "账号不存在", ""));
+        return Ok(nako_http::error_response_html(&mut view, "账号不存在", ""));
     }
 
     let mut ctx = nako_http::view_data();
     
     ctx.insert("data", &user_info);
 
-    Ok(nako_http::view(view, "admin/user/update_password.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/user/update_password.html", &ctx))
 }
 
 // 表单数据

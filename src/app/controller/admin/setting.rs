@@ -25,7 +25,7 @@ pub async fn index(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let settings = setting::SettingModel::find_all(db).await.unwrap_or_default();
 
@@ -39,7 +39,7 @@ pub async fn index(
     let mut ctx = nako_http::view_data();
     ctx.insert("data", &data);
 
-    Ok(nako_http::view(view, "admin/setting/index.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/setting/index.html", &ctx))
 }
 
 // 保存设置

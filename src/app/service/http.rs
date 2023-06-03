@@ -11,7 +11,7 @@ use crate::nako::{
 };
 
 // 返回失败页面
-pub fn error_admin_html(t: &tera::Tera, message: &str, url: &str) -> HttpResponse {
+pub fn error_admin_html(t: &mut tera::Tera, message: &str, url: &str) -> HttpResponse {
     let mut new_url = url;
     if new_url == "back" {
         new_url = "javascript:history.back(-1);";
@@ -25,7 +25,7 @@ pub fn error_admin_html(t: &tera::Tera, message: &str, url: &str) -> HttpRespons
 }
 
 // 返回博客失败页面
-pub fn error_blog_html(t: &tera::Tera, message: &str, url: &str) -> HttpResponse {
+pub fn error_blog_html(t: &mut tera::Tera, message: &str, url: &str) -> HttpResponse {
     let mut new_url = url;
     if new_url == "back" {
         new_url = "javascript:history.back(-1);";

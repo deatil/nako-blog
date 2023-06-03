@@ -6,6 +6,8 @@ use actix_session::{
 use actix_web::{
     web, 
     App, 
+    Error,
+    Result,
     HttpServer,
     dev::Service,
     http::{
@@ -19,14 +21,17 @@ use actix_web::{
         Logger,
         ErrorHandlers,
     },
+    HttpResponse,
 };
 use actix_files::Files as Fs;
 
 use tera::Tera;
+use mime_guess::from_path;
 use listenfd::ListenFd;
 
 use crate::nako::{
     db, 
+    embed,
     config,
     redis,
     view as nako_view,
@@ -128,8 +133,15 @@ pub async fn start() -> std::io::Result<()> {
                 
                 srv.call(req)
             })
-            .service(Fs::new("/static", "./assert/static"))
             .service(Fs::new("/upload", "./storage/upload"))
+            .configure(|cfg: &mut web::ServiceConfig| {
+                let is_embed = config::section::<bool>("app", "is_embed", true);
+                if is_embed {
+                    cfg.service(handle_embedded_static);
+                } else {
+                    cfg.service(Fs::new("/static", "./assert/static"));
+                }
+            })
             .configure(admin::route)
             .configure(blog::route)
             .default_service(web::to(error::app_default))
@@ -142,4 +154,19 @@ pub async fn start() -> std::io::Result<()> {
 
     println!("Starting server at {server_url}");
     server.run().await
+}
+
+/// 静态资源
+#[actix_web::get("/static/{_:.*}")]
+async fn handle_embedded_static(
+    path: web::Path<String>,
+) -> Result<HttpResponse, Error> {
+    let path = path.as_str();
+
+    match embed::Static::get(path) {
+        Some(content) => Ok(HttpResponse::Ok()
+            .content_type(from_path(path).first_or_octet_stream().as_ref())
+            .body(content.data.into_owned())),
+        None => Ok(HttpResponse::NotFound().body("404 Not Found")),
+    }
 }

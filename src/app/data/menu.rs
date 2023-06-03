@@ -79,7 +79,7 @@ pub fn menus() -> Value {
                 {
                     "id": 101,
                     "title": "用户管理",
-                    "icon": "layui-icon layui-icon-face-smile",
+                    "icon": "layui-icon layui-icon-user",
                     "type": 1,
                     "openType": "_iframe",
                     "href": "/admin/user/index"

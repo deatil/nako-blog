@@ -109,7 +109,7 @@ pub fn view_path(name: &str) -> String {
 }
 
 // 返回失败页面
-pub fn error_html(t: &tera::Tera, message: &str) -> HttpResponse {
+pub fn error_html(t: &mut tera::Tera, message: &str) -> HttpResponse {
     let mut ctx = http::view_data();
     ctx.insert("message", &message.to_string());
 

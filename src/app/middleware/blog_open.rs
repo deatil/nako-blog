@@ -25,7 +25,7 @@ pub async fn check(
     next: Next<BoxBody>,
 ) -> Result<dev::ServiceResponse<BoxBody>, Error> {
     let state = req.app_data::<web::Data<AppState>>().unwrap();
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let setting_data = setting::settings(&mut state.get_ref().clone()).await;
 
@@ -45,6 +45,6 @@ pub async fn check(
         return Ok(req.into_response(nako_http::error_response_json(error)));
     }
 
-    let res_body_data = service::http::error_blog_html(view, error, "");
+    let res_body_data = service::http::error_blog_html(&mut view, error, "");
     Ok(req.into_response(res_body_data))
 }

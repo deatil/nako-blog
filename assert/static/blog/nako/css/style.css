@@ -1359,3 +1359,28 @@ fieldset[disabled] .btn-clean-two.active {
   max-width: 100%;
   height: auto;
 }
+
+.blog-list .blog-teaser header {
+  position: relative;
+  text-align: center;
+  min-height: 80px;
+  border-bottom: 1px solid #ced5db;
+  padding: 15px 0;
+  overflow: hidden;
+}
+.blog-list .blog-cover {
+  width: 100px;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.blog-list .blog-cover img {
+  width: 100%;
+  height: auto;
+}
+.blog-list .blog-title {
+  padding-left: 100px;;
+}
+.blog-list .body {
+  padding-top: 15px;
+}

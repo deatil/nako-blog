@@ -34,11 +34,11 @@ use crate::app::model::{
 pub async fn index(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let ctx = nako_http::view_data();
 
-    Ok(nako_http::view(view, "admin/art/index.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/art/index.html", &ctx))
 }
 
 // ==========================
@@ -112,15 +112,15 @@ pub async fn detail(
     query: web::Query<DetailQuery>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "ID不能为空", ""));
+        return Ok(nako_http::error_response_html(&mut view, "ID不能为空", ""));
     }
 
     let data = art::ArtModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if data.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "文章不存在", ""));
+        return Ok(nako_http::error_response_html(&mut view, "文章不存在", ""));
     }
 
     // 分类
@@ -134,7 +134,7 @@ pub async fn detail(
     ctx.insert("cate", &cate_data);
     ctx.insert("user", &user_data);
 
-    Ok(nako_http::view(view, "admin/art/detail.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/art/detail.html", &ctx))
 }
 
 // ==========================
@@ -144,14 +144,14 @@ pub async fn create(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let cate_list = cate::CateModel::find_all(db).await.unwrap_or_default();
 
     let mut ctx = nako_http::view_data();
     ctx.insert("cate_list", &cate_list);
 
-    Ok(nako_http::view(view, "admin/art/create.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/art/create.html", &ctx))
 }
 
 // 表单数据
@@ -222,15 +222,15 @@ pub async fn update(
     query: web::Query<UpdateQuery>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "ID不能为空", ""));
+        return Ok(nako_http::error_response_html(&mut view, "ID不能为空", ""));
     }
 
     let info = art::ArtModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if info.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "文章不存在", ""));
+        return Ok(nako_http::error_response_html(&mut view, "文章不存在", ""));
     }
 
     let cate_list = cate::CateModel::find_all(db).await.unwrap_or_default();
@@ -239,7 +239,7 @@ pub async fn update(
     ctx.insert("data", &info);
     ctx.insert("cate_list", &cate_list);
 
-    Ok(nako_http::view(view, "admin/art/update.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/art/update.html", &ctx))
 }
 
 // 表单数据

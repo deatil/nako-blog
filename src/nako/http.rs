@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use actix_web::{
     http::header, 
     http::{
@@ -7,11 +9,28 @@ use actix_web::{
     HttpResponse,
 };
 
-use crate::nako::app;
-use crate::nako::global::{
-    Serialize,
-    Status, ResponseEntity
+use crate::nako::{
+    app,
+    embed,
+    config,
+    global::Serialize,
 };
+
+/// 状态枚举
+#[derive(Serialize)]
+pub enum Status {
+    SUCCESS,
+    FAIL,
+}
+
+/// 输出数据
+#[derive(Serialize)]
+pub struct ResponseEntity<T> {
+    pub status: Status,
+    pub code: i64,
+    pub message: String,
+    pub data: Option<T>,
+}
 
 // 返回文字
 pub fn text(body: String) -> HttpResponse {
@@ -29,7 +48,8 @@ pub fn html(body: String) -> HttpResponse {
 
 // 返回 json
 pub fn json<T: Serialize>(res_body: T) -> HttpResponse {
-    HttpResponse::build(StatusCode::OK).json(res_body)
+    HttpResponse::build(StatusCode::OK)
+        .json(res_body)
 }
 
 // 跳转
@@ -46,14 +66,38 @@ pub fn view_data() -> tera::Context {
 }
 
 // 视图
-pub fn view(view: &tera::Tera, name: &str, ctx: &tera::Context) -> HttpResponse {
+pub fn view(view: &mut tera::Tera, name: &str, ctx: &tera::Context) -> HttpResponse {
     let err = format!("html is error.");
 
-    let res_body: String = match view.render(name, ctx) {
+    let render: tera::Result<String>;
+
+    let is_embed = config::section::<bool>("app", "is_embed", true);
+    if is_embed {
+        let tpl_data = embed::get_tpl_data(name);
+        render = view.render_str(tpl_data.as_str(), ctx);
+    } else {
+        render = view.render(name, ctx);
+    }
+
+    let res_body: String = match render {
         Ok(v) => v,
         Err(e) => {
             if app::is_debug() {
-                format!("html [{}] is error: {}", name, e)
+                let mut data = Vec::new();
+
+                data.push(format!("#{}: {}", 1, e));
+
+                let mut i = 2;
+                
+                let mut cause = e.source();
+                while let Some(e) = cause {
+                    data.push(format!("#{}: {}", i, e));
+                    i += 1;
+
+                    cause = e.source();
+                }
+
+                format!("html [{}] is error: \r\n{}", name, data.join("\r\n"))
             } else {
                 err
             }
@@ -88,7 +132,7 @@ pub fn error_response_json(message: &str) -> HttpResponse {
 }
 
 // 返回失败页面
-pub fn error_response_html(t: &tera::Tera, message: &str, url: &str) -> HttpResponse {
+pub fn error_response_html(t: &mut tera::Tera, message: &str, url: &str) -> HttpResponse {
     let mut new_url = url;
     if new_url == "back" {
         new_url = "javascript:history.back(-1);";

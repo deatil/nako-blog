@@ -29,19 +29,19 @@ pub async fn update_info(
     session: Session, 
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
 
     let user_info = user::UserModel::find_user_by_id(db, id).await.unwrap_or_default().unwrap_or_default();
     if user_info.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "账号不存在", ""));
+        return Ok(nako_http::error_response_html(&mut view, "账号不存在", ""));
     }
 
     let mut ctx = nako_http::view_data();
     ctx.insert("data", &user_info);
 
-    Ok(nako_http::view(view, "admin/profile/update_info.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/profile/update_info.html", &ctx))
 }
 
 // 表单数据
@@ -103,11 +103,11 @@ pub async fn update_info_save(
 pub async fn update_password(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let ctx = nako_http::view_data();
 
-    Ok(nako_http::view(view, "admin/profile/update_password.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/profile/update_password.html", &ctx))
 }
 
 // 表单数据
@@ -179,11 +179,11 @@ pub async fn update_password_save(
 pub async fn update_avatar(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let ctx = nako_http::view_data();
 
-    Ok(nako_http::view(view, "admin/profile/update_avatar.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/profile/update_avatar.html", &ctx))
 }
 
 // 更改头像数据

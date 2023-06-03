@@ -203,6 +203,78 @@ impl ArtModel {
         paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
     }
 
+    /// 用户端列表
+    pub async fn list_count(
+        db: &DbConn,
+        wheres: ArtWhere,
+    ) -> Result<u64, DbErr> {
+        Art::find()
+            .apply_if(wheres.uuid, |query, v| {
+                query.filter(art::Column::Uuid.eq(v))
+            })
+            .apply_if(wheres.cate_id, |query, v| {
+                query.filter(art::Column::CateId.eq(v))
+            })
+            .apply_if(wheres.user_id, |query, v| {
+                query.filter(art::Column::UserId.eq(v))
+            })
+            .apply_if(wheres.title, |query, v| {
+                query.filter(art::Column::Title.contains(format!("%{}%", v).as_str()))
+            })
+            .apply_if(wheres.tag, |query, v| {
+                query.filter(
+                    Expr::cust_with_values("FIND_IN_SET(?, `tags`)", [v]),
+                )
+            })
+            .apply_if(wheres.is_top, |query, v| {
+                query.filter(art::Column::IsTop.eq(v))
+            })
+            .apply_if(wheres.status, |query, v| {
+                query.filter(art::Column::Status.eq(v))
+            })
+            .filter(art::Column::Status.eq(1))
+            .count(db)
+            .await
+    }
+
+    pub async fn list_in_page(
+        db: &DbConn,
+        page: u64,
+        per_page: u64,
+        wheres: ArtWhere,
+    ) -> Result<(Vec<art::Model>, u64), DbErr> {
+        let paginator = Art::find()
+            .apply_if(wheres.uuid, |query, v| {
+                query.filter(art::Column::Uuid.eq(v))
+            })
+            .apply_if(wheres.cate_id, |query, v| {
+                query.filter(art::Column::CateId.eq(v))
+            })
+            .apply_if(wheres.user_id, |query, v| {
+                query.filter(art::Column::UserId.eq(v))
+            })
+            .apply_if(wheres.title, |query, v| {
+                query.filter(art::Column::Title.contains(format!("%{}%", v).as_str()))
+            })
+            .apply_if(wheres.tag, |query, v| {
+                query.filter(
+                    Expr::cust_with_values("FIND_IN_SET(?, `tags`)", [v]),
+                )
+            })
+            .apply_if(wheres.is_top, |query, v| {
+                query.filter(art::Column::IsTop.eq(v))
+            })
+            .apply_if(wheres.status, |query, v| {
+                query.filter(art::Column::Status.eq(v))
+            })
+            .order_by_desc(art::Column::IsTop)
+            .order_by_desc(art::Column::AddTime)
+            .paginate(db, per_page);
+        let num_pages = paginator.num_pages().await?;
+
+        paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
+    }
+
     /// 一年内热门文章
     pub async fn find_one_year_hot(
         db: &DbConn,

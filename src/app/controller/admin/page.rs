@@ -32,11 +32,11 @@ use crate::app::model::{
 pub async fn index(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let ctx = nako_http::view_data();
 
-    Ok(nako_http::view(view, "admin/page/index.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/page/index.html", &ctx))
 }
 
 // ==========================
@@ -105,15 +105,15 @@ pub async fn detail(
     query: web::Query<DetailQuery>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "ID不能为空", ""));
+        return Ok(nako_http::error_response_html(&mut view, "ID不能为空", ""));
     }
 
     let data = page::PageModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if data.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "页面不存在", ""));
+        return Ok(nako_http::error_response_html(&mut view, "页面不存在", ""));
     }
 
     // 作者
@@ -123,7 +123,7 @@ pub async fn detail(
     ctx.insert("data", &data);
     ctx.insert("user", &user_data);
 
-    Ok(nako_http::view(view, "admin/page/detail.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/page/detail.html", &ctx))
 }
 
 // ==========================
@@ -132,11 +132,11 @@ pub async fn detail(
 pub async fn create(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let ctx = nako_http::view_data();
 
-    Ok(nako_http::view(view, "admin/page/create.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/page/create.html", &ctx))
 }
 
 // 表单数据
@@ -210,15 +210,15 @@ pub async fn update(
     query: web::Query<UpdateQuery>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "ID不能为空", ""));
+        return Ok(nako_http::error_response_html(&mut view, "ID不能为空", ""));
     }
 
     let info = page::PageModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if info.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "页面不存在", ""));
+        return Ok(nako_http::error_response_html(&mut view, "页面不存在", ""));
     }
 
     let page_tpls = app::page_tpls();
@@ -227,7 +227,7 @@ pub async fn update(
     ctx.insert("data", &info);
     ctx.insert("page_tpls", &page_tpls);
 
-    Ok(nako_http::view(view, "admin/page/update.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/page/update.html", &ctx))
 }
 
 // 表单数据

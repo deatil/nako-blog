@@ -26,7 +26,7 @@ pub async fn index(
     session: Session, 
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
     let user_info = user::UserModel::find_user_by_id(db, id).await.unwrap_or_default().unwrap_or_default();
@@ -34,7 +34,7 @@ pub async fn index(
     let mut ctx = nako_http::view_data();
     ctx.insert("login_user", &user_info);
 
-    Ok(nako_http::view(view, "admin/index/index.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/index/index.html", &ctx))
 }
 
 // 菜单
@@ -49,7 +49,7 @@ pub async fn console(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let search_where = art::ArtWhere{
         title: None,
@@ -75,5 +75,5 @@ pub async fn console(
     ctx.insert("comment_count", &comment_count);
     ctx.insert("tag_count", &tag_count);
 
-    Ok(nako_http::view(view, "admin/index/console.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/index/console.html", &ctx))
 }

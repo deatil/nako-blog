@@ -22,7 +22,7 @@ pub async fn index(
     req: HttpRequest,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let error = "发生了错误，请重试";
 
@@ -34,5 +34,5 @@ pub async fn index(
     let mut ctx = nako_http::view_data();
     ctx.insert("message", &error.to_string());
 
-    Ok(nako_http::view(view, app::view_path("error.html").as_str(), &ctx))
+    Ok(nako_http::view(&mut view, app::view_path("error.html").as_str(), &ctx))
 }

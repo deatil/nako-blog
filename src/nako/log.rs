@@ -1,14 +1,14 @@
-// use log::{debug, error, info, trace, warn};
 use std::time::SystemTime;
-use std::env;
 use humantime;
 
 use crate::nako::{
     app,
+    config,
 };
 
 // 初始化日志
 // log::info!("Hello, world!");
+// log::{debug, error, info, trace, warn};
 pub fn setup_logger() -> Result<(), fern::InitError> {
     let mut f = fern::Dispatch::new()
         .format(|out, message, record| {
@@ -21,7 +21,7 @@ pub fn setup_logger() -> Result<(), fern::InitError> {
             ))
         });
 
-    let rust_log = env::var("RUST_LOG").unwrap_or("info".into());
+    let rust_log = config::section::<String>("app", "rust_log", "error".to_string());
     let logging_level = app::get_log_level(rust_log);
 
     f = f.level(logging_level);

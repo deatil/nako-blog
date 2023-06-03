@@ -37,11 +37,11 @@ use crate::nako::app::{
 pub async fn index(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let ctx = nako_http::view_data();
 
-    Ok(nako_http::view(view, "admin/attach/index.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/attach/index.html", &ctx))
 }
 
 // ==========================
@@ -108,21 +108,21 @@ pub async fn detail(
     query: web::Query<DetailQuery>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "ID不能为空", ""));
+        return Ok(nako_http::error_response_html(&mut view, "ID不能为空", ""));
     }
 
     let data = attach::AttachModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if data.id == 0 {
-        return Ok(nako_http::error_response_html(&view, "附件不存在", ""));
+        return Ok(nako_http::error_response_html(&mut view, "附件不存在", ""));
     }
 
     let mut ctx = nako_http::view_data();
     ctx.insert("data", &data);
 
-    Ok(nako_http::view(view, "admin/attach/detail.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/attach/detail.html", &ctx))
 }
 
 // ==========================

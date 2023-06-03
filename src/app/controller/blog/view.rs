@@ -28,7 +28,7 @@ pub async fn index(
     web::Query(params): web::Query<HashMap<String, String>>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
-    let view = &state.view;
+    let mut view = state.view.clone();
 
     let mut page: u64 = 1;
     if let Some(p) = params.get("page") {
@@ -39,7 +39,7 @@ pub async fn index(
     let art = art::ArtModel::find_by_uuid(db, uuid.as_str())
         .await.unwrap_or_default().unwrap_or_default();
     if art.id == 0 {
-        return Ok(app::error_html(view, "文章不存在"));
+        return Ok(app::error_html(&mut view, "文章不存在"));
     }
 
     // 分类
@@ -82,6 +82,6 @@ pub async fn index(
         tpl = "view.html";
     }
 
-    Ok(nako_http::view(view, app::view_path(tpl).as_str(), &ctx))
+    Ok(nako_http::view(&mut view, app::view_path(tpl).as_str(), &ctx))
 }
 
