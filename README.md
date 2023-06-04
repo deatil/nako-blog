@@ -1,6 +1,6 @@
 ## nako-blog 博客系统
 
-`nako-blog` 是使用 `actix-web`, `sea-orm` 及 `tera` 的 `rust` 博客系统
+`nako-blog` 是使用 actix-web, sea-orm 及 tera 的 `rust` 博客系统
 
 
 ### 项目介绍
@@ -8,12 +8,13 @@
 *  使用 `rust` 开发的通用博客系统
 *  核心使用 `actix-web`, `sea-orm` 及 `tera` 等开发
 *  博客后台使用 `pear-admin` 后端模板，非前后端分离项目
-*  博客模板为可设置模板
+*  打包静态文件, 模板文件及配置文件。只需一个文件即可部署
 
 
 ### 环境要求
 
- - rust >= 1.18
+ - rust
+ - cargo
  - Myql
  - Redis
 
@@ -62,7 +63,7 @@ git clone https://github.com/deatil/nako-blog.git
 2. 然后配置数据库等信息
 
 ```
-/conf.ini
+/assert/config/conf.ini
 ```
 
 3. 最后导入 sql 数据到数据库

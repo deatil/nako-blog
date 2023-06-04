@@ -67,7 +67,21 @@ pub async fn start() -> std::io::Result<()> {
     let server_url = format!("{host}:{port}");
 
     let conn = db::connect().await.unwrap_or_default();
-    let mut view = Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/assert/templates/**/*")).unwrap_or_default();
+
+    let mut view: Tera;
+ 
+    // 是否打包
+    let is_embed = config::section::<bool>("app", "is_embed", true);
+    if is_embed {
+        view = Tera::default();
+
+        for file in embed::Templates::iter() {
+            let filename = file.as_ref();
+            view.add_raw_template(filename.clone(), embed::get_tpl_data(filename.clone()).as_str()).unwrap_or_default();
+        }
+    } else {
+        view = Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/assert/templates/**/*")).unwrap_or_default();
+    }
 
     // 设置模板函数
     nako_view::set_fns(&mut view);

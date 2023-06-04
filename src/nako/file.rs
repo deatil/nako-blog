@@ -17,7 +17,7 @@ impl File {
     }
 
     /// 判断是否存在
-    pub fn exists(f: &str) -> bool {
+    pub fn exists(&self, f: &str) -> bool {
         if path::Path::new(f).exists() {
             return true;
         }
@@ -26,14 +26,14 @@ impl File {
     }
 
     /// 删除文件
-    pub fn remove(f: &str) -> Result<(), Error> {
+    pub fn remove(&self, f: &str) -> Result<(), Error> {
         fs::remove_file(f)?;
 
         Ok(())
     }
 
     /// 创建文件
-    pub fn create(f: &str) -> Result<fs::File, Error> {
+    pub fn create(&self, f: &str) -> Result<fs::File, Error> {
         let file = fs::OpenOptions::new()
             .write(true)
             .create_new(true)
@@ -43,7 +43,7 @@ impl File {
     }
 
     /// 读取
-    pub fn read(f: &str) -> Result<String, Error> {
+    pub fn read(&self, f: &str) -> Result<String, Error> {
         let mut file = fs::File::open(f)?;
 
         let mut buffer = Vec::new();
@@ -55,7 +55,7 @@ impl File {
     }
 
     /// 写入信息
-    pub fn write(f: &str, content: String) -> Result<(), Error> {
+    pub fn write(&self, f: &str, content: String) -> Result<(), Error> {
         let path = path::Path::new(f);
 
         let mut file = fs::File::create(path)?;
@@ -65,14 +65,14 @@ impl File {
     }
 
     /// 创建文件夹
-    pub fn mkdir(d: &str) -> Result<(), Error> {
+    pub fn mkdir(&self, d: &str) -> Result<(), Error> {
         fs::create_dir_all(d)?;
 
         Ok(())
     }
 
     /// 删除文件夹
-    pub fn rmdir(d: &str) -> Result<(), Error> {
+    pub fn rmdir(&self, d: &str) -> Result<(), Error> {
         fs::remove_dir(d)?;
 
         Ok(())

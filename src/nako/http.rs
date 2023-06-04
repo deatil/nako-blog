@@ -11,8 +11,6 @@ use actix_web::{
 
 use crate::nako::{
     app,
-    embed,
-    config,
     global::Serialize,
 };
 
@@ -69,17 +67,7 @@ pub fn view_data() -> tera::Context {
 pub fn view(view: &mut tera::Tera, name: &str, ctx: &tera::Context) -> HttpResponse {
     let err = format!("html is error.");
 
-    let render: tera::Result<String>;
-
-    let is_embed = config::section::<bool>("app", "is_embed", true);
-    if is_embed {
-        let tpl_data = embed::get_tpl_data(name);
-        render = view.render_str(tpl_data.as_str(), ctx);
-    } else {
-        render = view.render(name, ctx);
-    }
-
-    let res_body: String = match render {
+    let res_body: String = match view.render(name, ctx) {
         Ok(v) => v,
         Err(e) => {
             if app::is_debug() {

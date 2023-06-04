@@ -5,8 +5,10 @@ use actix_web::{
     HttpResponse,
 };
 
-use crate::nako::http;
 use crate::nako::{
+    http,
+    embed,
+    utils,
     config,
 };
 
@@ -53,10 +55,30 @@ pub fn attach_path(name: String) -> String {
 
 // 列出模板
 pub fn list_tpls_by_prefix(file_prefix: String) -> Vec<String> {
-    let tpl = config::section::<String>("view", "blog_tpl_path", "./assert/templates/blog".to_string());
+    let base_path = "./assert/templates";
+
+    let tpl_path = config::section::<String>("view", "blog_tpl_path", "blog".to_string());
     let theme = config::section::<String>("view", "blog_theme", "nako".to_string());
 
-    let path = format!("{}/{}/", tpl, theme);
+    // 打包静态文件
+    let is_embed = config::section::<bool>("app", "is_embed", true);
+    if is_embed {
+        let prefix = format!("{}/{}/{}", tpl_path, theme, file_prefix);
+
+        let mut tpl_list: Vec<String> = Vec::new();
+        for file in embed::Templates::iter() {
+            let filename = file.as_ref();
+            let file_name = filename.clone();
+
+            if file_name.starts_with(&prefix) {
+                tpl_list.push(utils::get_path_filename(filename.clone()));
+            }
+        }
+
+        return tpl_list;
+    }
+
+    let path = format!("{}/{}/{}/", base_path, tpl_path, theme);
 
     let path_object = Path::new(&path);
 
@@ -101,9 +123,10 @@ pub fn page_tpls() -> Vec<String> {
 
 // 模板路径
 pub fn view_path(name: &str) -> String {
+    let tpl_path = config::section::<String>("view", "blog_tpl_path", "blog".to_string());
     let theme = config::section::<String>("view", "blog_theme", "nako".to_string());
 
-    let path = format!("blog/{}/{}", theme, name);
+    let path = format!("{}/{}/{}", tpl_path, theme, name);
 
     path
 }

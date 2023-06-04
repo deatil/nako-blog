@@ -31,7 +31,7 @@ use crate::nako::{
 };
 
 pub(crate) async fn app_default(req: HttpRequest) -> impl Responder {
-    get_error_response(&req, "no page")
+    get_error_response(&req, "404 Not Found")
 }
 
 pub(crate) fn json_parser_error(

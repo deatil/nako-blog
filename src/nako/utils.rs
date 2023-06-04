@@ -57,6 +57,17 @@ pub fn get_extension(filename: &str) -> String {
     "".to_string()
 }
 
+pub fn get_path_filename(path: &str) -> String {
+    let path_string = path.to_string();
+    let files = path_string.split("/").collect::<Vec<_>>();
+    let file_name = files.last();
+
+    match file_name {
+        Some(v) => v.to_string(),
+        None => "".to_string(),
+    }
+}
+
 pub fn formatsize<T: humansize::ToF64 + humansize::Unsigned>(size: T) -> String {
     let res: String = format_size(size, DECIMAL);
 
