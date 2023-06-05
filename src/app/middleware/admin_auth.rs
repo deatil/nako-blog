@@ -12,6 +12,7 @@ use actix_web_lab::middleware::Next;
 use actix_session::SessionExt;
 
 use crate::nako::http;
+use crate::nako::utils;
 use crate::nako::global::{
     AppState
 };
@@ -60,10 +61,7 @@ pub async fn auth(
     if !check {
         let message = "请先登陆";
 
-        let url: String = match req.request().url_for_static("admin.auth-login") {
-            Ok(data) => data.into(),
-            Err(_) => "/".into(),
-        };
+        let url: String = utils::url_for_static(req.request().clone(), "admin.auth-login");
 
         if req.method() == Method::POST {
             let res_body_data = http::error_response_json(message);

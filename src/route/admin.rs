@@ -39,11 +39,6 @@ pub fn route(cfg: &mut web::ServiceConfig) {
                             .name("admin.index"),
                     )
                     .service(
-                        web::resource("/menu")
-                            .route(web::get().to(index::menu))
-                            .name("admin.index-menu"),
-                    )
-                    .service(
                         web::resource("/console")
                             .route(web::get().to(index::console))
                             .name("admin.index-console"),

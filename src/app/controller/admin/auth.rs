@@ -17,6 +17,7 @@ use captcha::Captcha;
 use captcha::filters::{Noise, Wave, Dots};
 
 use crate::nako::{
+    utils,
     auth as nako_auth,
     http as nako_http,
     global::{
@@ -64,10 +65,7 @@ pub async fn login(
 ) -> Result<HttpResponse, Error> {
     let login_id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
     if login_id > 0 {
-        let redirect_url: String = match req.url_for("admin.index", &[""]) {
-            Ok(data) => data.into(),
-            Err(_) => "/".into(),
-        };
+        let redirect_url: String = utils::url_for_static(req, "admin.index");
 
         return Ok(nako_http::redirect(redirect_url));
     }
@@ -158,10 +156,7 @@ pub async fn logout(
         session.remove("login_id");
     }
 
-    let redirect_url: String = match req.url_for("admin.auth-login", &[""]) {
-        Ok(data) => data.into(),
-        Err(_) => "/".into(),
-    };
+    let redirect_url: String = utils::url_for_static(req, "admin.auth-login") ;
     
     return Ok(nako_http::redirect(redirect_url));
 }

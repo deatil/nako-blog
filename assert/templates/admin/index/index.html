@@ -42,13 +42,13 @@
 							<dd>
 								<a href="javascript:void(0);" 
 									user-menu-url="{{ url_for(name='admin.profile-info') | safe }}" 
-									user-menu-id="5555" 
+									user-menu-id="profile_info" 
 									user-menu-title="基本资料">基本资料</a>
 							</dd>
 							<dd>
 								<a href="javascript:void(0);" 
 									user-menu-url="{{ url_for(name='admin.profile-password') | safe }}" 
-									user-menu-id="5556" 
+									user-menu-id="profile_password" 
 									user-menu-title="更改密码">更改密码</a>
 							</dd>
 							<dd>
@@ -94,6 +94,7 @@
 		<script src="{{ assert(path='admin/component/layui/layui.js') | safe }}"></script>
 		<script src="{{ assert(path='admin/component/pear/pear.js') | safe }}"></script>
 		<!-- 框 架 初 始 化 -->
+		{% include "admin/index/_menus.html" %}
 		<script>
 			layui.use(['admin','jquery','convert','popup'], function() {
 				var admin = layui.admin;
@@ -109,11 +110,12 @@
 						"image": "{{ assert(path='admin/admin/images/logo.png') | safe }}"
 					},
 					"menu": {
-						"data": "{{ url_for(name='admin.index-menu') | safe }}",
+						"data": menus,
 						"collaspe": true,
 						"accordion": true,
 						"method": "GET",
 						"control": false,
+						"async": false,
 						"select": "0"
 					},
 					"tab": {

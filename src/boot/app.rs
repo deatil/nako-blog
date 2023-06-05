@@ -90,8 +90,8 @@ pub async fn start() -> std::io::Result<()> {
     let redis = redis::create_redis_pool(redis_url).await.unwrap();
 
     let state = AppState { 
-        view: view, 
         db: conn, 
+        view: view, 
         redis: redis, 
     };
 
@@ -149,7 +149,6 @@ pub async fn start() -> std::io::Result<()> {
             })
             .service(Fs::new("/upload", "./storage/upload"))
             .configure(|cfg: &mut web::ServiceConfig| {
-                let is_embed = config::section::<bool>("app", "is_embed", true);
                 if is_embed {
                     cfg.service(handle_embedded_static);
                 } else {

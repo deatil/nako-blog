@@ -11,7 +11,6 @@ use crate::nako::global::{
     AppState,
 };
 
-use crate::app::data as app_data;
 use crate::app::model::{
     user,
     art,
@@ -35,13 +34,6 @@ pub async fn index(
     ctx.insert("login_user", &user_info);
 
     Ok(nako_http::view(&mut view, "admin/index/index.html", &ctx))
-}
-
-// 菜单
-pub async fn menu() -> Result<HttpResponse, Error> {
-    let data = app_data::menu::menus();
-
-    Ok(nako_http::json(data))
 }
 
 // 控制台

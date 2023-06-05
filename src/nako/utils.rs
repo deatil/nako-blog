@@ -9,6 +9,8 @@ use crypto::digest::Digest;
 use uuid::Uuid;
 use humansize::{format_size, DECIMAL};
 
+use actix_web::HttpRequest;
+
 // md5
 pub fn md5(data: &str) -> String {
     let mut h = Md5::new();
@@ -97,3 +99,26 @@ pub fn is_image(extension: String) -> bool {
         || extension.eq("svg")
 }
 
+/// 生成 url
+pub fn url_for<U, I>(req: HttpRequest, name: &str, elements: U) -> String 
+where
+    U: IntoIterator<Item = I>,
+    I: AsRef<str>,
+{
+    let url: String = match req.url_for(name, elements) {
+        Ok(data) => data.into(),
+        Err(_) => "/".into(),
+    };
+
+    url
+}
+
+/// 生成 url 不带参数
+pub fn url_for_static(req: HttpRequest, name: &str) -> String {
+    let url: String = match req.url_for_static(name) {
+        Ok(data) => data.into(),
+        Err(_) => "/".into(),
+    };
+
+    url
+}
