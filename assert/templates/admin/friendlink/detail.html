@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>链接详情</title>
+        <link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
+    </head>
+    <body class="pear-container">
+        <div class="table-responsive">
+            <table class="layui-table">
+                <colgroup>
+                    <col width="200">
+                    <col>
+                </colgroup>
+          
+                <thead>
+                    <tr>
+                        <td>名称</td>
+                        <td>内容</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ID</td>
+                        <td>{{ data.id }} </td>
+                    </tr>
+                    <tr>
+                        <td>名称</td>
+                        <td>{{ data.title }}</td>
+                    </tr>
+                    <tr>
+                        <td>链接</td>
+                        <td>{{ data.url }}</td>
+                    </tr>
+                    <tr>
+                        <td>跳转方式</td>
+                        <td>
+                            {% if data.target == "_blank" %}
+                                <span class="layui-badge layui-bg-green">跳出页面</span>
+                            {% elif data.target == "_self" %}
+                                <span class="layui-badge layui-bg-blue">当前页面</span>
+                            {% endif %}
+                            <span class="layui-badge layui-bg-cyan">{{ data.target }}</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>链接图标</td>
+                        <td>{{ data.icon }}</td>
+                    </tr>
+                    <tr>
+                        <td>排序</td>
+                        <td>{{ data.sort }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>状态</td>
+                        <td>
+                            {% if data.status == 1 %}
+                                <span class="layui-badge-dot layui-bg-green"></span>
+                                <span class="text-green">启用</span>
+                            {% else %}
+                                <span class="layui-badge-dot layui-bg-orange"></span>
+                                <span class="text-orange">禁用</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>添加时间</td>
+                        <td>
+                            {{ data.add_time | date(format="%Y-%m-%d %H:%M:%S", timezone="Asia/Shanghai") }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>添加IP</td>
+                        <td>
+                            {{ data.add_ip }}
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>     
+        
+    </body>
+</html>

@@ -85,7 +85,7 @@ pub fn view(view: &mut tera::Tera, name: &str, ctx: &tera::Context) -> HttpRespo
                     cause = e.source();
                 }
 
-                format!("html [{}] is error: \r\n{}", name, data.join("\r\n"))
+                format!("html [{}] is error: <br />{}", name, data.join("<br />"))
             } else {
                 err
             }

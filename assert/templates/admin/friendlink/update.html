@@ -11,27 +11,59 @@
             <div class="main-container">
                 <div class="main-container">
                     <div class="layui-form-item">
-                        <label class="layui-form-label">账号</label>
+                        <label class="layui-form-label">名称</label>
                         <div class="layui-input-block">
-                            <input type="text" name="username" value="{{ data.username }}" 
-                                lay-verify="title" autocomplete="off" placeholder="请输入账号" class="layui-input">
+                            <input type="text" name="title" 
+                                value="{{ data.title }}" 
+                                lay-verify="title" autocomplete="off" 
+                                placeholder="请输入名称" class="layui-input">
                         </div>
                     </div>
+                    
                     <div class="layui-form-item">
-                        <label class="layui-form-label">昵称</label>
+                        <label class="layui-form-label">链接地址</label>
                         <div class="layui-input-block">
-                            <input type="text"  name="nickname" value="{{ data.nickname }}" 
-                                lay-verify="title" autocomplete="off" placeholder="请输入昵称" class="layui-input">
+                            <input type="text" name="url" 
+                                value="{{ data.url }}" 
+                                lay-verify="title" autocomplete="off" 
+                                placeholder="请输入链接地址" class="layui-input">
+                        </div>
+                    </div>
+     
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">跳转方式</label>
+                        <div class="layui-input-block">
+							<select name="target" lay-verify="">
+                                {% for name, target in targets %}
+                                    {% if data.target == name %}
+                                        <option value="{{ name }}" selected>{{ target }}</option>
+                                    {% else %}
+                                        <option value="{{ name }}">{{ target }}</option>
+                                    {% endif %}
+                                {% endfor %}
+							</select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">链接图标</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="icon" 
+                                value="{{ data.icon }}" autocomplete="off" 
+                                placeholder="请输入链接图标" class="layui-input">
                         </div>
                     </div>
     
                     <div class="layui-form-item">
-                        <label class="layui-form-label">签名</label>
+                        <label class="layui-form-label">排序</label>
                         <div class="layui-input-block">
-                            <textarea name="sign" placeholder="请输入签名" class="layui-textarea">{{ data.sign }}</textarea>
+                            <input type="text" name="sort" 
+                                value="{{ data.sort }}" 
+                                lay-verify="title" autocomplete="off" 
+                                placeholder="请输入排序" class="layui-input">
                         </div>
                     </div>
-    
+                    
                     <div class="layui-form-item">
                         <label class="layui-form-label">状态</label>
                         <div class="layui-input-block">
@@ -50,7 +82,7 @@
         
         <div class="bottom">
             <div class="button-container">
-                <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="user-save">
+                <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="friendlink-save">
                     <i class="layui-icon layui-icon-ok"></i>
                     提交
                 </button>
@@ -69,9 +101,9 @@
         let form = layui.form;
         let $ = layui.jquery;
 
-        form.on('submit(user-save)', function(data) {
+        form.on('submit(friendlink-save)', function(data) {
             $.ajax({
-                url: "{{ url_for(name='admin.user-update') | safe }}?id={{ data.id }}",
+                url: "{{ url_for(name='admin.friendlink-update') | safe }}?id={{ data.id }}",
                 data: data.field,
                 dataType: 'json',
                 type: 'post',
@@ -79,7 +111,7 @@
                     if (result.code == 0) {
                         layer.msg(result.message, {icon:1,time:1000}, function() {
                             parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
-                            parent.layui.table.reload("user-table");
+                            parent.layui.table.reload("friendlink-table");
                         });
                     } else {
                         layer.msg(result.message, {icon:2,time:1000});

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>添加文章</title>
+    <title>链接编辑</title>
     <link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
 </head>
 <body>
@@ -11,32 +11,27 @@
         <div class="main-container">
             <div class="main-container">
                 <div class="layui-form-item">
-                    <label class="layui-form-label">所属分类</label>
+                    <label class="layui-form-label">名称</label>
                     <div class="layui-input-block">
-                        <select name="cate_id" lay-verify="">
-                            <option value="0">清选择分类</option>
-                            {% if cate_list %}
-                                {% for cate_item in cate_list %}
-                                    <option value="{{ cate_item.id }}">{{ cate_item.name }}</option>
-                                {% endfor %}
-                            {% endif %}
-                        </select>
+                        <input type="text" name="title" 
+                            lay-verify="title" autocomplete="off" 
+                            placeholder="请输入名称" class="layui-input">
                     </div>
                 </div>
-
                 <div class="layui-form-item">
-                    <label class="layui-form-label">标题</label>
+                    <label class="layui-form-label">链接地址</label>
                     <div class="layui-input-block">
-                        <input type="text" name="title" lay-verify="title" 
-                            autocomplete="off" placeholder="请输入标题" class="layui-input">
+                        <input type="text" name="url" 
+                            lay-verify="title" autocomplete="off" 
+                            placeholder="请输入链接地址" class="layui-input">
                     </div>
                 </div>
 
                 <div class="layui-form-item">
                     <label class="layui-form-label">状态</label>
                     <div class="layui-input-block">
-                        <input type="radio" name="status" value="1" title="启用">
-                        <input type="radio" name="status" value="0" title="禁用" checked>
+                        <input type="radio" name="status" value="1" title="启用" checked>
+                        <input type="radio" name="status" value="0" title="禁用">
                     </div>
                 </div>
             </div>
@@ -45,7 +40,7 @@
     
     <div class="bottom">
         <div class="button-container">
-            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="art-save">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="friendlink-save">
                 <i class="layui-icon layui-icon-ok"></i>
                 提交
             </button>
@@ -64,10 +59,10 @@ layui.use(['form','jquery'],function(){
     let form = layui.form;
     let $ = layui.jquery;
 
-    form.on('submit(art-save)', function(data){
+    form.on('submit(friendlink-save)', function(data){
 
         $.ajax({
-            url: "{{ url_for(name='admin.art-create') | safe }}",
+            url: "{{ url_for(name='admin.friendlink-create') | safe }}",
             data: data.field,
             dataType:'json',
             type:'post',
@@ -75,7 +70,7 @@ layui.use(['form','jquery'],function(){
                 if (result.code == 0) {
                     layer.msg(result.message, {icon:1,time:1000}, function() {
                         parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
-                        parent.layui.table.reload("art-table");
+                        parent.layui.table.reload("friendlink-table");
                     });
                 } else {
                     layer.msg(result.message, {icon:2,time:1000});

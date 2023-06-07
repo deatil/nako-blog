@@ -12,6 +12,7 @@
         }
         </style>
     </head>
+
     <body>
     <form class="layui-form" action="">
         <div class="mainBox">
@@ -38,7 +39,9 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">标题</label>
                         <div class="layui-input-block">
-                            <input type="text" name="title" value="{{ data.title }}" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+                            <input type="text" name="title" value="{{ data.title }}" 
+                                lay-verify="title" autocomplete="off" 
+                                placeholder="请输入标题" class="layui-input">
                         </div>
                     </div>
                     
@@ -59,7 +62,9 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">关键字</label>
                         <div class="layui-input-block">
-                            <input type="text"  name="keywords" value="{{ data.keywords }}" lay-verify="title" autocomplete="off" placeholder="请输入关键字" class="layui-input">
+                            <input type="text"  name="keywords" value="{{ data.keywords }}" 
+                                lay-verify="title" autocomplete="off" 
+                                placeholder="请输入关键字" class="layui-input">
                         </div>
                     </div>
     
@@ -106,21 +111,28 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">标签</label>
                         <div class="layui-input-block">
-                            <input type="text"  name="tags" value="{{ data.tags }}" lay-verify="title" autocomplete="off" placeholder="请输入标签" class="layui-input tags-item">
+                            <input type="text" name="tags" value="{{ data.tags }}" 
+                                lay-verify="title" autocomplete="off" 
+                                placeholder="请输入标签" class="layui-input tags-item">
                         </div>
                     </div>
     
                     <div class="layui-form-item">
                         <label class="layui-form-label">文章来源</label>
                         <div class="layui-input-block">
-                            <input type="text"  name="from" value="{{ data.from }}" lay-verify="title" autocomplete="off" placeholder="请输入文章来源" class="layui-input">
+                            <input type="text" name="from" value="{{ data.from }}" 
+                                lay-verify="title" autocomplete="off" 
+                                placeholder="请输入文章来源" class="layui-input">
                         </div>
                     </div>
 
                     <div class="layui-form-item">
                         <label class="layui-form-label">发布时间</label>
                         <div class="layui-input-block">
-                            <input type="text" name="add_time" value="{{ data.add_time | date(format='%Y-%m-%d %H:%M:%S', timezone='Asia/Shanghai') }}" lay-verify="title" autocomplete="off" placeholder="请输入发布时间" class="layui-input add_time">
+                            <input type="text" name="add_time" 
+                                value="{{ data.add_time | date(format='%Y-%m-%d %H:%M:%S', timezone='Asia/Shanghai') }}" 
+                                lay-verify="title" autocomplete="off" 
+                                placeholder="请输入发布时间" class="layui-input add_time">
                         </div>
                     </div>
 
@@ -152,6 +164,7 @@
                 </div>
             </div>
         </div>
+        
         <div class="bottom">
             <div class="button-container">
                 <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="art-save">

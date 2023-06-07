@@ -5,6 +5,7 @@
     <title>添加文章</title>
     <link rel="stylesheet" href="{{ assert(path='admin/component/pear/css/pear.css') | safe }}" />
 </head>
+
 <body>
 <form class="layui-form" action="">
     <div class="mainBox">
@@ -13,14 +14,18 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">标题</label>
                     <div class="layui-input-block">
-                        <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+                        <input type="text" name="title" 
+                            lay-verify="title" autocomplete="off" 
+                            placeholder="请输入标题" class="layui-input">
                     </div>
                 </div>
 
                 <div class="layui-form-item">
                     <label class="layui-form-label">标识</label>
                     <div class="layui-input-block">
-                        <input type="text" name="slug" lay-verify="title" autocomplete="off" placeholder="请输入标识" class="layui-input">
+                        <input type="text" name="slug" 
+                            lay-verify="title" autocomplete="off" 
+                            placeholder="请输入标识" class="layui-input">
                     </div>
                 </div>
 
@@ -34,6 +39,7 @@
             </div>
         </div>
     </div>
+    
     <div class="bottom">
         <div class="button-container">
             <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="page-save">

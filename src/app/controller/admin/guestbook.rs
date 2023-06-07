@@ -127,27 +127,27 @@ pub async fn detail(
 // ==========================
 
 #[derive(Deserialize)]
-pub struct DeleteQuery {
+pub struct DeleteForm {
     id: u32,
 }
 
 // 删除
 pub async fn delete(
     state: web::Data<AppState>,
-    query: web::Query<DeleteQuery>,
+    params: web::Form<DeleteForm>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
 
-    if query.id == 0 {
+    if params.id == 0 {
         return Ok(nako_http::error_response_json("ID不能为空"));
     }
 
-    let data = guestbook::GuestbookModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
+    let data = guestbook::GuestbookModel::find_by_id(db, params.id).await.unwrap_or_default().unwrap_or_default();
     if data.id == 0 {
         return Ok(nako_http::error_response_json("要删除的留言不存在"));
     }
 
-    let delete_data = guestbook::GuestbookModel::delete(db, query.id).await;
+    let delete_data = guestbook::GuestbookModel::delete(db, params.id).await;
     if delete_data.is_err() {
         return Ok(nako_http::error_response_json("删除失败"));
     }
@@ -155,12 +155,45 @@ pub async fn delete(
     Ok(nako_http::success_response_json("删除成功", ""))
 }
 
+// ==========================
+
+#[derive(Deserialize)]
+pub struct BatchDeleteForm {
+    ids: String,
+}
+
+// 批量删除
+pub async fn batch_delete(
+    state: web::Data<AppState>,
+    params: web::Form<BatchDeleteForm>,
+) -> Result<HttpResponse, Error> {
+    let db = &state.db;
+
+    if params.ids.as_str() == "" {
+        return Ok(nako_http::error_response_json("未选中数据"));
+    }
+
+    let ids = params.ids.split(",").collect::<Vec<&str>>();
+
+    for id in ids {
+        let delete_id = id.parse::<u32>().unwrap_or_default();
+
+        let data = guestbook::GuestbookModel::find_by_id(db, delete_id).await.unwrap_or_default().unwrap_or_default();
+        if data.id > 0 {
+            let _ = guestbook::GuestbookModel::delete(db, delete_id).await;
+        }
+    }
+
+
+    Ok(nako_http::success_response_json("批量删除成功", ""))
+}
+
+// ==========================
+
 #[derive(Deserialize)]
 pub struct UpdateStatusQuery {
     id: u32,
 }
-
-// ==========================
 
 // 表单数据
 #[derive(Deserialize)]

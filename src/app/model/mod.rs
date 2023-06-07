@@ -7,5 +7,6 @@ pub mod setting;
 pub mod tag;
 pub mod user;
 pub mod guestbook;
+pub mod friendlink;
 
 pub use sea_orm;

@@ -33,28 +33,36 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">分类名称</label>
                         <div class="layui-input-block">
-                            <input type="text" name="name" value="{{ data.name }}" lay-verify="title" autocomplete="off" placeholder="请输入账号" class="layui-input">
+                            <input type="text" name="name" 
+                                value="{{ data.name }}" 
+                                lay-verify="title" autocomplete="off" 
+                                placeholder="请输入分类名称" class="layui-input">
                         </div>
                     </div>
                     
                     <div class="layui-form-item">
                         <label class="layui-form-label">分类标识</label>
                         <div class="layui-input-block">
-                            <input type="text"  name="slug" value="{{ data.slug }}" lay-verify="title" autocomplete="off" placeholder="请输入昵称" class="layui-input">
+                            <input type="text" name="slug" 
+                                value="{{ data.slug }}" 
+                                lay-verify="title" autocomplete="off" 
+                                placeholder="请输入分类标识" class="layui-input">
                         </div>
                     </div>
     
                     <div class="layui-form-item">
                         <label class="layui-form-label">描述</label>
                         <div class="layui-input-block">
-                            <textarea name="desc" placeholder="请输入签名" class="layui-textarea">{{ data.desc }}</textarea>
+                            <textarea name="desc" placeholder="请输入描述" class="layui-textarea">{{ data.desc }}</textarea>
                         </div>
                     </div>
     
                     <div class="layui-form-item">
                         <label class="layui-form-label">排序</label>
                         <div class="layui-input-block">
-                            <input type="text"  name="sort" value="{{ data.sort }}" lay-verify="title" autocomplete="off" placeholder="请输入昵称" class="layui-input">
+                            <input type="text" name="sort" value="{{ data.sort }}" 
+                                lay-verify="title" autocomplete="off" 
+                                placeholder="请输入排序" class="layui-input">
                         </div>
                     </div>
     
@@ -103,6 +111,7 @@
                 </div>
             </div>
         </div>
+        
         <div class="bottom">
             <div class="button-container">
                 <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="cate-save">

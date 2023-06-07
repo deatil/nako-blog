@@ -333,12 +333,12 @@ pub async fn delete(
     Ok(nako_http::success_response_json("删除成功", ""))
 }
 
+// ==========================
+
 #[derive(Deserialize)]
 pub struct UpdateStatusQuery {
     id: u32,
 }
-
-// ==========================
 
 // 表单数据
 #[derive(Deserialize)]

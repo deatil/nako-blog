@@ -33,6 +33,23 @@
       </div>
   </div>
 
-  {% include "blog/nako/_right.html" %}
+  <aside class="col-md-4 blog-aside">
+    {% include "blog/nako/_right.html" %}
+
+    {% if friendlinks %}
+        <div class="aside-widget">
+            <header>
+                <h3>友情链接</h3>
+            </header>
+            <div class="body clearfix">
+                <ul class="tags">
+                    {% for friendlink in friendlinks %}
+                        <li><a href="{{ friendlink.url | default(value='#') | safe }}" target="{{ friendlink.target | default(value='_blank') }}" rel="nofollow">{{ friendlink.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}  
+  </aside>
 </div>
 {% endblock content %}

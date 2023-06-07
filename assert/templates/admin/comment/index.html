@@ -64,6 +64,13 @@
 		</div>
 
 		{% raw %}
+		<script type="text/html" id="comment-toolbar">
+		    <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove">
+		        <i class="layui-icon layui-icon-delete"></i>
+		        批量删除
+		    </button>
+		</script>
+
 		<script type="text/html" id="comment-bar">
 			<button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="detail">详情</button>
 		    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove">删除</button>
@@ -97,7 +104,10 @@
 
 				let cols = [
 					[
-					{
+						{
+							type: 'checkbox'
+						},
+						{
 							title: '所属用户',
 							field: 'username',
 							align: 'left',
@@ -136,6 +146,7 @@
 					page: true,
 					cols: cols,
 					skin: 'line',
+					toolbar: '#comment-toolbar',
 					parseData: function(res) {
 						return {
 							"code": res.code,
@@ -168,6 +179,8 @@
 				table.on('toolbar(comment-table)', function(obj) {
 					if (obj.event === 'refresh') {
 						window.refresh();
+					} else if (obj.event === 'batchRemove') {
+						window.batchRemove(obj);
 					}
 				});
 
@@ -231,6 +244,51 @@
 										time: 1000
 									}, function() {
 										obj.del();
+									});
+								} else {
+									layer.msg(result.message, {
+										icon: 2,
+										time: 1000
+									});
+								}
+							}
+						})
+					});
+				}
+
+				window.batchRemove = function(obj) {
+					var checkIds = common.checkField(obj, 'id');
+					
+					if (checkIds === "") {
+						layer.msg("未选中数据", {
+							icon: 3,
+							time: 1000
+						});
+						return false;
+					}
+					
+					layer.confirm('确定要删除这些回复吗?', {
+						icon: 3,
+						title: '提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+						$.ajax({
+							url: "{{ url_for(name='admin.comment-batch-delete') | safe }}",
+							data: {
+								ids: checkIds,
+							},
+							dataType: 'json',
+							type: 'post',
+							success: function(result) {
+								layer.close(loading);
+
+								if (result.code == 0) {
+									layer.msg(result.message, {
+										icon: 1,
+										time: 1000
+									}, function() {
+										table.reload('comment-table');
 									});
 								} else {
 									layer.msg(result.message, {

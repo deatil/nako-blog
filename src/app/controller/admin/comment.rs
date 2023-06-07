@@ -151,12 +151,44 @@ pub async fn delete(
     Ok(nako_http::success_response_json("删除成功", ""))
 }
 
+// ==========================
+
+#[derive(Deserialize)]
+pub struct BatchDeleteForm {
+    ids: String,
+}
+
+// 批量删除
+pub async fn batch_delete(
+    state: web::Data<AppState>,
+    params: web::Form<BatchDeleteForm>,
+) -> Result<HttpResponse, Error> {
+    let db = &state.db;
+
+    if params.ids.as_str() == "" {
+        return Ok(nako_http::error_response_json("未选中数据"));
+    }
+
+    let ids = params.ids.split(",").collect::<Vec<&str>>();
+
+    for id in ids {
+        let delete_id = id.parse::<u32>().unwrap_or_default();
+
+        let data = comment::CommentModel::find_by_id(db, delete_id).await.unwrap_or_default().unwrap_or_default();
+        if data.id > 0 {
+            let _ = comment::CommentModel::delete(db, delete_id).await;
+        }
+    }
+
+    Ok(nako_http::success_response_json("批量删除成功", ""))
+}
+
+// ==========================
+
 #[derive(Deserialize)]
 pub struct UpdateStatusQuery {
     id: u32,
 }
-
-// ==========================
 
 // 表单数据
 #[derive(Deserialize)]

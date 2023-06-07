@@ -12,3 +12,4 @@ pub mod page;
 pub mod setting;
 pub mod error;
 pub mod guestbook;
+pub mod friendlink;

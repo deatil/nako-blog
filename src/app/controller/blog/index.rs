@@ -17,6 +17,7 @@ use crate::app::model::{
     art,
     cate,
     tag,
+    friendlink,
 };
 
 /// 首页
@@ -41,11 +42,15 @@ pub async fn index(
     let cates = cate::CateModel::find_open_cate(db).await.unwrap_or_default();
     let tags = tag::TagModel::find_open_tags(db, 6).await.unwrap_or_default();
 
+    let friendlinks = friendlink::FriendlinkModel::list_open(db).await.unwrap_or_default();
+
     let mut ctx = nako_http::view_data();
     ctx.insert("arts", &arts);
     ctx.insert("hot_arts", &hot_arts);
     ctx.insert("cates", &cates);
     ctx.insert("tags", &tags);
+
+    ctx.insert("friendlinks", &friendlinks);
 
     Ok(nako_http::view(&mut view, app::view_path("index.html").as_str(), &ctx))
 }

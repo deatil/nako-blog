@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use actix_web::{
     web, 
     Result, 
@@ -7,7 +8,6 @@ use actix_web::{
 };
 
 use crate::nako::{
-    app,
     time,
     http as nako_http,
 };
@@ -20,10 +20,10 @@ use crate::nako::global::{
 
 use crate::app::entity::{
     self,
-    cate as cate_entity
+    friendlink as friendlink_entity
 };
 use crate::app::model::{
-    cate,
+    friendlink,
 };
 
 // 首页
@@ -34,14 +34,14 @@ pub async fn index(
 
     let ctx = nako_http::view_data();
 
-    Ok(nako_http::view(&mut view, "admin/cate/index.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/friendlink/index.html", &ctx))
 }
 
 // ==========================
 
 #[derive(Serialize)]
 pub struct ListData {
-    list: Vec<cate_entity::Model>,
+    list: Vec<friendlink_entity::Model>,
     count: u64,
 }
 
@@ -50,8 +50,9 @@ pub struct ListQuery {
     page: u64,
     limit: u64,
 
-    name: Option<String>,
-    slug: Option<String>,
+    title: Option<String>,
+    url: Option<String>,
+    target: Option<String>,
     status: Option<i32>,
 }
 
@@ -65,21 +66,22 @@ pub async fn list(
     let page: u64 = query.page;
     let per_page: u64 = query.limit;
 
-    let search_where = cate::CateWhere{
-        name: query.name.clone(),
-        slug: query.slug.clone(),
+    let search_where = friendlink::FriendlinkWhere{
+        title: query.title.clone(),
+        url: query.url.clone(),
+        target: query.target.clone(),
         status: query.status,
     };
     let search_where = search_where.format();
 
-    let (list, _num_pages) = cate::CateModel::search_in_page(
+    let (list, _num_pages) = friendlink::FriendlinkModel::search_in_page(
             db, 
             page, 
             per_page, 
             search_where.clone(),
         )
         .await.unwrap_or_default();
-    let count = cate::CateModel::search_count(db, search_where.clone())
+    let count = friendlink::FriendlinkModel::search_count(db, search_where.clone())
         .await.unwrap_or(0);
 
     let res = ListData{
@@ -109,15 +111,15 @@ pub async fn detail(
         return Ok(nako_http::error_response_html(&mut view, "ID不能为空", ""));
     }
 
-    let data = cate::CateModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
+    let data = friendlink::FriendlinkModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if data.id == 0 {
-        return Ok(nako_http::error_response_html(&mut view, "分类不存在", ""));
+        return Ok(nako_http::error_response_html(&mut view, "链接不存在", ""));
     }
 
     let mut ctx = nako_http::view_data();
     ctx.insert("data", &data);
 
-    Ok(nako_http::view(&mut view, "admin/cate/detail.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/friendlink/detail.html", &ctx))
 }
 
 // ==========================
@@ -130,14 +132,14 @@ pub async fn create(
 
     let ctx = nako_http::view_data();
 
-    Ok(nako_http::view(&mut view, "admin/cate/create.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/friendlink/create.html", &ctx))
 }
 
 // 表单数据
 #[derive(Deserialize)]
 pub struct CreateForm {
-    name: String,
-    slug: String,
+    title: String,
+    url: String,
     status: i32,
 }
 
@@ -149,19 +151,14 @@ pub async fn create_save(
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
 
-    if params.name.as_str() == "" {
-        return Ok(nako_http::error_response_json("分类不能为空"));
+    if params.title.as_str() == "" {
+        return Ok(nako_http::error_response_json("名称不能为空"));
     }
-    if params.slug.as_str() == "" {
-        return Ok(nako_http::error_response_json("标识不能为空"));
+    if params.url.as_str() == "" {
+        return Ok(nako_http::error_response_json("链接不能为空"));
     }
     if params.status != 0 && params.status != 1  {
         return Ok(nako_http::error_response_json("状态不能为空"));
-    }
-
-    let data = cate::CateModel::find_by_slug(db, params.slug.as_str()).await.unwrap_or_default().unwrap_or_default();
-    if data.id > 0 {
-        return Ok(nako_http::error_response_json("分类标识已经存在"));
     }
 
     let add_time = time::now().timestamp();
@@ -171,13 +168,12 @@ pub async fn create_save(
         ip = val.ip().to_string();
     }
 
-    let create_data = cate::CateModel::create(db, cate_entity::Model{
-            pid:      0,
-            name:     params.name.clone(),
-            slug:     params.slug.clone(),
-            sort:     100,
-            list_tpl: "".to_string(),
-            view_tpl: "".to_string(),
+    let create_data = friendlink::FriendlinkModel::create(db, friendlink_entity::Model{
+            title:    params.title.clone(),
+            url:      params.url.clone(),
+            target:   Some("_blank".to_string()),
+            icon:     Some("".to_string()),
+            sort:     Some(100),
             status:   Some(params.status),
             add_time: Some(add_time),
             add_ip:   Some(ip.clone()),
@@ -209,52 +205,43 @@ pub async fn update(
         return Ok(nako_http::error_response_html(&mut view, "ID不能为空", ""));
     }
 
-    let info = cate::CateModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
+    let info = friendlink::FriendlinkModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if info.id == 0 {
-        return Ok(nako_http::error_response_html(&mut view, "分类不存在", ""));
+        return Ok(nako_http::error_response_html(&mut view, "链接不存在", ""));
     }
 
-    let cate_list = cate::CateModel::find_all(db).await.unwrap_or_default();
-
-    let list_tpls = app::list_tpls();
-    let view_tpls = app::view_tpls();
+    let mut targets = HashMap::new();
+    targets.insert("_blank", "跳出页面");
+    targets.insert("_self", "当前页面");
 
     let mut ctx = nako_http::view_data();
     ctx.insert("data", &info);
-    ctx.insert("cate_list", &cate_list);
-    ctx.insert("list_tpls", &list_tpls);
-    ctx.insert("view_tpls", &view_tpls);
+    ctx.insert("targets", &targets);
 
-    Ok(nako_http::view(&mut view, "admin/cate/update.html", &ctx))
+    Ok(nako_http::view(&mut view, "admin/friendlink/update.html", &ctx))
 }
 
 // 表单数据
 #[derive(Deserialize)]
 pub struct UpdateForm {
-    pid: u32,
-    name: String,
-    slug: String,
-    desc: String,
+    title: String,
+    url: String,
+    target: String,
+    icon: String,
     sort: i32,
-    list_tpl: String,
-    view_tpl: String,
     status: i32,
 }
 
 #[derive(Debug, Validate, Deserialize, Clone)]
 pub struct UpdateValidate {
-    #[validate(required(message = "父级不能为空"))]
-    pid: Option<u32>,
-    #[validate(required(message = "分类名称不能为空"))]
-    name: Option<String>,
-    #[validate(required(message = "分类标识不能为空"))]
-    slug: Option<String>,
+    #[validate(required(message = "名称不能为空"))]
+    title: Option<String>,
+    #[validate(required(message = "链接不能为空"))]
+    url: Option<String>,
+    #[validate(required(message = "跳转方式不能为空"))]
+    target: Option<String>,
     #[validate(required(message = "排序不能为空"))]
     sort: Option<i32>,
-    #[validate(required(message = "列表模板不能为空"))]
-    list_tpl: Option<String>,
-    #[validate(required(message = "详情模板不能为空"))]
-    view_tpl: Option<String>,
     #[validate(required(message = "状态不能为空"))]
     status: Option<i32>,
 }
@@ -270,12 +257,10 @@ pub async fn update_save(
     }
 
     let vali_data = UpdateValidate{
-        pid: Some(params.pid.clone()),
-        name: Some(params.name.clone()),
-        slug: Some(params.slug.clone()),
+        title: Some(params.title.clone()),
+        url: Some(params.url.clone()),
+        target: Some(params.target.clone()),
         sort: Some(params.sort.clone()),
-        list_tpl: Some(params.list_tpl.clone()),
-        view_tpl: Some(params.view_tpl.clone()),
         status: Some(params.status.clone()),
     };
 
@@ -286,28 +271,19 @@ pub async fn update_save(
 
     let db = &state.db;
 
-    let info = cate::CateModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
+    let info = friendlink::FriendlinkModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if info.id == 0 {
-        return Ok(nako_http::error_response_json("要更改的分类不存在"));
-    }
-
-    let info_by_name = cate::CateModel::find_by_slug(db, params.slug.as_str()).await.unwrap_or_default().unwrap_or_default();
-    if info_by_name.id > 0 {
-        if info.id != info_by_name.id {
-            return Ok(nako_http::error_response_json("分类标识已经存在"));
-        }
+        return Ok(nako_http::error_response_json("要更改的链接不存在"));
     }
 
     // 更新
-    let data = cate::CateModel::update_by_id(db, query.id, cate_entity::Model{
-            pid:      params.pid,
-            name:     params.name.clone(),
-            slug:     params.slug.clone(),
-            desc:     Some(params.desc.clone()),
-            sort:     params.sort,
-            list_tpl: params.list_tpl.clone(),
-            view_tpl: params.view_tpl.clone(),
-            status:   Some(params.status),
+    let data = friendlink::FriendlinkModel::update_by_id(db, query.id, friendlink_entity::Model{
+            title:  params.title.clone(),
+            url:    params.url.clone(),
+            target: Some(params.target.clone()),
+            icon:   Some(params.icon.clone()),
+            sort:   Some(params.sort.clone()),
+            status: Some(params.status),
             ..entity::default()
         })
         .await;
@@ -336,12 +312,12 @@ pub async fn delete(
         return Ok(nako_http::error_response_json("ID不能为空"));
     }
 
-    let data = cate::CateModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
+    let data = friendlink::FriendlinkModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if data.id == 0 {
-        return Ok(nako_http::error_response_json("要删除的分类不存在"));
+        return Ok(nako_http::error_response_json("要删除的链接不存在"));
     }
 
-    let delete_data = cate::CateModel::delete(db, query.id).await;
+    let delete_data = friendlink::FriendlinkModel::delete(db, query.id).await;
     if delete_data.is_err() {
         return Ok(nako_http::error_response_json("删除失败"));
     }
@@ -378,13 +354,13 @@ pub async fn update_status(
         return Ok(nako_http::error_response_json("状态不能为空"));
     }
 
-    let data = cate::CateModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
+    let data = friendlink::FriendlinkModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if data.id == 0 {
-        return Ok(nako_http::error_response_json("要更改的分类不存在"));
+        return Ok(nako_http::error_response_json("要更改的链接不存在"));
     }
 
     // 更新
-    let status = cate::CateModel::update_status_by_id(db, query.id, cate_entity::Model{
+    let status = friendlink::FriendlinkModel::update_status_by_id(db, query.id, friendlink_entity::Model{
             status: Some(params.status),
             ..entity::default()
         })

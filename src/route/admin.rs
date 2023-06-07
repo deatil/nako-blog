@@ -23,6 +23,7 @@ use crate::app::controller::admin::{
     setting,
     error,
     guestbook,
+    friendlink,
 };
 
 pub fn route(cfg: &mut web::ServiceConfig) {
@@ -215,6 +216,11 @@ pub fn route(cfg: &mut web::ServiceConfig) {
                             .route(web::post().to(comment::delete))
                             .name("admin.comment-delete"),
                     )
+                    .service(
+                        web::resource("/batch-delete")
+                            .route(web::post().to(comment::batch_delete))
+                            .name("admin.comment-batch-delete"),
+                    )
             )
             .service(
                 // 标签
@@ -325,6 +331,52 @@ pub fn route(cfg: &mut web::ServiceConfig) {
                         web::resource("/delete")
                             .route(web::post().to(guestbook::delete))
                             .name("admin.guestbook-delete"),
+                    )
+                    .service(
+                        web::resource("/batch-delete")
+                            .route(web::post().to(guestbook::batch_delete))
+                            .name("admin.guestbook-batch-delete"),
+                    )
+            )
+            .service(
+                // 友情链接
+                web::scope("/friendlink")
+                    .service(
+                        web::resource("/index")
+                            .route(web::get().to(friendlink::index))
+                            .name("admin.friendlink-index"),
+                    )
+                    .service(
+                        web::resource("/list")
+                            .route(web::get().to(friendlink::list))
+                            .name("admin.friendlink-list"),
+                    )
+                    .service(
+                        web::resource("/detail")
+                            .route(web::get().to(friendlink::detail))
+                            .name("admin.friendlink-detail"),
+                    )
+                    .service(
+                        web::resource("/create")
+                            .route(web::get().to(friendlink::create))
+                            .route(web::post().to(friendlink::create_save))
+                            .name("admin.friendlink-create"),
+                    )
+                    .service(
+                        web::resource("/update")
+                            .route(web::get().to(friendlink::update))
+                            .route(web::post().to(friendlink::update_save))
+                            .name("admin.friendlink-update"),
+                    )
+                    .service(
+                        web::resource("/status")
+                            .route(web::post().to(friendlink::update_status))
+                            .name("admin.friendlink-status"),
+                    )
+                    .service(
+                        web::resource("/delete")
+                            .route(web::post().to(friendlink::delete))
+                            .name("admin.friendlink-delete"),
                     )
             )
             .service(
