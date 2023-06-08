@@ -254,8 +254,10 @@
 						let loading = layer.load();
 
 						$.ajax({
-							url: "{{ url_for(name='admin.cate-delete') | safe }}?id=" + obj.data['id'],
-							data: {},
+							url: "{{ url_for(name='admin.cate-delete') | safe }}",
+							data: {
+								id: obj.data['id'],
+							},
 							type: 'post',
 							dataType: 'json',
 							success: function(result) {

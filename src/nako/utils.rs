@@ -8,6 +8,7 @@ use crypto::mac::Mac;
 use crypto::digest::Digest;
 use uuid::Uuid;
 use humansize::{format_size, DECIMAL};
+use base64::{Engine as _, engine::general_purpose};
 
 use actix_web::HttpRequest;
 
@@ -40,6 +41,23 @@ pub fn hmac_sha1<'a>(
     let s = String::from_utf8_lossy(code);
 
     s.to_string()
+}
+
+// base64 编码
+pub fn base64_encode(data: String) -> String {
+    let data = data.as_bytes();
+
+    general_purpose::STANDARD.encode(&data[..])
+}
+
+// base64 解码
+pub fn base64_decode(data: String) -> String {
+    let res = general_purpose::STANDARD.decode(data).unwrap_or_default();
+
+    match String::from_utf8(res) {
+        Ok(v) => v,
+        Err(_) => "".to_string(),
+    }
 }
 
 // uuid
@@ -99,6 +117,34 @@ pub fn is_image(extension: String) -> bool {
         || extension.eq("svg")
 }
 
+/// 删除空格
+pub fn str_trim(input: &str) -> String {
+    input
+        // 修剪前面和后面的空格
+        .trim()
+        // 分割成行
+        .lines()
+        .map(|part| {
+            // 对于每一行
+            part
+                // 修剪前导和尾部的空白处
+                .trim()
+                //对空白处进行分割。
+                //包括字符串被分割的空白处
+                // 分割后的部分
+                .split_inclusive(char::is_whitespace)
+                // 过滤掉只包含空白的子字符串
+                .filter(|part| !part.trim().is_empty())
+                //为这一行收集成一个字符串
+                .collect()
+        })
+        //收集成一个字符串的Vec
+        .collect::<Vec<String>>()
+        //用换行符连接这些字符串
+        //返回到最终的字符串中
+        .join("")
+}
+
 /// 生成 url
 pub fn url_for<U, I>(req: HttpRequest, name: &str, elements: U) -> String 
 where
@@ -122,3 +168,4 @@ pub fn url_for_static(req: HttpRequest, name: &str) -> String {
 
     url
 }
+

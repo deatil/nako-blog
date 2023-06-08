@@ -40,9 +40,9 @@ pub async fn captcha(
     let c = c.add_chars(4) 
         .apply_filter(Noise::new(0.4))
         .apply_filter(Wave::new(2.0, 20.0).horizontal())
-        .apply_filter(Wave::new(2.0, 20.0).vertical())
-        .view(260, 96)
-        .apply_filter(Dots::new(15));
+        // .apply_filter(Wave::new(2.0, 20.0).vertical())
+        .apply_filter(Dots::new(15))
+        .view(260, 96);
 
     if let Some((data, png_data)) = c.as_tuple() {
         if !session.insert("auth_captcha", data).is_err() {
@@ -59,8 +59,8 @@ pub async fn captcha(
 
 // 登陆
 pub async fn login(
-    req: HttpRequest,
     session: Session, 
+    req: HttpRequest,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
     let login_id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
@@ -71,7 +71,6 @@ pub async fn login(
     }
 
     let mut view = state.view.clone();
-
     let ctx = nako_http::view_data();
 
     Ok(nako_http::view(&mut view, "admin/auth/login.html", &ctx))
@@ -129,7 +128,6 @@ pub async fn login_check(
     }
 
     let pass = user_info.password.unwrap_or("".to_string());
-
     if !nako_auth::password_verify(params.password.as_str(), pass.as_str()) {
         return Ok(nako_http::error_response_json("账号或者密码错误"));
     }

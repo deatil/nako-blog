@@ -321,14 +321,14 @@ pub async fn update_save(
 // ==========================
 
 #[derive(Deserialize)]
-pub struct DeleteQuery {
+pub struct DeleteForm {
     id: u32,
 }
 
 // 删除
 pub async fn delete(
     state: web::Data<AppState>,
-    query: web::Query<DeleteQuery>,
+    query: web::Form<DeleteForm>,
 ) -> Result<HttpResponse, Error> {
     let db = &state.db;
 
