@@ -39,6 +39,7 @@
 		<!-- 资 源 引 入 -->
 		<script src="{{ assert(path='admin/component/layui/layui.js') | safe }} "></script>
 		<script src="{{ assert(path='admin/component/pear/pear.js') | safe }}"></script>
+		<script src="{{ assert(path='admin/component/nako/jsencrypt.js') | safe }}"></script>
 		<script src="{{ assert(path='admin/component/nako/md5.js') | safe }}"></script>
 		<script>
 			layui.use(['form', 'button', 'popup', 'jquery'], function() {
@@ -57,9 +58,16 @@
 					var name = $(data.form).find('.login-name').val();            
 					var password = $(data.form).find('.login-password').val();            
 					var captcha = $(data.form).find('.login-captcha').val();    
+
+					var passkey = "{{ pub_key | default(value='') | safe }}";
 					
 					if (password != "") {
 						password = hex_md5(password);
+						
+						// 密码加密
+						var encrypt = new JSEncrypt();
+						encrypt.setPublicKey(passkey);
+						password = encrypt.encrypt(password);
 					}
 
 					var url = "{{ url_for(name='admin.auth-login') | safe }}";

@@ -41,8 +41,8 @@
             <header>
                 <h3>友情链接</h3>
             </header>
-            <div class="body clearfix">
-                <ul class="tags">
+            <div class="body">
+                <ul class="clean-list">
                     {% for friendlink in friendlinks %}
                         <li><a href="{{ friendlink.url | default(value='#') | safe }}" target="{{ friendlink.target | default(value='_blank') }}" rel="nofollow">{{ friendlink.title }}</a></li>
                     {% endfor %}

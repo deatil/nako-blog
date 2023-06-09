@@ -17,6 +17,7 @@ use captcha::Captcha;
 use captcha::filters::{Noise, Wave, Dots};
 
 use crate::nako::{
+    rsa,
     utils,
     auth as nako_auth,
     http as nako_http,
@@ -30,6 +31,8 @@ use crate::nako::{
 use crate::app::model::{
     user,
 };
+
+const AUTH_KEY: &str = "nako:auth_key";
 
 // 验证码
 pub async fn captcha(
@@ -71,7 +74,21 @@ pub async fn login(
     }
 
     let mut view = state.view.clone();
-    let ctx = nako_http::view_data();
+
+    let mut ctx = nako_http::view_data();
+
+    if let Ok((pri_key, pub_key)) = rsa::generate_key() {
+        let pub_key = pub_key.replace("-----BEGIN PUBLIC KEY-----", "")
+            .replace("-----END PUBLIC KEY-----", "")
+            .replace("\r\n", "")
+            .replace("\r", "")
+            .replace("\n", "")
+            .replace(" ", "");
+
+        ctx.insert("pub_key", &pub_key.trim());
+
+        if let Ok(_) = session.insert(AUTH_KEY, pri_key.clone()){}
+    }
 
     Ok(nako_http::view(&mut view, "admin/auth/login.html", &ctx))
 }
@@ -128,7 +145,18 @@ pub async fn login_check(
     }
 
     let pass = user_info.password.unwrap_or("".to_string());
-    if !nako_auth::password_verify(params.password.as_str(), pass.as_str()) {
+
+    // 私钥
+    let prikey = session.get::<String>(AUTH_KEY).unwrap_or_default().unwrap_or_default();
+
+    // 解出密码
+    let params_pass = utils::base64_decode(params.password.clone());
+    let depass = rsa::decrypt(prikey.as_str(), params_pass.as_slice()).unwrap_or_default();
+
+    let depass = String::from_utf8(depass).unwrap_or("".to_string());
+
+    // 验证密码
+    if !nako_auth::password_verify(depass.as_str(), pass.as_str()) {
         return Ok(nako_http::error_response_json("账号或者密码错误"));
     }
 
@@ -140,6 +168,8 @@ pub async fn login_check(
     if session.insert("login_id", user_info.id).is_err() {
         return Ok(nako_http::error_response_json("登陆失败"));
     }
+
+    session.remove(AUTH_KEY);
 
     Ok(nako_http::success_response_json("登陆成功", ""))
 }

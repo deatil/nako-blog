@@ -14,6 +14,7 @@ use crate::nako::global::{
     Deserialize,
 };
 
+use crate::app::service::http;
 use crate::app::entity::{
     self,
     comment as comment_entity
@@ -106,12 +107,12 @@ pub async fn detail(
     let mut view = state.view.clone();
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_html(&mut view, "ID不能为空", ""));
+        return Ok(http::error_admin_html(&mut view, "ID不能为空", ""));
     }
 
     let data = comment::CommentModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if data.id == 0 {
-        return Ok(nako_http::error_response_html(&mut view, "评论不存在", ""));
+        return Ok(http::error_admin_html(&mut view, "评论不存在", ""));
     }
 
     let mut ctx = nako_http::view_data();

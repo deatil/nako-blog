@@ -18,6 +18,7 @@ use crate::nako::global::{
     Deserialize,
 };
 
+use crate::app::service::http;
 use crate::app::entity::{
     self,
     cate as cate_entity
@@ -106,12 +107,12 @@ pub async fn detail(
     let mut view = state.view.clone();
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_html(&mut view, "ID不能为空", ""));
+        return Ok(http::error_admin_html(&mut view, "ID不能为空", ""));
     }
 
     let data = cate::CateModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if data.id == 0 {
-        return Ok(nako_http::error_response_html(&mut view, "分类不存在", ""));
+        return Ok(http::error_admin_html(&mut view, "分类不存在", ""));
     }
 
     let mut ctx = nako_http::view_data();
@@ -206,12 +207,12 @@ pub async fn update(
     let mut view = state.view.clone();
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_html(&mut view, "ID不能为空", ""));
+        return Ok(http::error_admin_html(&mut view, "ID不能为空", ""));
     }
 
     let info = cate::CateModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if info.id == 0 {
-        return Ok(nako_http::error_response_html(&mut view, "分类不存在", ""));
+        return Ok(http::error_admin_html(&mut view, "分类不存在", ""));
     }
 
     let cate_list = cate::CateModel::find_all(db).await.unwrap_or_default();

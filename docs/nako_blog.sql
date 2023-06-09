@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `nako_art` (
   `add_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '添加IP',
   PRIMARY KEY (`id`),
   KEY `uuid` (`id`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文章';
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文章';
 
 -- 正在导出表  nako_blog.nako_art 的数据：5 rows
 /*!40000 ALTER TABLE `nako_art` DISABLE KEYS */;
@@ -32,7 +32,7 @@ REPLACE INTO `nako_art` (`id`, `uuid`, `cate_id`, `user_id`, `title`, `keywords`
 	(2, 'fd57a201-ed89-4d5c-882a-5f0d6a98f2c7', 1, 1, 'How to Create Template', '', '测试', '/upload/images/fe48e124-8462-4bce-a7d0-be16cf0a140d.jpg', '<p>123123</p><p><img src="../../upload/images/fe48e124-8462-4bce-a7d0-be16cf0a140d.jpg" alt="" data-mce-src="../../upload/images/fe48e124-8462-4bce-a7d0-be16cf0a140d.jpg" width="1080" height="1080"></p>', 'Lorem ipsum', '安卓', '网络', 15, 1, 1, 1685476404, '127.0.0.1'),
 	(3, 'e33761cb-40ed-4734-84f8-9c1444d7548a', 6, 1, '热门文章推荐', '热门文章推荐', '热门文章推荐', '/upload/images/7c441a5f-4f6b-4758-b27a-dd40db1da897.jpg', '<p>热门文章推荐</p>', '热门文章推荐热门文章推荐热门文章推荐', '推荐', '网络', 103, 0, 1, 1685386512, '127.0.0.1'),
 	(4, '2c981722-cc13-4b13-b489-ecbef88de00e', 1, 1, '热蒙八卦', '热蒙八卦', '热蒙八卦', '/upload/images/ca0477df-5545-4627-9f85-127a2d062103.jpg', '<p>热蒙八卦</p>', '热蒙八卦', '热蒙八卦', '网络', 3, 0, 1, 1685242600, '127.0.0.1'),
-	(5, 'f78790e6-0ca0-4d21-a67e-900396cc691a', 9, 1, '这是一个没人用过的模式', '这是一个没人用过的模式', '这是一个没人用过的模式', '/upload/images/e7e90d8f-f408-4537-9e17-7dfa5dd43cb7.jpg', '<p>这是一个没人用过的模式</p>', '这是一个没人用过的模式', '八卦', '网络', 109, 0, 1, 1685271511, '127.0.0.1'),
+	(5, 'f78790e6-0ca0-4d21-a67e-900396cc691a', 9, 1, '这是一个没人用过的模式', '这是一个没人用过的模式', '这是一个没人用过的模式', '/upload/images/e7e90d8f-f408-4537-9e17-7dfa5dd43cb7.jpg', '<p>这是一个没人用过的模式</p>', '这是一个没人用过的模式', '八卦', '网络', 110, 0, 1, 1685271511, '127.0.0.1'),
 	(6, '0414689e-9f51-4b02-869a-23ad5cd78992', 6, 1, '测试文章', '测试文章', '测试文章', '/upload/images/b91a7d14-e03b-41fa-977a-e965d4a4c23f.png', '<p>测试文章</p>', '测试文章', '测试文章', '网络', 2, 0, 1, 1685352288, '127.0.0.1');
 /*!40000 ALTER TABLE `nako_art` ENABLE KEYS */;
 
@@ -52,15 +52,8 @@ CREATE TABLE IF NOT EXISTS `nako_attach` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT COMMENT='附件表';
 
--- 正在导出表  nako_blog.nako_attach 的数据：6 rows
+-- 正在导出表  nako_blog.nako_attach 的数据：5 rows
 /*!40000 ALTER TABLE `nako_attach` DISABLE KEYS */;
-REPLACE INTO `nako_attach` (`id`, `name`, `path`, `ext`, `size`, `md5`, `type`, `status`, `add_time`, `add_ip`) VALUES
-	(1, 'avatar.jpg', '/images/fe48e124-8462-4bce-a7d0-be16cf0a140d.jpg', 'jpg', 0000076158, 'f1ae3f3797de2749bc8a9baab7523935', 2, 1, 1685158261, '127.0.0.1'),
-	(2, 'show.png', '/images/5517eb15-d516-43c8-8d1c-00d4fb6e685e.png', 'png', 0000056400, '12ba50cf659d15124676f96494476e88', 2, 1, 1685161497, '127.0.0.1'),
-	(3, '2.jpg', '/images/ca0477df-5545-4627-9f85-127a2d062103.jpg', 'jpg', 0000414243, '5fd56208145ffee12559592f149f3999', 2, 1, 1685213829, '127.0.0.1'),
-	(4, '1.jpg', '/images/7c441a5f-4f6b-4758-b27a-dd40db1da897.jpg', 'jpg', 0000182651, '97b3a0be2076e955c1f0458f6a1ec9a3', 2, 1, 1685213842, '127.0.0.1'),
-	(5, '3.jpg', '/images/e7e90d8f-f408-4537-9e17-7dfa5dd43cb7.jpg', 'jpg', 0000204769, 'ebf5959e6b105d59905bc3c587c4ab4d', 2, 1, 1685213934, '127.0.0.1'),
-	(6, 'avatar.png', '/images/b91a7d14-e03b-41fa-977a-e965d4a4c23f.png', 'png', 0000005728, '387f003aba382f2fd5666a6a88bf191f', 2, 1, 1685237103, '127.0.0.1');
 /*!40000 ALTER TABLE `nako_attach` ENABLE KEYS */;
 
 -- 导出  表 nako_blog.nako_cate 结构
@@ -78,14 +71,14 @@ CREATE TABLE IF NOT EXISTS `nako_cate` (
   `add_time` int NOT NULL DEFAULT '0' COMMENT '添加时间',
   `add_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '添加IP',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='分类';
+) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='分类';
 
 -- 正在导出表  nako_blog.nako_cate 的数据：3 rows
 /*!40000 ALTER TABLE `nako_cate` DISABLE KEYS */;
 REPLACE INTO `nako_cate` (`id`, `pid`, `name`, `slug`, `desc`, `sort`, `list_tpl`, `view_tpl`, `status`, `add_time`, `add_ip`) VALUES
 	(1, 0, '热门八卦', 'rmbg', '热门八卦热门八卦', 100, 'list.html', 'view.html', 1, 1655823356, ''),
 	(6, 0, '影视综合', 'video', '影视综合', 106, 'list.html', 'view.html', 1, 1655823356, '127.0.0.1'),
-	(9, 0, '诗词江湖', 'scjh', '诗词江湖11', 95, 'list.html', 'view.html', 1, 1655823356, '127.0.0.1');
+	(14, 0, '123', '123', NULL, 100, '', '', 1, 1685869256, '127.0.0.1');
 /*!40000 ALTER TABLE `nako_cate` ENABLE KEYS */;
 
 -- 导出  表 nako_blog.nako_comment 结构
@@ -103,10 +96,9 @@ CREATE TABLE IF NOT EXISTS `nako_comment` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='评论';
 
--- 正在导出表  nako_blog.nako_comment 的数据：7 rows
+-- 正在导出表  nako_blog.nako_comment 的数据：6 rows
 /*!40000 ALTER TABLE `nako_comment` DISABLE KEYS */;
 REPLACE INTO `nako_comment` (`id`, `art_id`, `reply_id`, `username`, `email`, `content`, `status`, `add_time`, `add_ip`) VALUES
-	(4, 1, 0, '12123', '123', '123', 1, 123, '123'),
 	(5, 5, NULL, '123', '123@123.com', '123', 1, 1685227045, '127.0.0.1'),
 	(6, 5, NULL, '测试', 'ceshi@qq.com', '测试测试', 1, 1685238167, '127.0.0.1'),
 	(7, 5, NULL, '测试', 'ceshi@qq.com', '测试测试', 1, 1685238171, '127.0.0.1'),
@@ -128,9 +120,9 @@ CREATE TABLE IF NOT EXISTS `nako_friendlink` (
   `add_time` int NOT NULL DEFAULT '0' COMMENT '添加时间',
   `add_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '添加IP',
   KEY `id` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='友情链接';
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='友情链接';
 
--- 正在导出表  nako_blog.nako_friendlink 的数据：~1 rows (大约)
+-- 正在导出表  nako_blog.nako_friendlink 的数据：1 rows
 /*!40000 ALTER TABLE `nako_friendlink` DISABLE KEYS */;
 REPLACE INTO `nako_friendlink` (`id`, `title`, `url`, `target`, `icon`, `sort`, `status`, `add_time`, `add_ip`) VALUES
 	(2, '测试', 'hhtp://baidu.com', '_blank', '', 100, 1, 1685862757, '127.0.0.1');
@@ -152,12 +144,11 @@ CREATE TABLE IF NOT EXISTS `nako_guestbook` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='留言版';
 
--- 正在导出表  nako_blog.nako_guestbook 的数据：3 rows
+-- 正在导出表  nako_blog.nako_guestbook 的数据：2 rows
 /*!40000 ALTER TABLE `nako_guestbook` DISABLE KEYS */;
 REPLACE INTO `nako_guestbook` (`id`, `name`, `message`, `phone`, `email`, `qq`, `weixin`, `status`, `add_time`, `add_ip`) VALUES
 	(3, '八卦', '12312431', NULL, '12323@123.com', NULL, NULL, 0, 1685864362, '127.0.0.1'),
-	(2, '222', '12312341234', NULL, '123@123.com', NULL, NULL, 0, 1685230678, '127.0.0.1'),
-	(4, '八卦', '12312431', NULL, '12323@123.com', NULL, NULL, 0, 1685864365, '127.0.0.1');
+	(2, '222', '12312341234', NULL, '123@123.com', NULL, NULL, 0, 1685230678, '127.0.0.1');
 /*!40000 ALTER TABLE `nako_guestbook` ENABLE KEYS */;
 
 -- 导出  表 nako_blog.nako_page 结构
@@ -175,13 +166,13 @@ CREATE TABLE IF NOT EXISTS `nako_page` (
   `add_time` int NOT NULL DEFAULT '0' COMMENT '添加时间',
   `add_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '添加IP',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='单页';
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='单页';
 
 -- 正在导出表  nako_blog.nako_page 的数据：2 rows
 /*!40000 ALTER TABLE `nako_page` DISABLE KEYS */;
 REPLACE INTO `nako_page` (`id`, `user_id`, `slug`, `title`, `keywords`, `description`, `content`, `tpl`, `status`, `add_time`, `add_ip`) VALUES
-	(1, 1, 'aboutme', '关于我们', '111', '111', '<p>关于我们</p>', 'page_about.html', 1, 1655823356, '127.0.0.1'),
-	(3, 1, 'contact', '联系我们', '', '', '', 'page_contact.html', 1, 1685169754, '127.0.0.1');
+	(1, 1, 'aboutme', '关于我', '111', '111', '<p>关于我</p>', 'page_about.html', 1, 1655823356, '127.0.0.1'),
+	(3, 1, 'contact', '联系我', '', '', '<p>联系我</p>', 'page_contact.html', 1, 1685169754, '127.0.0.1');
 /*!40000 ALTER TABLE `nako_page` ENABLE KEYS */;
 
 -- 导出  表 nako_blog.nako_setting 结构
@@ -216,7 +207,7 @@ CREATE TABLE IF NOT EXISTS `nako_tag` (
   `add_time` int NOT NULL DEFAULT '0' COMMENT '添加时间',
   `add_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '添加IP',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='标签';
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='标签';
 
 -- 正在导出表  nako_blog.nako_tag 的数据：2 rows
 /*!40000 ALTER TABLE `nako_tag` DISABLE KEYS */;
@@ -238,9 +229,11 @@ CREATE TABLE IF NOT EXISTS `nako_user` (
   `add_time` int NOT NULL DEFAULT '0' COMMENT '添加时间',
   `add_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '添加IP',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户';
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户';
 
 -- 正在导出表  nako_blog.nako_user 的数据：2 rows
+/*!40000 ALTER TABLE `nako_user` DISABLE KEYS */;
 REPLACE INTO `nako_user` (`id`, `username`, `password`, `nickname`, `avatar`, `sign`, `status`, `add_time`, `add_ip`) VALUES
 	(1, 'admin', '$2b$12$/aXiCMVd11/L5Mt0WonuiOfNLr81HJtNsIzLucYVVm9dNlZbcH7q.', '管理员', '/upload/avatar/356a192b7913b04c54574d18c28d46e6395428ab.jpg', 'signsign', 1, 1684299438, '127.0.0.1'),
-	(10, 'nako', '$2b$12$do.4tIJg4Q3Yd.A6Jwio9O9bqZrOQKvblvRShhFOWpanvGW5is1hy', 'test', NULL, 'test123123', 1, 1684304910, '127.0.0.1');
+	(10, 'nako', '$2b$12$InjaYkeO1x72hH9WQG8N1uBHkleYyULDmbVgaB1O.edXPrrZorUlO', 'nako-blog', NULL, 'nako-blog 是使用 rust 开发的博客系统', 1, 1684304910, '127.0.0.1');
+/*!40000 ALTER TABLE `nako_user` ENABLE KEYS */;

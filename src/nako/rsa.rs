@@ -24,36 +24,22 @@ pub fn generate_key() -> Result<(String, String)> {
     Ok((priv_pem.to_string(), pub_pem.to_string()))
 }
 
-pub fn encrypt(pubkey: &str, data: String) -> Result<String> {
+pub fn encrypt(pubkey: &str, data: &[u8]) -> Result<Vec<u8>> {
     let mut rng = rand::thread_rng();
-
-    let data = data.as_bytes();
 
     if let Ok(pub_key) = RsaPublicKey::from_public_key_pem(pubkey) {
         let enc_data = pub_key.encrypt(&mut rng, Pkcs1v15Encrypt, &data[..])?;
-
-        let enc_data = match String::from_utf8(enc_data) {
-            Ok(v) => v,
-            Err(_) => "".into(),
-        };
     
         return Ok(enc_data);
     };
 
-    Ok("".to_string())
+    Ok("".into())
 }
 
-pub fn decrypt(privkey: &str, data: String) -> Result<String> {
+pub fn decrypt(privkey: &str, data: &[u8]) -> Result<Vec<u8>> {
     let priv_key = RsaPrivateKey::from_pkcs8_pem(privkey)?;
 
-    let data = data.as_bytes();
-
     let dec_data = priv_key.decrypt(Pkcs1v15Encrypt, &data)?;
-
-    let dec_data = match String::from_utf8(dec_data) {
-        Ok(v) => v,
-        Err(e) => format!("{}", e),
-    };
 
     Ok(dec_data)
 }

@@ -8,7 +8,7 @@ use crypto::mac::Mac;
 use crypto::digest::Digest;
 use uuid::Uuid;
 use humansize::{format_size, DECIMAL};
-use base64::{Engine as _, engine::general_purpose};
+use data_encoding::BASE64;
 
 use actix_web::HttpRequest;
 
@@ -44,20 +44,17 @@ pub fn hmac_sha1<'a>(
 }
 
 // base64 编码
-pub fn base64_encode(data: String) -> String {
-    let data = data.as_bytes();
-
-    general_purpose::STANDARD.encode(&data[..])
+pub fn base64_encode(data: &[u8]) -> String {
+    BASE64.encode(data)
 }
 
 // base64 解码
-pub fn base64_decode(data: String) -> String {
-    let res = general_purpose::STANDARD.decode(data).unwrap_or_default();
+pub fn base64_decode(data: String) -> Vec<u8> {
+    let data = data.as_bytes();
 
-    match String::from_utf8(res) {
-        Ok(v) => v,
-        Err(_) => "".to_string(),
-    }
+    let res = BASE64.decode(data).unwrap_or_default();
+
+    res
 }
 
 // uuid
