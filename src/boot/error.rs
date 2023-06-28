@@ -108,10 +108,8 @@ pub(crate) fn not_found<B>(
 fn get_error_response(req: &HttpRequest, error: &str) -> HttpResponse {
     if let Some(state) = req.app_data::<web::Data<AppState>>() {
         let mut view = state.view.clone();
-
-        let method = req.method();
         
-        if method == Method::POST {
+        if req.method() == Method::POST {
             return nako_http::error_response_json(error);
         }
         

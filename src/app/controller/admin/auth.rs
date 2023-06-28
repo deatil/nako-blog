@@ -77,7 +77,7 @@ pub async fn login(
 
     let mut ctx = nako_http::view_data();
 
-    if let Ok((pri_key, pub_key)) = rsa::generate_key() {
+    if let Ok((pri_key, pub_key)) = rsa::generate_key(1024) {
         let pub_key = pub_key.replace("-----BEGIN PUBLIC KEY-----", "")
             .replace("-----END PUBLIC KEY-----", "")
             .replace("\r\n", "")

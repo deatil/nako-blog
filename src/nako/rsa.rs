@@ -7,10 +7,9 @@ use rsa::{
     RsaPublicKey,
 };
 
-/// 生成证书
-pub fn generate_key() -> Result<(String, String)> {
+// 生成证书
+pub fn generate_key(bits: usize) -> Result<(String, String)> {
     let mut rng = rand::thread_rng();
-    let bits = 1024;
 
     let priv_key = RsaPrivateKey::new(&mut rng, bits)?;
     let pub_key = RsaPublicKey::from(&priv_key);
@@ -24,6 +23,7 @@ pub fn generate_key() -> Result<(String, String)> {
     Ok((priv_pem.to_string(), pub_pem.to_string()))
 }
 
+// 加密
 pub fn encrypt(pubkey: &str, data: &[u8]) -> Result<Vec<u8>> {
     let mut rng = rand::thread_rng();
 
@@ -36,6 +36,7 @@ pub fn encrypt(pubkey: &str, data: &[u8]) -> Result<Vec<u8>> {
     Ok("".into())
 }
 
+// 解密
 pub fn decrypt(privkey: &str, data: &[u8]) -> Result<Vec<u8>> {
     let priv_key = RsaPrivateKey::from_pkcs8_pem(privkey)?;
 
