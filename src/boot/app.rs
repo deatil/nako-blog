@@ -1,8 +1,3 @@
-use actix_session::{
-    SessionMiddleware,
-    storage::RedisSessionStore, 
-    config::PersistentSession,
-};
 use actix_web::{
     web, 
     App, 
@@ -23,6 +18,11 @@ use actix_web::{
     },
     HttpResponse,
 };
+use actix_session::{
+    SessionMiddleware,
+    storage::RedisSessionStore, 
+    config::PersistentSession,
+};
 use actix_files::Files as Fs;
 
 use tera::Tera;
@@ -38,7 +38,6 @@ use crate::nako::{
     log as nako_log,
     global::AppState,
 };
-
 use crate::boot::{
     error,
 };
@@ -47,7 +46,7 @@ use crate::route::{
     blog,
 };
 
-/// app 运行
+// app 运行
 pub async fn start() -> std::io::Result<()> {
     let rust_log = config::section::<String>("app", "rust_log", "error".to_string());
     std::env::set_var("RUST_LOG", rust_log.as_str());

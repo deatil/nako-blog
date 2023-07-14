@@ -51,14 +51,8 @@ pub async fn auth(
 
     let session = req.get_session();
 
-    let mut check = false;
-
     let login_id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
-    if login_id > 0 {
-        check = true;
-    }
-
-    if !check {
+    if login_id <= 0 {
         let message = "请先登陆";
 
         let url: String = utils::url_for_static(req.request().clone(), "admin.auth-login");
@@ -72,7 +66,7 @@ pub async fn auth(
             
             return Ok(req.into_response(res_body_data));
         }
-    }    
+    } 
 
     return to_next(req, next).await;
 }

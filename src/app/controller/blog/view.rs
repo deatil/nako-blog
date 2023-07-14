@@ -65,7 +65,11 @@ pub async fn index(
         let art_tags = tags_string.split(",").collect::<Vec<&str>>();
         ctx.insert("art_tags", &art_tags);
     }
-      
+  
+    // 添加阅读量
+    art::ArtModel::view_add(db, art.id, 1).await.unwrap_or_default();
+  
+    // 右侧数据
     let hot_arts = art::ArtModel::find_one_year_hot(db, 6).await.unwrap_or_default();
     let cates = cate::CateModel::find_open_cate(db).await.unwrap_or_default();
     let tags = tag::TagModel::find_open_tags(db, 6).await.unwrap_or_default();
@@ -73,9 +77,6 @@ pub async fn index(
     ctx.insert("hot_arts", &hot_arts);
     ctx.insert("cates", &cates);
     ctx.insert("tags", &tags);
-
-    // 添加阅读量
-    art::ArtModel::view_add(db, art.id, 1).await.unwrap_or_default();
 
     let mut tpl = cate_data.view_tpl.as_str();
     if tpl == "" {

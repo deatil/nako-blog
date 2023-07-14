@@ -19,7 +19,7 @@
             {% if art.cover %}
             <header>
                 <div class="lead-image">
-                    <img src="{{ art.cover }}" alt="{{ art.title }}" class="img-responsive">
+                    <img src="{{ art.cover | safe }}" alt="{{ art.title }}" class="img-responsive">
                 </div>
             </header>
             {% endif %}

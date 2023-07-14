@@ -71,15 +71,6 @@ pub fn route(cfg: &mut web::ServiceConfig) {
                     )
             )
             .service(
-                // 页面
-                web::scope("/p")
-                    .service(
-                        web::resource("/{slug}")
-                            .route(web::get().to(page::index))
-                            .name("blog.page-index"),
-                    )
-            )
-            .service(
                 // 评论
                 web::scope("/guestbook")
                     .service(
@@ -87,6 +78,15 @@ pub fn route(cfg: &mut web::ServiceConfig) {
                             .route(web::post().to(guestbook::create))
                             .name("blog.guestbook-create"),
                     ),
+            )
+            .service(
+                // 页面
+                web::scope("")
+                    .service(
+                        web::resource("/{slug}")
+                            .route(web::get().to(page::index))
+                            .name("blog.page-index"),
+                    )
             )
             .default_service(web::to(error::index))
             .wrap(from_fn(blog_settings::settings))
