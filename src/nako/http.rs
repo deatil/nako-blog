@@ -95,8 +95,8 @@ pub fn view(view: &mut tera::Tera, name: &str, ctx: &tera::Context) -> HttpRespo
     html(res_body)
 }
 
-// 返回失败 json
-pub fn success_response_json<T: Serialize>(message: &str, data: T) -> HttpResponse {
+// 返回成功 json
+pub fn success_json<T: Serialize>(message: &str, data: T) -> HttpResponse {
     let res_body: ResponseEntity<T> = ResponseEntity {
         status: Status::SUCCESS,
         code: 0,
@@ -107,8 +107,8 @@ pub fn success_response_json<T: Serialize>(message: &str, data: T) -> HttpRespon
     json(res_body)
 }
 
-// 返回成功 json
-pub fn error_response_json(message: &str) -> HttpResponse {
+// 返回失败 json
+pub fn error_json(message: &str) -> HttpResponse {
     let res_body: ResponseEntity<String> = ResponseEntity {
         status: Status::FAIL,
         code: 1,
@@ -120,7 +120,7 @@ pub fn error_response_json(message: &str) -> HttpResponse {
 }
 
 // 返回失败页面
-pub fn error_response_html(t: &mut tera::Tera, message: &str, url: &str) -> HttpResponse {
+pub fn error_html(t: &mut tera::Tera, message: &str, url: &str) -> HttpResponse {
     let mut new_url = url;
     if new_url == "back" {
         new_url = "javascript:history.back(-1);";

@@ -72,14 +72,14 @@ pub async fn create(
 
     let vali = vali_data.validate();
     if vali.is_err() {
-        return Ok(nako_http::error_response_json(format!("{}", vali.unwrap_err()).as_str()));
+        return Ok(nako_http::error_json(format!("{}", vali.unwrap_err()).as_str()));
     }
 
     // 文章详情
     let art = art::ArtModel::find_by_uuid(db, uuid.as_str())
         .await.unwrap_or_default().unwrap_or_default();
     if art.id == 0 {
-        return Ok(nako_http::error_response_json("文章不存在"));
+        return Ok(nako_http::error_json("文章不存在"));
     }
 
     let add_time = time::now().timestamp();
@@ -100,10 +100,10 @@ pub async fn create(
             ..entity::default()
         }).await;
     if create_data.is_err() {
-        return Ok(nako_http::error_response_json("提交回复失败"));
+        return Ok(nako_http::error_json("提交回复失败"));
     }
 
-    Ok(nako_http::success_response_json("提交回复成功", ""))
+    Ok(nako_http::success_json("提交回复成功", ""))
 }
 
 

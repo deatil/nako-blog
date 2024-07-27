@@ -42,7 +42,7 @@ pub async fn check(
 
     let method = req.method();
     if method == Method::POST {
-        return Ok(req.into_response(nako_http::error_response_json(error)));
+        return Ok(req.into_response(nako_http::error_json(error)));
     }
 
     let res_body_data = service::http::error_blog_html(&mut view, error, "");

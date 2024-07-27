@@ -1,3 +1,4 @@
+pub mod table;
 pub mod art;
 pub mod attach;
 pub mod cate;

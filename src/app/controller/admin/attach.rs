@@ -93,7 +93,7 @@ pub async fn list(
         count: count,
     };
 
-    Ok(nako_http::success_response_json("获取成功", res))
+    Ok(nako_http::success_json("获取成功", res))
 }
 
 // ==========================
@@ -141,17 +141,17 @@ pub async fn delete(
     let db = &state.db;
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_json("ID不能为空"));
+        return Ok(nako_http::error_json("ID不能为空"));
     }
 
     let data = attach::AttachModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if data.id == 0 {
-        return Ok(nako_http::error_response_json("要删除的附件不存在"));
+        return Ok(nako_http::error_json("要删除的附件不存在"));
     }
 
     let status = attach::AttachModel::delete(db, query.id).await;
     if status.is_err() {
-        return Ok(nako_http::error_response_json("删除失败"));
+        return Ok(nako_http::error_json("删除失败"));
     }
 
     let mut upload_path = upload_path(data.path.clone());
@@ -161,7 +161,7 @@ pub async fn delete(
 
     fs::remove_file(upload_path).unwrap_or_default();
 
-    Ok(nako_http::success_response_json("删除成功", ""))
+    Ok(nako_http::success_json("删除成功", ""))
 }
 
 // ==========================

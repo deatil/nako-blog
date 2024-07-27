@@ -118,7 +118,7 @@ pub async fn login_check(
 ) -> Result<HttpResponse, Error> {
     let login_id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
     if login_id > 0 {
-        return Ok(nako_http::error_response_json("你已经登陆了"));
+        return Ok(nako_http::error_json("你已经登陆了"));
     }
 
     let vali_data = LoginValidate{
@@ -129,19 +129,19 @@ pub async fn login_check(
 
     let vali = vali_data.validate();
     if vali.is_err() {
-        return Ok(nako_http::error_response_json(format!("{}", vali.unwrap_err()).as_str()));
+        return Ok(nako_http::error_json(format!("{}", vali.unwrap_err()).as_str()));
     }
 
     let auth_captcha = session.get::<String>("auth_captcha").unwrap_or_default().unwrap_or_default();
     if params.captcha.to_uppercase() != auth_captcha.to_uppercase() {
-        return Ok(nako_http::error_response_json("验证码错误"));
+        return Ok(nako_http::error_json("验证码错误"));
     }
 
     let db = &state.db;
     let user_info = user::UserModel::find_user_by_name(db, params.name.as_str()).await.unwrap_or_default().unwrap_or_default();
     
     if user_info.id == 0 {
-        return Ok(nako_http::error_response_json("账号或者密码错误"));
+        return Ok(nako_http::error_json("账号或者密码错误"));
     }
 
     let pass = user_info.password.unwrap_or("".to_string());
@@ -157,21 +157,21 @@ pub async fn login_check(
 
     // 验证密码
     if !nako_auth::password_verify(depass.as_str(), pass.as_str()) {
-        return Ok(nako_http::error_response_json("账号或者密码错误"));
+        return Ok(nako_http::error_json("账号或者密码错误"));
     }
 
     let status = user_info.status.unwrap_or(0);
     if status == 0 {
-        return Ok(nako_http::error_response_json("账号不存在或者已被禁用"));
+        return Ok(nako_http::error_json("账号不存在或者已被禁用"));
     }
 
     if session.insert("login_id", user_info.id).is_err() {
-        return Ok(nako_http::error_response_json("登陆失败"));
+        return Ok(nako_http::error_json("登陆失败"));
     }
 
     session.remove(AUTH_KEY);
 
-    Ok(nako_http::success_response_json("登陆成功", ""))
+    Ok(nako_http::success_json("登陆成功", ""))
 }
 
 // 退出

@@ -92,7 +92,7 @@ pub async fn file(
 
         let mut buffer = Vec::new();
         if f.file.read_to_end(&mut buffer).is_err() {
-            return Ok(nako_http::error_response_json("上传失败"));
+            return Ok(nako_http::error_json("上传失败"));
         }
 
         let contents = String::from_utf8_lossy(&buffer).to_string();
@@ -111,7 +111,7 @@ pub async fn file(
         }
 
         if f.file.persist(path.clone()).is_err() {
-            return Ok(nako_http::error_response_json("上传失败"));
+            return Ok(nako_http::error_json("上传失败"));
         }
 
         let create_data = attach::AttachModel::create(db, attach_entity::Model{
@@ -135,11 +135,11 @@ pub async fn file(
         } else {
             if let Ok(_) = fs::remove_file(path.clone()) {}
 
-            return Ok(nako_http::error_response_json("上传失败"));
+            return Ok(nako_http::error_json("上传失败"));
         }
     }
 
-    Ok(nako_http::success_response_json("上传成功", res))
+    Ok(nako_http::success_json("上传成功", res))
 }
 
 // =================
@@ -193,7 +193,7 @@ pub async fn image(
 
         let mut buffer = Vec::new();
         if f.file.read_to_end(&mut buffer).is_err() {
-            return Ok(nako_http::error_response_json("上传失败"));
+            return Ok(nako_http::error_json("上传失败"));
         }
 
         let contents = String::from_utf8_lossy(&buffer).to_string();
@@ -213,7 +213,7 @@ pub async fn image(
         }
 
         if f.file.persist(path.clone()).is_err() {
-            return Ok(nako_http::error_response_json("上传失败"));
+            return Ok(nako_http::error_json("上传失败"));
         }
 
         let create_data = attach::AttachModel::create(db, attach_entity::Model{
@@ -238,11 +238,11 @@ pub async fn image(
         } else {
             if let Ok(_) = fs::remove_file(path.clone()) {}
 
-            return Ok(nako_http::error_response_json("上传失败"));
+            return Ok(nako_http::error_json("上传失败"));
         }
     }
 
-    Ok(nako_http::success_response_json("上传成功", res))
+    Ok(nako_http::success_json("上传成功", res))
 }
 
 // =================
@@ -270,7 +270,7 @@ pub async fn avatar(
     };
 
     if file_name.as_str() == "" {
-        return Ok(nako_http::error_response_json("上传失败"));
+        return Ok(nako_http::error_json("上传失败"));
     }
 
     let avatar_dir = upload_path("avatar/".to_string());
@@ -292,12 +292,12 @@ pub async fn avatar(
     let url = upload_url(name.clone());
 
     if form.file.file.persist(path.clone()).is_err() {
-        return Ok(nako_http::error_response_json("上传失败"));
+        return Ok(nako_http::error_json("上传失败"));
     }
 
     let res = AvatarData{
         url: url,
     };
     
-    Ok(nako_http::success_response_json("上传成功", res))
+    Ok(nako_http::success_json("上传成功", res))
 }

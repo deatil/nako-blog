@@ -64,7 +64,7 @@ pub async fn create(
 
     let vali = vali_data.validate();
     if vali.is_err() {
-        return Ok(nako_http::error_response_json(format!("{}", vali.unwrap_err()).as_str()));
+        return Ok(nako_http::error_json(format!("{}", vali.unwrap_err()).as_str()));
     }
 
     let add_time = time::now().timestamp();
@@ -84,10 +84,10 @@ pub async fn create(
             ..entity::default()
         }).await;
     if create_data.is_err() {
-        return Ok(nako_http::error_response_json("提交留言失败"));
+        return Ok(nako_http::error_json("提交留言失败"));
     }
 
-    Ok(nako_http::success_response_json("提交留言成功", ""))
+    Ok(nako_http::success_json("提交留言成功", ""))
 }
 
 

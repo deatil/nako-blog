@@ -110,10 +110,10 @@ fn get_error_response(req: &HttpRequest, error: &str) -> HttpResponse {
         let mut view = state.view.clone();
         
         if req.method() == Method::POST {
-            return nako_http::error_response_json(error);
+            return nako_http::error_json(error);
         }
         
-        return nako_http::error_response_html(&mut view, error, "");
+        return nako_http::error_html(&mut view, error, "");
     }
 
     nako_http::text(error.to_string())

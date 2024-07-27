@@ -85,7 +85,7 @@ pub async fn list(
         count: count,
     };
 
-    Ok(nako_http::success_response_json("获取成功", res))
+    Ok(nako_http::success_json("获取成功", res))
 }
 
 // ==========================
@@ -145,17 +145,17 @@ pub async fn create_save(
     params: web::Form<CreateForm>,
 ) -> Result<HttpResponse, Error> {
     if params.name.as_str() == "" {
-        return Ok(nako_http::error_response_json("标签不能为空"));
+        return Ok(nako_http::error_json("标签不能为空"));
     }
     if params.status != 0 && params.status != 1  {
-        return Ok(nako_http::error_response_json("状态不能为空"));
+        return Ok(nako_http::error_json("状态不能为空"));
     }
 
     let db = &state.db;
 
     let data = tag::TagModel::find_by_name(db, params.name.as_str()).await.unwrap_or_default().unwrap_or_default();
     if data.id > 0 {
-        return Ok(nako_http::error_response_json("标签已经存在"));
+        return Ok(nako_http::error_json("标签已经存在"));
     }
 
     let add_time = time::now().timestamp();
@@ -175,10 +175,10 @@ pub async fn create_save(
             ..entity::default()
         }).await;
     if create_data.is_ok() {
-        return Ok(nako_http::success_response_json("添加成功", ""));
+        return Ok(nako_http::success_json("添加成功", ""));
     }
 
-    Ok(nako_http::error_response_json("添加失败"))
+    Ok(nako_http::error_json("添加失败"))
 }
 
 // ==========================
@@ -237,7 +237,7 @@ pub async fn update_save(
     params: web::Form<UpdateForm>,
 ) -> Result<HttpResponse, Error> {
     if query.id == 0 {
-        return Ok(nako_http::error_response_json("ID不能为空"));
+        return Ok(nako_http::error_json("ID不能为空"));
     }
 
     let vali_data = UpdateValidate{
@@ -248,20 +248,20 @@ pub async fn update_save(
 
     let vali = vali_data.validate();
     if vali.is_err() {
-        return Ok(nako_http::error_response_json(format!("{}", vali.unwrap_err()).as_str()));
+        return Ok(nako_http::error_json(format!("{}", vali.unwrap_err()).as_str()));
     }
 
     let db = &state.db;
 
     let info = tag::TagModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if info.id == 0 {
-        return Ok(nako_http::error_response_json("要更改的标签不存在"));
+        return Ok(nako_http::error_json("要更改的标签不存在"));
     }
 
     let info_by_name = tag::TagModel::find_by_name(db, params.name.as_str()).await.unwrap_or_default().unwrap_or_default();
     if info_by_name.id > 0 {
         if info.id != info_by_name.id {
-            return Ok(nako_http::error_response_json("标签标识已经存在"));
+            return Ok(nako_http::error_json("标签标识已经存在"));
         }
     }
 
@@ -275,10 +275,10 @@ pub async fn update_save(
         })
         .await;
     if data.is_err() {
-        return Ok(nako_http::error_response_json("更新失败"));
+        return Ok(nako_http::error_json("更新失败"));
     }
 
-    Ok(nako_http::success_response_json("更新成功", ""))
+    Ok(nako_http::success_json("更新成功", ""))
 }
 
 // ==========================
@@ -296,20 +296,20 @@ pub async fn delete(
     let db = &state.db;
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_json("ID不能为空"));
+        return Ok(nako_http::error_json("ID不能为空"));
     }
 
     let data = tag::TagModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if data.id == 0 {
-        return Ok(nako_http::error_response_json("要删除的标签不存在"));
+        return Ok(nako_http::error_json("要删除的标签不存在"));
     }
 
     let delete_data = tag::TagModel::delete(db, query.id).await;
     if delete_data.is_err() {
-        return Ok(nako_http::error_response_json("删除失败"));
+        return Ok(nako_http::error_json("删除失败"));
     }
 
-    Ok(nako_http::success_response_json("删除成功", ""))
+    Ok(nako_http::success_json("删除成功", ""))
 }
 
 // ==========================
@@ -334,16 +334,16 @@ pub async fn update_status(
     let db = &state.db;
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_json("ID不能为空"));
+        return Ok(nako_http::error_json("ID不能为空"));
     }
 
     if params.status != 0 && params.status != 1  {
-        return Ok(nako_http::error_response_json("状态不能为空"));
+        return Ok(nako_http::error_json("状态不能为空"));
     }
 
     let data = tag::TagModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if data.id == 0 {
-        return Ok(nako_http::error_response_json("要更改的标签不存在"));
+        return Ok(nako_http::error_json("要更改的标签不存在"));
     }
 
     // 更新
@@ -353,9 +353,9 @@ pub async fn update_status(
         })
         .await;
     if status.is_err() {
-        return Ok(nako_http::error_response_json("更新失败"));
+        return Ok(nako_http::error_json("更新失败"));
     }
 
-    Ok(nako_http::success_response_json("更新成功", ""))
+    Ok(nako_http::success_json("更新成功", ""))
 }
 

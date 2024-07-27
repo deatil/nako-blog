@@ -88,7 +88,7 @@ pub async fn list(
         count: count,
     };
 
-    Ok(nako_http::success_response_json("获取成功", res))
+    Ok(nako_http::success_json("获取成功", res))
 }
 
 // ==========================
@@ -136,20 +136,20 @@ pub async fn delete(
     let db = &state.db;
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_json("ID不能为空"));
+        return Ok(nako_http::error_json("ID不能为空"));
     }
 
     let data = comment::CommentModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if data.id == 0 {
-        return Ok(nako_http::error_response_json("要删除的评论不存在"));
+        return Ok(nako_http::error_json("要删除的评论不存在"));
     }
 
     let delete_data = comment::CommentModel::delete(db, query.id).await;
     if delete_data.is_err() {
-        return Ok(nako_http::error_response_json("删除失败"));
+        return Ok(nako_http::error_json("删除失败"));
     }
 
-    Ok(nako_http::success_response_json("删除成功", ""))
+    Ok(nako_http::success_json("删除成功", ""))
 }
 
 // ==========================
@@ -167,7 +167,7 @@ pub async fn batch_delete(
     let db = &state.db;
 
     if params.ids.as_str() == "" {
-        return Ok(nako_http::error_response_json("未选中数据"));
+        return Ok(nako_http::error_json("未选中数据"));
     }
 
     let ids = params.ids.split(",").collect::<Vec<&str>>();
@@ -181,7 +181,7 @@ pub async fn batch_delete(
         }
     }
 
-    Ok(nako_http::success_response_json("批量删除成功", ""))
+    Ok(nako_http::success_json("批量删除成功", ""))
 }
 
 // ==========================
@@ -206,16 +206,16 @@ pub async fn update_status(
     let db = &state.db;
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_json("ID不能为空"));
+        return Ok(nako_http::error_json("ID不能为空"));
     }
 
     if params.status != 0 && params.status != 1  {
-        return Ok(nako_http::error_response_json("状态不能为空"));
+        return Ok(nako_http::error_json("状态不能为空"));
     }
 
     let data = comment::CommentModel::find_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if data.id == 0 {
-        return Ok(nako_http::error_response_json("要更改的评论不存在"));
+        return Ok(nako_http::error_json("要更改的评论不存在"));
     }
 
     // 更新
@@ -225,9 +225,9 @@ pub async fn update_status(
         })
         .await;
     if status.is_err() {
-        return Ok(nako_http::error_response_json("更新失败"));
+        return Ok(nako_http::error_json("更新失败"));
     }
 
-    Ok(nako_http::success_response_json("更新成功", ""))
+    Ok(nako_http::success_json("更新成功", ""))
 }
 

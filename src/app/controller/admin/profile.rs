@@ -62,23 +62,23 @@ pub async fn update_info_save(
     let db = &state.db;
 
     if params.username.as_str() == "" {
-        return Ok(nako_http::error_response_json("账号不能为空"));
+        return Ok(nako_http::error_json("账号不能为空"));
     }
     if params.nickname.as_str() == "" {
-        return Ok(nako_http::error_response_json("昵称不能为空"));
+        return Ok(nako_http::error_json("昵称不能为空"));
     }
 
     let id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
 
     let user_info = user::UserModel::find_user_by_id(db, id).await.unwrap_or_default().unwrap_or_default();
     if user_info.id == 0 {
-        return Ok(nako_http::error_response_json("账号不存在"));
+        return Ok(nako_http::error_json("账号不存在"));
     }
 
     let user_info_by_name = user::UserModel::find_user_by_name(db, params.username.as_str()).await.unwrap_or_default().unwrap_or_default();
     if user_info_by_name.id > 0 {
         if user_info_by_name.id != user_info.id {
-            return Ok(nako_http::error_response_json("账号已经存在"));
+            return Ok(nako_http::error_json("账号已经存在"));
         }
     }
 
@@ -92,10 +92,10 @@ pub async fn update_info_save(
         })
         .await;
     if user_data.is_err() {
-        return Ok(nako_http::error_response_json("更新失败"));
+        return Ok(nako_http::error_json("更新失败"));
     }
 
-    Ok(nako_http::success_response_json("更新成功", ""))
+    Ok(nako_http::success_json("更新成功", ""))
 }
 
 // ==========================
@@ -128,16 +128,16 @@ pub async fn update_password_save(
     let db = &state.db;
 
     if params.old_password.as_str() == "" {
-        return Ok(nako_http::error_response_json("旧密码不能为空"));
+        return Ok(nako_http::error_json("旧密码不能为空"));
     }
     if params.new_password.as_str() == "" {
-        return Ok(nako_http::error_response_json("新密码不能为空"));
+        return Ok(nako_http::error_json("新密码不能为空"));
     }
     if params.new_password2.as_str() == "" {
-        return Ok(nako_http::error_response_json("确认密码不能为空"));
+        return Ok(nako_http::error_json("确认密码不能为空"));
     }
     if params.new_password2 != params.new_password {
-        return Ok(nako_http::error_response_json("确认密码不一致"));
+        return Ok(nako_http::error_json("确认密码不一致"));
     }
 
     let mut id: u32 = 0;
@@ -147,18 +147,18 @@ pub async fn update_password_save(
 
     let user_info = user::UserModel::find_user_by_id(db, id).await.unwrap_or_default().unwrap_or_default();
     if user_info.id == 0 {
-        return Ok(nako_http::error_response_json("更改密码失败"));
+        return Ok(nako_http::error_json("更改密码失败"));
     }
 
     let pass = user_info.password.unwrap_or("".to_string());
 
     if !nako_auth::password_verify(params.old_password.as_str(), pass.as_str()) {
-        return Ok(nako_http::error_response_json("账号旧密码错误"));
+        return Ok(nako_http::error_json("账号旧密码错误"));
     }
 
     let new_hashed_password = nako_auth::password_hash(params.new_password.as_str());
     if new_hashed_password.as_str() == "" {
-        return Ok(nako_http::error_response_json("更改密码失败"));
+        return Ok(nako_http::error_json("更改密码失败"));
     }
 
     // 更新
@@ -168,10 +168,10 @@ pub async fn update_password_save(
         })
         .await;
     if new_user_data.is_err() {
-        return Ok(nako_http::error_response_json("更改密码失败"));
+        return Ok(nako_http::error_json("更改密码失败"));
     }
 
-    Ok(nako_http::success_response_json("更新密码成功", ""))
+    Ok(nako_http::success_json("更新密码成功", ""))
 }
 
 // ==========================
@@ -202,7 +202,7 @@ pub async fn update_avatar_save(
     let db = &state.db;
 
     if params.avatar.as_str() == "" {
-        return Ok(nako_http::error_response_json("头像数据不能为空"));
+        return Ok(nako_http::error_json("头像数据不能为空"));
     }
 
     let mut id: u32 = 0;
@@ -212,7 +212,7 @@ pub async fn update_avatar_save(
 
     let user_info = user::UserModel::find_user_by_id(db, id).await.unwrap_or_default().unwrap_or_default();
     if user_info.id == 0 {
-        return Ok(nako_http::error_response_json("更改头像失败"));
+        return Ok(nako_http::error_json("更改头像失败"));
     }
 
     // 更新
@@ -222,8 +222,8 @@ pub async fn update_avatar_save(
         })
         .await;
     if new_user_data.is_err() {
-        return Ok(nako_http::error_response_json("更改头像失败"));
+        return Ok(nako_http::error_json("更改头像失败"));
     }
 
-    Ok(nako_http::success_response_json("更改头像成功", ""))
+    Ok(nako_http::success_json("更改头像成功", ""))
 }

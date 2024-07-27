@@ -89,7 +89,7 @@ pub async fn list(
         count: count,
     };
 
-    Ok(nako_http::success_response_json("获取成功", res))
+    Ok(nako_http::success_json("获取成功", res))
 }
 
 // ==========================
@@ -151,20 +151,20 @@ pub async fn create_save(
     params: web::Form<CreateForm>,
 ) -> Result<HttpResponse, Error> {
     if params.username.as_str() == "" {
-        return Ok(nako_http::error_response_json("账号不能为空"));
+        return Ok(nako_http::error_json("账号不能为空"));
     }
     if params.nickname.as_str() == "" {
-        return Ok(nako_http::error_response_json("昵称不能为空"));
+        return Ok(nako_http::error_json("昵称不能为空"));
     }
     if params.status != 0 && params.status != 1  {
-        return Ok(nako_http::error_response_json("状态不能为空"));
+        return Ok(nako_http::error_json("状态不能为空"));
     }
 
     let db = &state.db;
 
     let user_data = user::UserModel::find_user_by_name(db, params.username.as_str()).await.unwrap_or_default().unwrap_or_default();
     if user_data.id > 0 {
-        return Ok(nako_http::error_response_json("账号已经存在"));
+        return Ok(nako_http::error_json("账号已经存在"));
     }
 
     let add_time = time::now().timestamp();
@@ -184,10 +184,10 @@ pub async fn create_save(
             ..entity::default()
         }).await;
     if let Ok(_) = create_data {
-        return Ok(nako_http::success_response_json("添加成功", ""));
+        return Ok(nako_http::success_json("添加成功", ""));
     }
 
-    Ok(nako_http::error_response_json("添加失败"))
+    Ok(nako_http::error_json("添加失败"))
 }
 
 // ==========================
@@ -238,27 +238,27 @@ pub async fn update_save(
     session: Session, 
 ) -> Result<HttpResponse, Error> {
     if query.id == 0 {
-        return Ok(nako_http::error_response_json("ID不能为空"));
+        return Ok(nako_http::error_json("ID不能为空"));
     }
 
     if params.username.as_str() == "" {
-        return Ok(nako_http::error_response_json("账号不能为空"));
+        return Ok(nako_http::error_json("账号不能为空"));
     }
     if params.nickname.as_str() == "" {
-        return Ok(nako_http::error_response_json("昵称不能为空"));
+        return Ok(nako_http::error_json("昵称不能为空"));
     }
     if params.status != 0 && params.status != 1  {
-        return Ok(nako_http::error_response_json("状态不能为空"));
+        return Ok(nako_http::error_json("状态不能为空"));
     }
 
     let admin_id: u32 = app::get_admin_id();
     if admin_id == query.id {
-        return Ok(nako_http::error_response_json("当前账号不能被修改"));
+        return Ok(nako_http::error_json("当前账号不能被修改"));
     }
 
     if let Some(login_id) = session.get::<u32>("login_id")? {
         if login_id == query.id {
-            return Ok(nako_http::error_response_json("你不能修改你自己"));
+            return Ok(nako_http::error_json("你不能修改你自己"));
         }
     } 
 
@@ -266,13 +266,13 @@ pub async fn update_save(
 
     let user_info = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if user_info.id == 0 {
-        return Ok(nako_http::error_response_json("要更改的账号不存在"));
+        return Ok(nako_http::error_json("要更改的账号不存在"));
     }
 
     let user_info_by_name = user::UserModel::find_user_by_name(db, params.username.as_str()).await.unwrap_or_default().unwrap_or_default();
     if user_info_by_name.id > 0 {
         if user_info.id != user_info_by_name.id {
-            return Ok(nako_http::error_response_json("账号已经存在"));
+            return Ok(nako_http::error_json("账号已经存在"));
         }
     }
 
@@ -286,10 +286,10 @@ pub async fn update_save(
         })
         .await;
     if user_data.is_err() {
-        return Ok(nako_http::error_response_json("更新失败"));
+        return Ok(nako_http::error_json("更新失败"));
     }
 
-    Ok(nako_http::success_response_json("更新成功", ""))
+    Ok(nako_http::success_json("更新成功", ""))
 }
 
 // ==========================
@@ -308,30 +308,30 @@ pub async fn delete(
     let db = &state.db;
 
     if query.id == 0 {
-        return Ok(nako_http::error_response_json("ID不能为空"));
+        return Ok(nako_http::error_json("ID不能为空"));
     }
 
     let admin_id: u32 = app::get_admin_id();
     if admin_id == query.id {
-        return Ok(nako_http::error_response_json("当前账号不能被删除"));
+        return Ok(nako_http::error_json("当前账号不能被删除"));
     }
 
     let login_id = session.get::<u32>("login_id").unwrap_or_default().unwrap_or_default();
     if login_id == query.id {
-        return Ok(nako_http::error_response_json("你不能删除你自己"));
+        return Ok(nako_http::error_json("你不能删除你自己"));
     }
 
     let user_data = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if user_data.id == 0 {
-        return Ok(nako_http::error_response_json("要删除的账号不存在"));
+        return Ok(nako_http::error_json("要删除的账号不存在"));
     }
 
     let delete_data = user::UserModel::delete_user(db, query.id).await;
     if delete_data.is_err() {
-        return Ok(nako_http::error_response_json("删除失败"));
+        return Ok(nako_http::error_json("删除失败"));
     }
 
-    Ok(nako_http::success_response_json("删除成功", ""))
+    Ok(nako_http::success_json("删除成功", ""))
 }
 
 // ==========================
@@ -355,21 +355,21 @@ pub async fn update_status(
     session: Session, 
 ) -> Result<HttpResponse, Error> {
     if query.id == 0 {
-        return Ok(nako_http::error_response_json("ID不能为空"));
+        return Ok(nako_http::error_json("ID不能为空"));
     }
 
     if params.status != 0 && params.status != 1  {
-        return Ok(nako_http::error_response_json("状态不能为空"));
+        return Ok(nako_http::error_json("状态不能为空"));
     }
 
     let admin_id: u32 = app::get_admin_id();
     if admin_id == query.id {
-        return Ok(nako_http::error_response_json("当前账号不能被修改"));
+        return Ok(nako_http::error_json("当前账号不能被修改"));
     }
 
     if let Some(login_id) = session.get::<u32>("login_id")? {
         if login_id == query.id {
-            return Ok(nako_http::error_response_json("你不能修改你自己"));
+            return Ok(nako_http::error_json("你不能修改你自己"));
         }
     } 
 
@@ -377,7 +377,7 @@ pub async fn update_status(
 
     let user_data = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if user_data.id == 0 {
-        return Ok(nako_http::error_response_json("要更改的账号不存在"));
+        return Ok(nako_http::error_json("要更改的账号不存在"));
     }
 
     // 更新
@@ -387,10 +387,10 @@ pub async fn update_status(
         })
         .await;
     if user_data.is_err() {
-        return Ok(nako_http::error_response_json("更新失败"));
+        return Ok(nako_http::error_json("更新失败"));
     }
 
-    Ok(nako_http::success_response_json("更新成功", ""))
+    Ok(nako_http::success_json("更新成功", ""))
 }
 
 // ==========================
@@ -438,21 +438,21 @@ pub async fn update_password_save(
     session: Session, 
 ) -> Result<HttpResponse, Error> {
     if query.id == 0 {
-        return Ok(nako_http::error_response_json("ID不能为空"));
+        return Ok(nako_http::error_json("ID不能为空"));
     }
 
     if params.password.as_str() == "" {
-        return Ok(nako_http::error_response_json("密码不能为空"));
+        return Ok(nako_http::error_json("密码不能为空"));
     }
 
     let admin_id: u32 = app::get_admin_id();
     if admin_id == query.id {
-        return Ok(nako_http::error_response_json("当前账号不能被修改"));
+        return Ok(nako_http::error_json("当前账号不能被修改"));
     }
 
     if let Some(login_id) = session.get::<u32>("login_id")? {
         if login_id == query.id {
-            return Ok(nako_http::error_response_json("你不能修改你自己"));
+            return Ok(nako_http::error_json("你不能修改你自己"));
         }
     } 
 
@@ -460,12 +460,12 @@ pub async fn update_password_save(
 
     let user_info = user::UserModel::find_user_by_id(db, query.id).await.unwrap_or_default().unwrap_or_default();
     if user_info.id == 0 {
-        return Ok(nako_http::error_response_json("要更改的账号不存在"));
+        return Ok(nako_http::error_json("要更改的账号不存在"));
     }
 
     let new_password = nako_auth::password_hash(params.password.as_str());
     if new_password.as_str() == "" {
-        return Ok(nako_http::error_response_json("更改密码失败"));
+        return Ok(nako_http::error_json("更改密码失败"));
     }
 
     // 更新
@@ -475,8 +475,8 @@ pub async fn update_password_save(
         })
         .await;
     if new_user_data.is_err() {
-        return Ok(nako_http::error_response_json("更新失败"));
+        return Ok(nako_http::error_json("更新失败"));
     }
 
-    Ok(nako_http::success_response_json("更新成功", ""))
+    Ok(nako_http::success_json("更新成功", ""))
 }

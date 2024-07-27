@@ -28,7 +28,7 @@ pub async fn index(
 
     let method = req.method();
     if method == Method::POST {
-        return Ok(nako_http::error_response_json(error));
+        return Ok(nako_http::error_json(error));
     }
     
     let mut ctx = nako_http::view_data();

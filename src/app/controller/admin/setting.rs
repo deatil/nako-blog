@@ -58,12 +58,12 @@ pub async fn setting_save(
                 })
                 .await;
             if status.is_err() {
-                return Ok(nako_http::error_response_json("更新失败"));
+                return Ok(nako_http::error_json("更新失败"));
             }
         }
     }
 
     service::setting::clear(&mut state.get_ref().clone()).await;
 
-    Ok(nako_http::success_response_json("更新成功", ""))
+    Ok(nako_http::success_json("更新成功", ""))
 }

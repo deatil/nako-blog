@@ -58,7 +58,7 @@ pub async fn auth(
         let url: String = utils::url_for_static(req.request().clone(), "admin.auth-login");
 
         if req.method() == Method::POST {
-            let res_body_data = http::error_response_json(message);
+            let res_body_data = http::error_json(message);
             
             return Ok(req.into_response(res_body_data));
         } else {
