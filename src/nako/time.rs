@@ -23,7 +23,6 @@ pub fn timezone() -> Tz {
 // 当前时间
 pub fn now() -> DateTime<Tz> {
     let tz = timezone();
-
     Utc::now().with_timezone(&tz)
 }
 
@@ -32,7 +31,6 @@ pub fn parse(d: &str) -> DateTime<Tz> {
     let tz = timezone();
 
     let date = NaiveDateTime::parse_from_str(d, "%Y-%m-%d %H:%M:%S").unwrap_or_default();
-
     tz.from_utc_datetime(&date)
 }
 
@@ -40,7 +38,6 @@ pub fn parse(d: &str) -> DateTime<Tz> {
 pub fn from_timestamp(t: i64) -> DateTime<Tz> {
     let tz = timezone();
 
-    let date = NaiveDateTime::from_timestamp_opt(t, 0).unwrap_or_default();
-
-    tz.from_utc_datetime(&date)
+    let date = DateTime::from_timestamp(t, 0).unwrap_or_default();
+    date.with_timezone(&tz)
 }
