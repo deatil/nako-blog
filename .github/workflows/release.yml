@@ -1,17 +1,20 @@
- name: Release
+name: Release
 
 on:
   release:
     types: [created]
 
+permissions:
+    contents: write
+    packages: write
+
 jobs:
-  release:
+  build_linux:
     name: Create Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
